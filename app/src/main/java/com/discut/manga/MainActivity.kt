@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint
+import manga.core.preference.PreferenceManager
 import manga.extension.ExtensionManager
 import javax.inject.Inject
 
@@ -11,9 +12,12 @@ import javax.inject.Inject
 class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var extensionManager: ExtensionManager
+
+    @Inject
+    lateinit var appPreference: PreferenceManager
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        Toast.makeText(this, extensionManager.getString(), Toast.LENGTH_LONG).show()
+        Toast.makeText(this, appPreference.getString(), Toast.LENGTH_LONG).show()
     }
 }
