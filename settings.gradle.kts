@@ -16,3 +16,6 @@ dependencyResolutionManagement {
 rootProject.name = "Manga"
 include(":app")
 include(":source-api")
+include(":core")
+include(":extension")
+include(":preference")
