@@ -33,4 +33,6 @@ class PreferenceManager @Inject constructor(@ApplicationContext private val cont
         throw IllegalArgumentException("${T::class.java.simpleName} not found")
     }
 
+    companion object
+
 }

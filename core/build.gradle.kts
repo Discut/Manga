@@ -42,7 +42,7 @@ dependencies {
 
     // for DI
     implementation("com.google.dagger:hilt-android:2.48.1")
-    kapt("com.google.dagger:hilt-android-compiler:2.44")
+    kapt("com.google.dagger:hilt-android-compiler:2.48.1")
 
     implementation("androidx.preference:preference-ktx:1.2.1")
 

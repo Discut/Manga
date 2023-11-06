@@ -18,5 +18,5 @@ abstract class BaseActivity : AppCompatActivity(),
     /**
      * Judge whether to automatically register the security activity
      */
-    private fun isAutoRegisterSecurityActivity(): Boolean = true
+    protected open fun isAutoRegisterSecurityActivity(): Boolean = true
 }
