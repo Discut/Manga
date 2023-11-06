@@ -19,8 +19,8 @@ class MainActivity : BaseActivity() {
         Toast.makeText(this, securityPreference.useAuthenticator().toString(), Toast.LENGTH_LONG)
             .show()
 
-        /*setComposeContent {
+        setComposeContent {
 
-        }*/
+        }
     }
 }
