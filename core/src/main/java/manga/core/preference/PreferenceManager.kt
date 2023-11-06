@@ -24,17 +24,13 @@ class PreferenceManager @Inject constructor(@ApplicationContext private val cont
             }
         }
         T::class.constructors.forEach {
-            if (it.parameters.size == 1 && it.parameters[0].type == SharedPreferences::class.java) {
+            if (it.parameters.size == 1 && it.parameters[0].type.classifier == SharedPreferences::class) {
                 val preference = it.call(appPreference)
                 preferencesMap[T::class.java.simpleName] = preference
                 return@getPreferences preference
             }
         }
         throw IllegalArgumentException("${T::class.java.simpleName} not found")
-    }
-
-    fun getString(): String {
-        return "PreferenceManager"
     }
 
 }
