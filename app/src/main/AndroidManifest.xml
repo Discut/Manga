@@ -19,8 +19,9 @@
         android:theme="@style/Theme.Manga"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.main.MainActivity"
             android:exported="true"
+            android:launchMode="singleTop"
             android:theme="@style/Theme.Manga">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

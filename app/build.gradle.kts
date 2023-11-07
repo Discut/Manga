@@ -84,6 +84,14 @@ dependencies {
     // for DI
     implementation("com.google.dagger:hilt-android:2.48.1")
 
+    // lifecycle
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
+
+    // navigation
+    implementation("androidx.navigation:navigation-compose:2.5.3")
+
     // for datastore
     implementation("androidx.datastore:datastore:1.0.0")
 
