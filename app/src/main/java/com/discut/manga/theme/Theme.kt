@@ -60,8 +60,11 @@ fun MangaTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = Color.Transparent.toArgb()//colorScheme.tertiaryContainer.toArgb()
+            window.statusBarColor =
+                Color.Transparent.toArgb()//colorScheme.tertiaryContainer.toArgb()
             window.navigationBarColor = Color.Transparent.toArgb()
+            // 设置布局延申至导航栏下
+            WindowCompat.setDecorFitsSystemWindows(window, false)
             // set info color of status bar
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
