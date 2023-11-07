@@ -5,5 +5,5 @@ import manga.core.preference.AppPreference
 
 class SecurityPreference(appPreference: SharedPreferences) : AppPreference(appPreference) {
     fun useAuthenticator() =
-        getValue("use_authenticator", true)
+        getValue("use_authenticator", false)
 }
