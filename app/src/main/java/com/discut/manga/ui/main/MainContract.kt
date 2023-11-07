@@ -3,7 +3,7 @@ package com.discut.manga.ui.main
 import com.discut.core.mvi.contract.UiEffect
 import com.discut.core.mvi.contract.UiEvent
 import com.discut.core.mvi.contract.UiState
-import com.discut.manga.ui.main.data.NavBarItem
+import com.discut.manga.ui.main.domain.NavBarItem
 
 data class MainState(val navBarItems: List<NavBarItem>) : UiState
 

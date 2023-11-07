@@ -2,7 +2,6 @@ package com.discut.manga.ui.main
 
 import android.content.Intent
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -16,13 +15,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.discut.core.mvi.CollectSideEffect
 import com.discut.manga.ui.base.BaseScreen
-import com.discut.manga.ui.main.data.NavBarItem
+import com.discut.manga.ui.main.domain.NavBarItem
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
 
@@ -38,7 +41,11 @@ class MainScreen @Inject constructor() :
         viewModel.CollectSideEffect {
             when (it) {
                 is MainEffect.NavigateTo -> navController.navigate(it.route) {
-
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        saveState = true
+                    }
+                    launchSingleTop = true
+                    restoreState = true
                 }
 
                 is MainEffect.OpenAbout -> navController.navigate("about")
@@ -49,14 +56,19 @@ class MainScreen @Inject constructor() :
             navBarIsSelected = { item ->
                 navController.currentBackStackEntryAsState().value?.destination?.route == item.route
             },
-            navBarClick = {
+            navBarClick = { viewModel.sendEvent(MainEvent.ClickNavigationItem(it)) },
+        ) {
+            NavHost(
+                navController = navController,
+                startDestination = MainViewModel.DEFAULT_SCREEN_ROUTE,
+                modifier = Modifier.padding(it)
+            ) {
+                state.navBarItems.forEach { navBarItem ->
+                    composable(navBarItem.route) {
+                        /*TodoScreen()*/
+                    }
+                }
 
-            },
-            searchBarClick = { /*TODO*/ }) {
-            Box(modifier = Modifier.padding(it)) {
-                Text(
-                    text = "Home",
-                )
             }
         }
     }
@@ -67,7 +79,6 @@ class MainScreen @Inject constructor() :
         state: MainState,
         navBarIsSelected: @Composable (item: NavBarItem) -> Boolean,
         navBarClick: (item: NavBarItem) -> Unit,
-        searchBarClick: () -> Unit,
         content: @Composable (padding: PaddingValues) -> Unit
     ) {
         val context = LocalContext.current

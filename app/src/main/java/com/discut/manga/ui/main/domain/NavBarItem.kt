@@ -1,4 +1,4 @@
-package com.discut.manga.ui.main.data
+package com.discut.manga.ui.main.domain
 
 import androidx.compose.ui.graphics.vector.ImageVector
 

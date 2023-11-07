@@ -6,13 +6,17 @@ import androidx.compose.material.icons.filled.Bookmarks
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.MoreHoriz
 import com.discut.core.mvi.BaseViewModel
-import com.discut.manga.ui.main.data.NavBarItem
+import com.discut.manga.ui.main.domain.NavBarItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor() :
     BaseViewModel<MainState, MainEvent, MainEffect>() {
+    companion object {
+        const val DEFAULT_SCREEN_ROUTE = "/books"
+    }
+
     override fun initialState(): MainState {
         return MainState(
             navBarItems = listOf(
@@ -25,7 +29,12 @@ class MainViewModel @Inject constructor() :
     }
 
     override suspend fun handleEvent(event: MainEvent, state: MainState): MainState {
-        return state
+        return when (event) {
+            is MainEvent.ClickNavigationItem -> {
+                sendEffect(MainEffect.NavigateTo(event.navigationItem.route))
+                state
+            }
+        }
     }
 
 }
