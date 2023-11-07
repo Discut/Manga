@@ -6,7 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionContext
-import com.discut.manga.ui.theme.MangaTheme
+import com.discut.manga.theme.MangaTheme
 
 fun Window.enableSecureScreen() {
     setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE)

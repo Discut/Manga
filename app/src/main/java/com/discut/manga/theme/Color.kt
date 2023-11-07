@@ -1,4 +1,4 @@
-package com.discut.manga.ui.theme
+package com.discut.manga.theme
 
 import androidx.compose.ui.graphics.Color
 
