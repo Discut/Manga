@@ -8,6 +8,7 @@ import com.discut.manga.util.get
 import com.discut.manga.util.startToActivity
 import com.discut.manga.util.unableSecureScreen
 import manga.core.preference.PreferenceManager
+import manga.core.preference.SettingsPreference
 
 class SecurityActivityDelegateImpl : SecurityActivityDelegate,
     DefaultLifecycleObserver {
@@ -15,6 +16,7 @@ class SecurityActivityDelegateImpl : SecurityActivityDelegate,
     private lateinit var activity: AppCompatActivity
     private val securityPreference =
         PreferenceManager.get<SecurityPreference>()
+    private val settingsPreference = PreferenceManager.get<SettingsPreference>()
 
     override fun registerSecurityActivity(activity: AppCompatActivity) {
         activity.lifecycle.addObserver(this)
@@ -37,17 +39,22 @@ class SecurityActivityDelegateImpl : SecurityActivityDelegate,
     }
 
     override fun onPause(owner: LifecycleOwner) {
-        if (securityPreference.useAuthenticator().not()) {
+        if (isNeedLock().not()) {
             return
         }
         UnlockActivity.isAuthorized = false
     }
 
     private fun setApplicationLock() {
-        if (securityPreference.useAuthenticator().not()) {
+        if (isNeedLock().not()) {
             return
         }
         activity.startToActivity(UnlockActivity::class.java)
     }
 
+    private fun isNeedLock(): Boolean {
+        return securityPreference.useAuthenticator() && settingsPreference.enableSecurityMode()
+    }
+
 }
+

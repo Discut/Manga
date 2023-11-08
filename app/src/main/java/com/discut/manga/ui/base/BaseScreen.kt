@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 
 abstract class BaseScreen<V : ViewModel> {
+
     @Composable
     fun Content() {
         Content(getViewModel())
@@ -14,4 +15,6 @@ abstract class BaseScreen<V : ViewModel> {
 
     @Composable
     abstract fun getViewModel(): V
+
+    abstract fun getRoute(): String
 }

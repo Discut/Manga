@@ -7,12 +7,16 @@ import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.MoreHoriz
 import com.discut.core.mvi.BaseViewModel
 import com.discut.manga.ui.main.domain.NavBarItem
+import com.discut.manga.ui.more.MoreScreen
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor() :
     BaseViewModel<MainState, MainEvent, MainEffect>() {
+
+    @Inject
+    lateinit var moreScreen: MoreScreen
     companion object {
         const val DEFAULT_SCREEN_ROUTE = "/books"
     }
@@ -20,10 +24,10 @@ class MainViewModel @Inject constructor() :
     override fun initialState(): MainState {
         return MainState(
             navBarItems = listOf(
-                NavBarItem("Books", "/books", Icons.Filled.Bookmarks),
-                NavBarItem("History", "/history", Icons.Filled.History),
-                NavBarItem("Search", "/search", Icons.Filled.Attribution),
-                NavBarItem("More", "/more", Icons.Filled.MoreHoriz)
+                NavBarItem("Books", "/books", Icons.Filled.Bookmarks, moreScreen),
+                NavBarItem("History", "/history", Icons.Filled.History, moreScreen),
+                NavBarItem("Search", "/search", Icons.Filled.Attribution, moreScreen),
+                NavBarItem("More", "/more", Icons.Filled.MoreHoriz, moreScreen)
             )
         )
     }

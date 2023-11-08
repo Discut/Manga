@@ -8,6 +8,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : BaseActivity() {
+
     @Inject
     lateinit var mainScreen: MainScreen
     override fun onCreate(savedInstanceState: Bundle?) {

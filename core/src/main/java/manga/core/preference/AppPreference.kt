@@ -19,7 +19,7 @@ open class AppPreference constructor(private val appPreference: SharedPreference
         return appPreference.getStringSet(key, defaultValue)!!
     }
 
-    private fun getEdit(): SharedPreferences.Editor {
+    protected fun getEdit(): SharedPreferences.Editor {
         return appPreference.edit()
     }
 

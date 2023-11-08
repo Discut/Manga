@@ -15,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -26,10 +25,10 @@ import androidx.navigation.compose.rememberNavController
 import com.discut.core.mvi.CollectSideEffect
 import com.discut.manga.ui.base.BaseScreen
 import com.discut.manga.ui.main.domain.NavBarItem
-import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
+import javax.inject.Singleton
 
-@ActivityScoped
+@Singleton
 class MainScreen @Inject constructor() :
     BaseScreen<MainViewModel>() {
     @Composable
@@ -65,10 +64,9 @@ class MainScreen @Inject constructor() :
             ) {
                 state.navBarItems.forEach { navBarItem ->
                     composable(navBarItem.route) {
-                        /*TodoScreen()*/
+                        navBarItem.screen.Content()
                     }
                 }
-
             }
         }
     }
@@ -109,5 +107,6 @@ class MainScreen @Inject constructor() :
 
     @Composable
     override fun getViewModel(): MainViewModel = viewModel()
+    override fun getRoute(): String = "/main"
 
 }
