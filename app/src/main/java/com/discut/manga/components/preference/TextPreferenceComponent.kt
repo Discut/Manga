@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.discut.manga.theme.MangaTheme
 
 @Composable
-internal fun TextPreferenceComponent(
+fun TextPreferenceComponent(
     modifier: Modifier = Modifier,
     title: String,
     subTitle: String? = null,
