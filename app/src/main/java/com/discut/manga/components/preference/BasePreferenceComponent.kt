@@ -14,15 +14,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.discut.core.mvi.BaseViewModel
 import com.discut.manga.theme.MangaTheme
 
 @Composable
-internal fun BasePreferenceComponent(
+fun BasePreferenceComponent(
     modifier: Modifier = Modifier,
     title: String = "",
+    titleFontSize: TextUnit = 16.sp,
     onClick: (() -> Unit)? = null,
     subWidget: @Composable (ColumnScope.() -> Unit)? = null,
     iconWidget: @Composable (() -> Unit)? = null,
@@ -52,7 +53,7 @@ internal fun BasePreferenceComponent(
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1,
                     style = MaterialTheme.typography.titleLarge,
-                    fontSize = 16.sp
+                    fontSize = titleFontSize
                 )
             }
             subWidget?.invoke(this)
@@ -64,12 +65,13 @@ internal fun BasePreferenceComponent(
         }
     }
 }
+
 @Preview(
     showBackground = true,
     name = "Light",
 )
 @Composable
-private fun BasePreferenceComponentPreview(){
+private fun BasePreferenceComponentPreview() {
     MangaTheme {
         BasePreferenceComponent(
             title = "Title",
