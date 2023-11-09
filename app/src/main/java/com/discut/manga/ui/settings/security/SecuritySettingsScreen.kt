@@ -20,6 +20,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.discut.manga.components.preference.HighlightSwitchPreferenceComponent
+import com.discut.manga.components.preference.SwitchPreferenceComponent
 import com.discut.manga.components.preference.TipsPreferenceComponent
 import com.discut.manga.ui.settings.security.domain.SecuritySettingsEvent
 
@@ -70,9 +71,21 @@ fun SecuritySettingsScreen() {
             .padding(innerPadding)
             .nestedScroll(scrollBehavior.nestedScrollConnection),
             checkSecurityMode = state.enableSecurityMode,
+            checkAppLock = state.enableAppLock,
+            checkHidePreview = state.enableHidePreview,
             onSecurityModeCheckedChange = {
                 vm.sendEvent(
                     SecuritySettingsEvent.ClickSecurityModeComponent(it)
+                )
+            },
+            onAppLockCheckedChange = {
+                vm.sendEvent(
+                    SecuritySettingsEvent.ClickAppLockComponent(it)
+                )
+            },
+            onHidePreviewCheckedChange = {
+                vm.sendEvent(
+                    SecuritySettingsEvent.ClickHidePreviewComponent(it)
                 )
             })
     }
@@ -82,7 +95,11 @@ fun SecuritySettingsScreen() {
 private fun SecuritySettingsScreenContent(
     modifier: Modifier = Modifier,
     checkSecurityMode: Boolean = false,
-    onSecurityModeCheckedChange: ((Boolean) -> Unit)
+    checkAppLock: Boolean = false,
+    checkHidePreview: Boolean = false,
+    onSecurityModeCheckedChange: ((Boolean) -> Unit),
+    onAppLockCheckedChange: ((Boolean) -> Unit),
+    onHidePreviewCheckedChange: ((Boolean) -> Unit),
 ) {
     Column(modifier = modifier) {
         HighlightSwitchPreferenceComponent(
@@ -90,6 +107,18 @@ private fun SecuritySettingsScreenContent(
             checked = checkSecurityMode,
             onCheckedChange = onSecurityModeCheckedChange
         )
+        if (checkSecurityMode) {
+            SwitchPreferenceComponent(title = "应用锁", state = checkAppLock) { _, n ->
+                onAppLockCheckedChange(n)
+            }
+            SwitchPreferenceComponent(
+                title = "隐藏多任务预览图",
+                state = checkHidePreview
+            ) { _, n ->
+                onHidePreviewCheckedChange(n)
+            }
+        }
+
         TipsPreferenceComponent(text = "锁定app，阻止系统截屏，并在切换至后台时隐藏预览图。")
     }
 
