@@ -31,8 +31,8 @@ fun BasePreferenceComponent(
 ) {
     Row(
         modifier = modifier
-            .padding(0.dp)
             .clickable(enabled = onClick != null, onClick = { onClick?.invoke() })
+            .padding(vertical = 8.dp)
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
