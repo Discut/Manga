@@ -33,6 +33,12 @@
             android:name=".ui.security.UnlockActivity"
             android:exported="true"
             android:theme="@style/Theme.Manga" />
+
+        <activity
+            android:name=".ui.reader.ReaderActivity"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.Manga" />
     </application>
 
 </manifest>
