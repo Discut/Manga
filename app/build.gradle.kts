@@ -8,12 +8,12 @@ plugins {
 
 android {
     namespace = "com.discut.manga"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.discut.manga"
         minSdk = 29
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -90,7 +90,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
 
     // navigation
-    implementation("androidx.navigation:navigation-compose:2.5.3")
+    implementation("androidx.navigation:navigation-compose:2.7.5")
 
     // for datastore
     implementation("androidx.datastore:datastore:1.0.0")
