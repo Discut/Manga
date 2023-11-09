@@ -23,90 +23,81 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.discut.core.mvi.CollectSideEffect
-import com.discut.manga.ui.base.BaseScreen
+import com.discut.manga.ui.main.domain.MainEffect
+import com.discut.manga.ui.main.domain.MainEvent
+import com.discut.manga.ui.main.domain.MainState
 import com.discut.manga.ui.main.domain.NavBarItem
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class MainScreen @Inject constructor() :
-    BaseScreen<MainViewModel>() {
-    @Composable
-    override fun Content(viewModel: MainViewModel) {
+@Composable
+fun MainScreen() {
+    val viewModel: MainViewModel = viewModel()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val navController = rememberNavController()
 
-        val state by viewModel.uiState.collectAsStateWithLifecycle()
-        val navController = rememberNavController()
-
-        viewModel.CollectSideEffect {
-            when (it) {
-                is MainEffect.NavigateTo -> navController.navigate(it.route) {
-                    popUpTo(navController.graph.findStartDestination().id) {
-                        saveState = true
-                    }
-                    launchSingleTop = true
-                    restoreState = true
+    viewModel.CollectSideEffect {
+        when (it) {
+            is MainEffect.NavigateTo -> navController.navigate(it.route) {
+                popUpTo(navController.graph.findStartDestination().id) {
+                    saveState = true
                 }
+                launchSingleTop = true
+                restoreState = true
+            }
 
-                is MainEffect.OpenAbout -> navController.navigate("about")
-            }
-        }
-        HomeScreenContent(
-            state = state,
-            navBarIsSelected = { item ->
-                navController.currentBackStackEntryAsState().value?.destination?.route == item.route
-            },
-            navBarClick = { viewModel.sendEvent(MainEvent.ClickNavigationItem(it)) },
-        ) {
-            NavHost(
-                navController = navController,
-                startDestination = MainViewModel.DEFAULT_SCREEN_ROUTE,
-                modifier = Modifier.padding(it)
-            ) {
-                state.navBarItems.forEach { navBarItem ->
-                    composable(navBarItem.route) {
-                        navBarItem.screen.Content()
-                    }
-                }
-            }
+            is MainEffect.OpenAbout -> navController.navigate("about")
         }
     }
-
-    @OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    private fun HomeScreenContent(
-        state: MainState,
-        navBarIsSelected: @Composable (item: NavBarItem) -> Boolean,
-        navBarClick: (item: NavBarItem) -> Unit,
-        content: @Composable (padding: PaddingValues) -> Unit
+    HomeScreenContent(
+        state = state,
+        navBarIsSelected = { item ->
+            navController.currentBackStackEntryAsState().value?.destination?.route == item.route
+        },
+        navBarClick = { viewModel.sendEvent(MainEvent.ClickNavigationItem(it)) },
     ) {
-        val context = LocalContext.current
-        Scaffold(
-            topBar = {
-            },
-            bottomBar = {
-                NavigationBar(modifier = Modifier.wrapContentHeight()) {
-                    state.navBarItems.forEach {
-                        NavigationBarItem(
-                            icon = { Icon(imageVector = it.icon, contentDescription = null) },
-                            label = { Text(text = it.title) },
-                            selected = navBarIsSelected(it),
-                            onClick = { navBarClick(it) }
-                        )
-                    }
+        NavHost(
+            navController = navController,
+            startDestination = MainViewModel.DEFAULT_SCREEN_ROUTE,
+            modifier = Modifier.padding(it)
+        ) {
+            state.navBarItems.forEach { navBarItem ->
+                composable(navBarItem.route) {
+                    navBarItem.screen.invoke()
                 }
-            }) {
-            content(it)
-            BackHandler {
-                context.startActivity(Intent(Intent.ACTION_MAIN).apply {
-                    addCategory(Intent.CATEGORY_HOME)
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                })
             }
         }
     }
+}
 
-    @Composable
-    override fun getViewModel(): MainViewModel = viewModel()
-    override fun getRoute(): String = "/main"
-
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun HomeScreenContent(
+    state: MainState,
+    navBarIsSelected: @Composable (item: NavBarItem) -> Boolean,
+    navBarClick: (item: NavBarItem) -> Unit,
+    content: @Composable (padding: PaddingValues) -> Unit
+) {
+    val context = LocalContext.current
+    Scaffold(
+        topBar = {
+        },
+        bottomBar = {
+            NavigationBar(modifier = Modifier.wrapContentHeight()) {
+                state.navBarItems.forEach {
+                    NavigationBarItem(
+                        icon = { Icon(imageVector = it.icon, contentDescription = null) },
+                        label = { Text(text = it.title) },
+                        selected = navBarIsSelected(it),
+                        onClick = { navBarClick(it) }
+                    )
+                }
+            }
+        }) {
+        content(it)
+        BackHandler {
+            context.startActivity(Intent(Intent.ACTION_MAIN).apply {
+                addCategory(Intent.CATEGORY_HOME)
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            })
+        }
+    }
 }

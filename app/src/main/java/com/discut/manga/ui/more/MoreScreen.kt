@@ -1,60 +1,45 @@
 package com.discut.manga.ui.more
 
-import android.util.Log
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.discut.core.flowbus.FlowBus
 import com.discut.core.mvi.CollectSideEffect
 import com.discut.manga.components.preference.SwitchPreferenceComponent
-import com.discut.manga.ui.base.BaseScreen
-import dagger.hilt.android.scopes.ViewModelScoped
-import javax.inject.Inject
-import javax.inject.Singleton
+import com.discut.manga.ui.main.domain.ToRouteEvent
 
-@Singleton
-class MoreScreen @Inject constructor() : BaseScreen<MoreScreenViewModel>() {
-    @Composable
-    override fun Content(viewModel: MoreScreenViewModel) {
-        val state by viewModel.uiState.collectAsStateWithLifecycle()
-        SideEffect {
-            Log.d("MoreScreen", state.toString())
+@Composable
+fun MoreScreen() {
+    val viewModel: MoreScreenViewModel = viewModel()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val rememberCoroutineScope = rememberCoroutineScope()
 
-        }
-
-        viewModel.CollectSideEffect {
-            when (it) {
-                is MoreScreenEffect.SecurityModeChange -> {
-                    //state.enableSecurityMode = it.enable
-                }
+    viewModel.CollectSideEffect {
+        when (it) {
+            is MoreScreenEffect.SecurityModeChange -> {
+                //state.enableSecurityMode = it.enable
             }
         }
-        LazyColumn {
-            item {
-                SwitchPreferenceComponent(
-                    title = "隐私模式", subTitle = "隐私模式",
-                    //icon = Icons.Default.Security,
-                    state = state.enableSecurityMode,
-                    onSwitchClick = {
-                        viewModel.sendEvent(
-                            MoreScreenEvent.ClickSecurityMode(
-                                !state.enableSecurityMode
-                            )
+    }
+    LazyColumn {
+        item {
+            SwitchPreferenceComponent(
+                title = "隐私模式", subTitle = "隐私模式",
+                //icon = Icons.Default.Security,
+                state = state.enableSecurityMode,
+                onSwitchClick = {
+                    viewModel.sendEvent(
+                        MoreScreenEvent.ClickSecurityMode(
+                            !state.enableSecurityMode
                         )
-                    }
-                ) { old, new ->
-
+                    )
                 }
+            ) { old, new ->
+                FlowBus.with<ToRouteEvent>().post(rememberCoroutineScope, ToRouteEvent("/settings/security"))
             }
         }
     }
-
-    @Composable
-    override fun getViewModel(): MoreScreenViewModel {
-        return viewModel()
-    }
-
-    override fun getRoute(): String = "/more"
 }
