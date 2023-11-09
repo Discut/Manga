@@ -1,6 +1,8 @@
 package com.discut.manga.ui.more
 
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -9,6 +11,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.discut.core.flowbus.FlowBus
 import com.discut.core.mvi.CollectSideEffect
 import com.discut.manga.components.preference.SwitchPreferenceComponent
+import com.discut.manga.components.preference.TextPreferenceComponent
+import com.discut.manga.navigation.NavigationEvent
+import com.discut.manga.navigation.NavigationRoute
 import com.discut.manga.ui.main.domain.ToRouteEvent
 
 @Composable
@@ -38,7 +43,17 @@ fun MoreScreen() {
                     )
                 }
             ) { old, new ->
-                FlowBus.with<ToRouteEvent>().post(rememberCoroutineScope, ToRouteEvent("/settings/security"))
+                FlowBus.with<ToRouteEvent>()
+                    .post(rememberCoroutineScope, ToRouteEvent("settings/security"))
+            }
+        }
+        item {
+            TextPreferenceComponent(title = "设置", icon = Icons.Default.Settings) {
+                FlowBus.with<NavigationEvent>()
+                    .post(
+                        rememberCoroutineScope,
+                        NavigationEvent(NavigationRoute.SettingsScreen.route)
+                    )
             }
         }
     }

@@ -7,10 +7,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.discut.core.flowbus.observeEvent
+import com.discut.manga.navigation.NavigationEvent
+import com.discut.manga.navigation.NavigationRoute
+import com.discut.manga.navigation.settingsGraph
 import com.discut.manga.ui.base.BaseActivity
 import com.discut.manga.ui.main.domain.ToRouteEvent
-import com.discut.manga.ui.util.GlobalNavigationRoute
-import com.discut.manga.ui.util.graph
 import com.discut.manga.util.setComposeContent
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -22,7 +23,7 @@ class MainActivity : BaseActivity() {
         setComposeContent {
             val navController = rememberNavController()
             LocalLifecycleOwner.current.observeEvent<ToRouteEvent> {
-                navController.navigate(it.route){
+                navController.navigate(it.route) {
                     popUpTo(navController.graph.findStartDestination().id) {
                         saveState = true
                     }
@@ -30,12 +31,17 @@ class MainActivity : BaseActivity() {
                     restoreState = true
                 }
             }
-            NavHost(navController = navController, startDestination = "/main") {
-                GlobalNavigationRoute.graph().forEach { (r, s) ->
-                    composable(route = r) {
-                        s.invoke()
-                    }
+            LocalLifecycleOwner.current.observeEvent<NavigationEvent> {
+                navController.navigate(it.route)
+            }
+            NavHost(
+                navController = navController,
+                startDestination = NavigationRoute.MainScreen.route
+            ) {
+                composable(NavigationRoute.MainScreen.route) {
+                    MainScreen()
                 }
+                settingsGraph(navController)
             }
         }
     }

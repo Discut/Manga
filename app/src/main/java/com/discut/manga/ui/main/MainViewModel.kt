@@ -28,7 +28,7 @@ class MainViewModel @Inject constructor() :
                 NavBarItem("Books", "/books", Icons.Filled.Bookmarks) { MoreScreen() },
                 NavBarItem("History", "/history", Icons.Filled.History) { MoreScreen() },
                 NavBarItem("Search", "/search", Icons.Filled.Attribution) { MoreScreen() },
-                NavBarItem("More", "/more", Icons.Filled.MoreHoriz) { MoreScreen() }
+                NavBarItem("More", "more", Icons.Filled.MoreHoriz) { MoreScreen() }
             )
         )
     }
