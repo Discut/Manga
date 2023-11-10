@@ -101,6 +101,17 @@ dependencies {
     implementation(project(mapOf("path" to ":source-api")))
     kapt("com.google.dagger:hilt-android-compiler:2.48.1")
 
+    //ui lib
+    implementation("com.github.tachiyomiorg:DirectionalViewPager:1.0.0") {
+        exclude(group = "androidx.viewpager", module = "viewpager")
+    }
+
+    // image loading
+    implementation("com.github.tachiyomiorg:subsampling-scale-image-view:c8e2650")/*{
+        exclude(module = "image-decoder")
+    }
+    implementation("com.github.tachiyomiorg:image-decoder:16eda64574")*/
+
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
