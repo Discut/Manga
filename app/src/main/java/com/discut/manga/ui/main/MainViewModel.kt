@@ -6,6 +6,7 @@ import androidx.compose.material.icons.filled.Bookmarks
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.MoreHoriz
 import com.discut.core.mvi.BaseViewModel
+import com.discut.manga.ui.bookshelf.BookshelfScreen
 import com.discut.manga.ui.main.domain.MainEffect
 import com.discut.manga.ui.main.domain.MainEvent
 import com.discut.manga.ui.main.domain.MainState
@@ -25,9 +26,9 @@ class MainViewModel @Inject constructor() :
     override fun initialState(): MainState {
         return MainState(
             navBarItems = listOf(
-                NavBarItem("Books", "/books", Icons.Filled.Bookmarks) { MoreScreen() },
-                NavBarItem("History", "/history", Icons.Filled.History) { MoreScreen() },
-                NavBarItem("Search", "/search", Icons.Filled.Attribution) { MoreScreen() },
+                NavBarItem("Books", "/books", Icons.Filled.Bookmarks) { BookshelfScreen() },
+                NavBarItem("History", "/history", Icons.Filled.History) { BookshelfScreen() },
+                NavBarItem("Search", "/search", Icons.Filled.Attribution) { BookshelfScreen() },
                 NavBarItem("More", "more", Icons.Filled.MoreHoriz) { MoreScreen() }
             )
         )
