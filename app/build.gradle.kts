@@ -1,5 +1,6 @@
 plugins {
     kotlin("kapt")
+    id("com.google.devtools.ksp")
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.dagger.hilt.android")
@@ -47,6 +48,9 @@ android {
 }
 
 dependencies {
+    implementation(project(mapOf("path" to ":data")))
+    val room_version = "2.5.1"
+
     val composeBom = platform("androidx.compose:compose-bom:2023.01.00")
     implementation(composeBom)
     androidTestImplementation(composeBom)
@@ -111,6 +115,25 @@ dependencies {
         exclude(module = "image-decoder")
     }
     implementation("com.github.tachiyomiorg:image-decoder:16eda64574")*/
+
+    // for room
+
+/*    // To use Kotlin annotation processing tool (kapt)
+    kapt("androidx.room:room-compiler:$room_version")*/
+    // To use Kotlin Symbol Processing (KSP)
+    //noinspection GradleDependency
+    ksp("androidx.room:room-compiler:$room_version")
+
+    // optional - Kotlin Extensions and Coroutines support for Room
+    implementation("androidx.room:room-ktx:$room_version")
+
+    // optional - Test helpers
+    testImplementation("androidx.room:room-testing:$room_version")
+
+    // optional - Paging 3 Integration
+    implementation("androidx.room:room-paging:$room_version")
+
+    // end room
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
