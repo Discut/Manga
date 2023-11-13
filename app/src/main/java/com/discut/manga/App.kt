@@ -2,6 +2,7 @@ package com.discut.manga
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
+import discut.manga.data.MangaAppDatabase
 import manga.core.preference.PreferenceManager
 import javax.inject.Inject
 
@@ -17,7 +18,11 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        // init module
         appPreference.initManager()
+        MangaAppDatabase.init(this)
+        // init end
+        val mangaDao = MangaAppDatabase.DB.mangaDao()
         instance = this
     }
 }
