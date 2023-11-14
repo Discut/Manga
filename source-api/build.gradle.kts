@@ -33,6 +33,13 @@ android {
 }
 
 dependencies {
+    implementation(project(mapOf("path" to ":core")))
+    val okhttp_version = "4.11.0"
+    implementation("com.squareup.okhttp3:okhttp:$okhttp_version")
+    implementation("com.squareup.okhttp3:logging-interceptor:$okhttp_version")
+
+    // for json
+    implementation("org.jsoup:jsoup:1.16.1")
 
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.appcompat:appcompat:1.6.1")

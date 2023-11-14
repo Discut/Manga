@@ -3,6 +3,8 @@ package com.discut.manga
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
 import discut.manga.data.MangaAppDatabase
+import managa.source.online.Baimangu
+import manga.core.application.application
 import manga.core.preference.PreferenceManager
 import javax.inject.Inject
 
@@ -18,11 +20,13 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        // save application instance
+        instance = this
+        application = this
         // init module
         appPreference.initManager()
         MangaAppDatabase.init(this)
         // init end
         val mangaDao = MangaAppDatabase.DB.mangaDao()
-        instance = this
     }
 }

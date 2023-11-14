@@ -1,6 +1,8 @@
 package com.discut.manga.ui.main
 
 import android.os.Bundle
+import android.util.Log
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -14,6 +16,10 @@ import com.discut.manga.ui.base.BaseActivity
 import com.discut.manga.ui.main.domain.ToRouteEvent
 import com.discut.manga.util.setComposeContent
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
+import managa.source.online.Baimangu
 
 @AndroidEntryPoint
 class MainActivity : BaseActivity() {
