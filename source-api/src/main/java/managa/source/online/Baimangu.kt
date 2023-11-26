@@ -2,7 +2,6 @@ package managa.source.online
 
 import android.content.SharedPreferences
 import android.widget.Toast
-import managa.source.ConfigurationSource
 import managa.source.domain.Filter
 import managa.source.domain.FilterList
 import managa.source.domain.Page
@@ -20,7 +19,7 @@ import org.jsoup.nodes.Element
 import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
 
-class Baimangu : ConfigurationSource, ParsedHttpSource() {
+class Baimangu : ParsedHttpSource() {
     override val id: Long
         get() = 73478327264
     override val language
@@ -103,7 +102,7 @@ class Baimangu : ConfigurationSource, ParsedHttpSource() {
     private class SortFilter :
         Filter.Select<String>("排序", arrayOf("按时间", "按人气", "按评分"), 0)
 
-    /*override*/ fun getFilterList() = FilterList(
+    override fun getFilterList() = FilterList(
         ChannelFilter(),
         SortFilter(),
     )

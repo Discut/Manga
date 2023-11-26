@@ -8,7 +8,7 @@ import manga.core.application.application
 /**
  * source config
  */
-interface ConfigurationSource : Source {
+interface ConfigurationSource : BaseSource {
     fun getPreferences(): SharedPreferences =
         application!!.getSharedPreferences("manga_source_$id", Context.MODE_PRIVATE)
     /*getContext().getSharedPreferences("manga_source_$id", Context.MODE_PRIVATE)*/

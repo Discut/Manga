@@ -1,19 +1,45 @@
 package com.discut.manga.ui.reader.viewer
 
+import android.content.Context
+import android.graphics.Bitmap
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.graphics.drawable.toBitmap
+import com.discut.manga.R
 import com.discut.manga.ui.reader.viewer.base.BasePageViewerAdapter
-import com.discut.manga.ui.reader.viewer.domain.PageType
+import com.discut.manga.ui.reader.viewer.domain.ReaderPage
+import com.discut.manga.ui.reader.viewer.domain.PageState
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.InputStream
 
-class PageViewerAdapter : BasePageViewerAdapter() {
+class PageViewerAdapter(context: Context) : BasePageViewerAdapter() {
 
-    var pages: MutableList<PageType> = mutableListOf(
+    var readerPages: MutableList<ReaderPage> = mutableListOf(
+/*        ReaderPage.ChapterPage(1, "", null, null).apply {
+            loadPage={
+                var stream: InputStream = ByteArrayInputStream(byteArrayOf())
+                try {
+                    val drawable = context.resources.getDrawable(R.drawable.image_test, null)
+                    val toBitmap = drawable.toBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight)
+                    val baos = ByteArrayOutputStream()
+                    toBitmap.compress(Bitmap.CompressFormat.PNG, 100, baos)
+                    stream = ByteArrayInputStream(baos.toByteArray())
+                } catch (e: Exception) {
+                    state = PageState.ERROR
+                }
+                streamGetter = { stream }
+                state = PageState.READY
+            }
+
+        }*/
+
     )
         private set
 
     override fun getCount(): Int {
-        return pages.size
+        return readerPages.size
     }
 
     override fun isViewFromObject(view: View, obj: Any): Boolean {
@@ -21,8 +47,8 @@ class PageViewerAdapter : BasePageViewerAdapter() {
     }
 
     override fun createPageView(container: ViewGroup, position: Int): View {
-        return when (val page = pages[position]) {
-            is PageType.ChapterPage -> {
+        return when (val page = readerPages[position]) {
+            is ReaderPage.ChapterPage -> {
                 ChapterPageHolder(container.context, page).apply {
                     layoutParams = ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
@@ -31,7 +57,7 @@ class PageViewerAdapter : BasePageViewerAdapter() {
                 }
             }
 
-            is PageType.ChapterTransition -> TextView(container.context).apply {
+            is ReaderPage.ChapterTransition -> TextView(container.context).apply {
 
             }
 
@@ -40,11 +66,11 @@ class PageViewerAdapter : BasePageViewerAdapter() {
     }
 
     override fun destroyPageView(container: ViewGroup, position: Int, view: View) {
-        TODO("Not yet implemented")
+        // TODO("Not yet implemented")
     }
 
     override fun getItemPosition(obj: Any): Int {
-        val position = pages.indexOf(obj as PageType)
+        val position = readerPages.indexOf(obj as ReaderPage)
         if (position != -1) {
             return position
         }

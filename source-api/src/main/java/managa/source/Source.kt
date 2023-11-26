@@ -1,31 +1,24 @@
 package managa.source
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.single
 import managa.source.domain.FilterList
 import managa.source.domain.Page
 import managa.source.domain.SChapter
 import managa.source.domain.SManga
 import managa.source.domain.SMangas
-import okhttp3.internal.wait
-import kotlin.coroutines.coroutineContext
+
+interface BaseSource {
+    val id: Long
+    val name: String
+    val language: String
+}
 
 /**
  * Its a basic interface from [Source], extension developer can extend it.
  * it could be online source or local source.
  */
-interface Source {
-    val id: Long
-    val name: String
-    val language: String
+interface Source : BaseSource {
 
     fun fetchMangaDetails(manga: SManga): Flow<SManga> =
         throw IllegalStateException("Not used")
@@ -43,8 +36,8 @@ interface Source {
      * @param page the page number to retrieve.
      */
     @Suppress("DEPRECATION")
-    suspend fun getPopularManga(page: Int): Flow<SMangas> {
-        return fetchPopularManga(page)
+    suspend fun getPopularManga(page: Int): SMangas {
+        return fetchPopularManga(page).single()
     }
 
     /**
@@ -56,8 +49,8 @@ interface Source {
      * @param filters the list of filters to apply.
      */
     @Suppress("DEPRECATION")
-    suspend fun getSearchManga(page: Int, query: String, filters: FilterList): MangasPage {
-        return fetchSearchManga(page, query, filters).awaitSingle()
+    suspend fun getSearchManga(page: Int, query: String, filters: FilterList): SMangas {
+        return fetchSearchManga(page, query, filters).single()
     }
 
     /**
@@ -67,15 +60,9 @@ interface Source {
      * @param page the page number to retrieve.
      */
     @Suppress("DEPRECATION")
-    fun getLatestUpdates(page: Int): SMangas {
-        CoroutineScope(Dispatchers.Default).launch {
-            fetchLatestUpdates(page)
-                .collect{
-
-                }
-        }
-        fetchLatestUpdates(page)
-            .launchIn().join()
+    suspend fun getLatestUpdates(page: Int): SMangas {
+        return fetchLatestUpdates(page)
+            .single()
     }
 
     /**
@@ -94,7 +81,7 @@ interface Source {
         "Use the non-RxJava API instead",
         ReplaceWith("getSearchManga"),
     )
-    fun fetchSearchManga(page: Int, query: String, filters: FilterList): Flow<SMangas> =
+    suspend fun fetchSearchManga(page: Int, query: String, filters: FilterList): Flow<SMangas> =
         throw IllegalStateException("Not used")
 
     @Deprecated(

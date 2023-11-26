@@ -36,13 +36,19 @@ android {
 
 dependencies {
 
-    val okhttp_version = "4.11.0"
-    implementation("com.squareup.okhttp3:okhttp:$okhttp_version")
-    implementation("com.squareup.okhttp3:logging-interceptor:$okhttp_version")
+    implementation(libs.bundles.okhttp)
 
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.9.0")
+
+    // Sort
+    implementation(libs.natural.comparator)
+
+    // image load
+    implementation(libs.image.decoder)
+    implementation(platform(libs.coil.bom))
+    implementation(libs.bundles.coil)
 
     // for DI
     implementation("com.google.dagger:hilt-android:2.48.1")

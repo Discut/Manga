@@ -6,19 +6,19 @@ import discut.manga.data.BaseDao
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface MangaEntityDao : BaseDao<MangaEntity> {
+interface MangaDao : BaseDao<Manga> {
     @Query(
         "SELECT * FROM manga"
     )
-    fun getAll(): List<MangaEntity>
+    fun getAll(): List<Manga>
 
     @Query(
         "SELECT * FROM manga WHERE id = :id"
     )
-    fun getById(id: Long): MangaEntity
+    fun getById(id: Long): Manga
 
     @Query(
         "SELECT * FROM manga WHERE id = :id"
     )
-    fun getByIdAsFlow(id: Long): Flow<MangaEntity>
+    fun getByIdAsFlow(id: Long): Flow<Manga>
 }

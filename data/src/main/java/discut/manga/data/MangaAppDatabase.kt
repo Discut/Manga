@@ -4,16 +4,16 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import discut.manga.data.manga.MangaEntity
-import discut.manga.data.manga.MangaEntityDao
+import discut.manga.data.manga.Manga
+import discut.manga.data.manga.MangaDao
 
 @Database(
-    entities = [MangaEntity::class],
+    entities = [Manga::class],
     version = 1,
     exportSchema = false
 )
 abstract class MangaAppDatabase : RoomDatabase() {
-    abstract fun mangaDao(): MangaEntityDao
+    abstract fun mangaDao(): MangaDao
 
     companion object {
         private var INSTANCE: MangaAppDatabase? = null

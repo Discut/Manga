@@ -12,6 +12,7 @@ import com.discut.manga.ui.main.domain.MainEvent
 import com.discut.manga.ui.main.domain.MainState
 import com.discut.manga.ui.main.domain.NavBarItem
 import com.discut.manga.ui.more.MoreScreen
+import com.discut.manga.ui.source.SourceScreen
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -29,6 +30,7 @@ class MainViewModel @Inject constructor() :
                 NavBarItem("Books", "/books", Icons.Filled.Bookmarks) { BookshelfScreen() },
                 NavBarItem("History", "/history", Icons.Filled.History) { BookshelfScreen() },
                 NavBarItem("Search", "/search", Icons.Filled.Attribution) { BookshelfScreen() },
+                NavBarItem("Source", "/source", Icons.Filled.Attribution) { SourceScreen() },
                 NavBarItem("More", "more", Icons.Filled.MoreHoriz) { MoreScreen() }
             )
         )

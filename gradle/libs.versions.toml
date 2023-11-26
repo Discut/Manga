@@ -17,6 +17,14 @@ leakcanary = "2.12"
 voyager = "1.0.0-rc09"
 richtext = "0.17.0"
 room = "2.5.1"
+agp = "8.1.2"
+org-jetbrains-kotlin-android = "1.9.0"
+core-ktx = "1.9.0"
+junit = "4.13.2"
+androidx-test-ext-junit = "1.1.5"
+espresso-core = "3.5.1"
+appcompat = "1.6.1"
+material = "1.8.0"
 
 [libraries]
 datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
@@ -46,6 +54,11 @@ subsamplingscaleimageview = "com.github.tachiyomiorg:subsampling-scale-image-vie
 image-decoder = "com.github.tachiyomiorg:image-decoder:fbd6601290"
 
 material = "com.google.android.material:material:1.9.0"
+
+coil-bom = { module = "io.coil-kt:coil-bom", version = "2.4.0" }
+coil-core = { module = "io.coil-kt:coil" }
+coil-gif = { module = "io.coil-kt:coil-gif" }
+coil-compose = { module = "io.coil-kt:coil-compose" }
 
 
 
@@ -77,11 +90,6 @@ sqlite-android = "com.github.requery:sqlite-android:3.43.0"
 preferencektx = "androidx.preference:preference-ktx:1.2.1"
 
 injekt-core = "com.github.inorichi.injekt:injekt-core:65b0440"
-
-coil-bom = { module = "io.coil-kt:coil-bom", version = "2.4.0" }
-coil-core = { module = "io.coil-kt:coil" }
-coil-gif = { module = "io.coil-kt:coil-gif" }
-coil-compose = { module = "io.coil-kt:coil-compose" }
 
 natural-comparator = "com.github.gpanther:java-nat-sort:natural-comparator-1.1"
 
@@ -124,6 +132,12 @@ voyager-tab-navigator = { module = "cafe.adriel.voyager:voyager-tab-navigator", 
 voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", version.ref = "voyager" }
 
 ktlint = "org.jlleitschuh.gradle:ktlint-gradle:11.6.1"
+core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
+junit-junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-ext-junit" }
+espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso-core" }
+appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+com-google-android-material-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 [bundles]
 okhttp = ["okhttp-core", "okhttp-logging", "okhttp-brotli", "okhttp-dnsoverhttps"]
@@ -136,3 +150,6 @@ voyager = ["voyager-navigator", "voyager-tab-navigator", "voyager-transitions"]
 richtext = ["richtext-commonmark", "richtext-m3"]
 room = ["room-compiler", "room-ktx", "room-paging", "room-test"]
 test = ["junit", "kotest-assertions", "mockk"]
+[plugins]
+com-android-library = { id = "com.android.library", version.ref = "agp" }
+org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "org-jetbrains-kotlin-android" }

@@ -11,6 +11,7 @@ import android.widget.FrameLayout
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
 import androidx.core.graphics.drawable.toBitmap
+import androidx.core.view.isVisible
 import com.davemorrissey.labs.subscaleview.ImageSource
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.discut.manga.ui.util.GLUtil
@@ -25,11 +26,11 @@ open class PageImageView @JvmOverloads constructor(
 
     private var content: View? = null
 
-    private fun setupPageContent(image: InputStream) {
+    protected fun setupPageContent(image: InputStream) {
         structurePageContent(ImageSource.inputStream(image))
     }
 
-    private fun setupPageContent(image: BitmapDrawable) {
+    protected fun setupPageContent(image: BitmapDrawable) {
         structurePageContent(ImageSource.bitmap(image.bitmap))
     }
     private fun structurePageContent(image: ImageSource) {
@@ -72,6 +73,8 @@ open class PageImageView @JvmOverloads constructor(
                     }
                 },
             )
+            setImage(image)
+            isVisible = true
         }
     }
 }

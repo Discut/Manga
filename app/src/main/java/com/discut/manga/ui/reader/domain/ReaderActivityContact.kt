@@ -10,7 +10,9 @@ data class ReaderActivityState(val navBarItems: List<NavBarItem>) : UiState
 
 sealed interface ReaderActivityEvent : UiEvent {
 
-    data class ClickNavigationItem(val navigationItem: NavBarItem) : ReaderActivityEvent
+    data class Initialize(val mangaId: Long, val chapterId: Long) : ReaderActivityEvent
 }
 
-sealed interface ReaderActivityEffect : UiEffect
+sealed interface ReaderActivityEffect : UiEffect {
+    data class InitMangaError(val error: Throwable) : ReaderActivityEffect
+}

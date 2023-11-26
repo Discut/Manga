@@ -47,6 +47,7 @@ android {
 
 }
 dependencies {
+    implementation(project(mapOf("path" to ":common-res")))
     val roomVersion = "2.5.1"
     val composeBom = platform("androidx.compose:compose-bom:2023.01.00")
 
@@ -104,10 +105,12 @@ dependencies {
     }
 
     // Image Loading
-    implementation(libs.subsamplingscaleimageview)/*{
+    implementation(libs.subsamplingscaleimageview){
         exclude(module = "image-decoder")
     }
-    implementation("com.github.tachiyomiorg:image-decoder:16eda64574")*/
+    implementation(libs.image.decoder)
+    implementation(platform(libs.coil.bom))
+    implementation(libs.bundles.coil)
 
     // Room
     // To use Kotlin annotation processing tool (kapt)

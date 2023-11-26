@@ -1,9 +1,7 @@
 package managa.source
 
-import android.content.Context
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
-import manga.core.network.GET
 import kotlinx.coroutines.channels.onFailure
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.Flow
@@ -15,16 +13,16 @@ import managa.source.domain.SChapter
 import managa.source.domain.SManga
 import managa.source.domain.SMangas
 import manga.core.application.application
+import manga.core.network.GET
 import manga.core.network.NetworkHelper
 import manga.core.network.asFlow
 import okhttp3.Headers
 import okhttp3.Request
 import okhttp3.Response
-import java.io.File
 import java.net.URI
 import java.net.URISyntaxException
 
-abstract class HttpSource : Source {
+abstract class HttpSource : Source, ConfigurationSource {
 
     val networkHelper = NetworkHelper(application!!.cacheDir)
 
@@ -64,7 +62,7 @@ abstract class HttpSource : Source {
     protected abstract fun popularMangaRequest(page: Int): Request
     protected abstract fun popularMangaParse(response: Response): SMangas
 
-    suspend fun fetchSearchManga(
+    override suspend fun fetchSearchManga(
         page: Int,
         query: String,
         filters: FilterList,
