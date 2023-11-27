@@ -27,6 +27,5 @@ class App : Application() {
         appPreference.initManager()
         MangaAppDatabase.init(this)
         // init end
-        val mangaDao = MangaAppDatabase.DB.mangaDao()
     }
 }

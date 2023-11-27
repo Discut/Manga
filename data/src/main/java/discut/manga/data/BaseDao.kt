@@ -6,14 +6,14 @@ import androidx.room.Update
 
 interface BaseDao<T> {
     @Delete
-    fun delete(manga: T): Int
+    fun delete(entity: T): Int
 
     @Update
-    fun update(manga: T): Int
+    fun update(entity: T): Int
 
     @Insert
-    fun insert(manga: T)
+    fun insert(entity: T)
 
     @Insert
-    fun insertAll(vararg manga: T)
+    fun insertAll(vararg entities: T)
 }

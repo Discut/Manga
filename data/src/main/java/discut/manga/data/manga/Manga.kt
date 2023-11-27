@@ -3,11 +3,13 @@ package discut.manga.data.manga
 // import tachiyomi.core.preference.TriState
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.TypeConverters
 import java.io.Serializable
 
 @Entity(
     tableName = "manga"
 )
+@TypeConverters(GenreConverter::class)
 data class Manga(
     @PrimaryKey
     val id: Long,
