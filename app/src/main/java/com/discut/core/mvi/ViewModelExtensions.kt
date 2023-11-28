@@ -4,10 +4,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.discut.core.mvi.contract.UiEffect
 import com.discut.core.mvi.contract.UiEvent
 import com.discut.core.mvi.contract.UiState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 /**
@@ -30,4 +33,40 @@ fun <S : UiState, E : UiEvent, F : UiEffect>
             sideEffectFlow.collect { sideEffect(it) }
         }
     }
+}
+
+/**
+ * Collect state from ViewModel
+ */
+fun <S : UiState, E : UiEvent, F : UiEffect>
+        BaseViewModel<S, E, F>.collectState(
+    lifecycle: Lifecycle,
+    lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
+    handleState: (suspend (state: S) -> Unit),
+) {
+    val stateFlow = this.uiState
+    lifecycle.coroutineScope.launch(Dispatchers.Main) {
+        lifecycle.repeatOnLifecycle(lifecycleState) {
+            stateFlow.collect { handleState(it) }
+        }
+    }
+
+}
+
+/**
+ * Collect effect from ViewMode
+ */
+fun <S : UiState, E : UiEvent, F : UiEffect>
+        BaseViewModel<S, E, F>.collectEffect(
+    lifecycle: Lifecycle,
+    lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
+    sideEffect: (suspend (sideEffect: F) -> Unit),
+) {
+    val sideEffectFlow = this.uiEffect
+    lifecycle.coroutineScope.launch(Dispatchers.Main) {
+        lifecycle.repeatOnLifecycle(lifecycleState) {
+            sideEffectFlow.collect { sideEffect(it) }
+        }
+    }
+
 }

@@ -1,12 +1,20 @@
 package com.discut.manga.ui.reader.domain
 
 
+import androidx.compose.runtime.Immutable
 import com.discut.core.mvi.contract.UiEffect
 import com.discut.core.mvi.contract.UiEvent
 import com.discut.core.mvi.contract.UiState
-import com.discut.manga.ui.main.domain.NavBarItem
+import com.discut.manga.ui.reader.viewer.domain.ReaderChapter
+import discut.manga.data.manga.Manga
 
-data class ReaderActivityState(val navBarItems: List<NavBarItem>) : UiState
+@Immutable
+data class ReaderActivityState(
+    val manga: Manga? = null,
+    val readerChapters: List<ReaderChapter> = emptyList(),
+    val currentChapters: CurrentChapters? = null,
+    val currentPage: Int = -1
+) : UiState
 
 sealed interface ReaderActivityEvent : UiEvent {
 
@@ -15,4 +23,5 @@ sealed interface ReaderActivityEvent : UiEvent {
 
 sealed interface ReaderActivityEffect : UiEffect {
     data class InitMangaError(val error: Throwable) : ReaderActivityEffect
+    data class InitChapterError(val error: Throwable) : ReaderActivityEffect
 }

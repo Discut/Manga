@@ -15,7 +15,7 @@ interface MangaDao : BaseDao<Manga> {
     @Query(
         "SELECT * FROM manga WHERE id = :id"
     )
-    fun getById(id: Long): Manga
+    fun getById(id: Long): Manga?
 
     @Query(
         "SELECT * FROM manga WHERE id = :id"

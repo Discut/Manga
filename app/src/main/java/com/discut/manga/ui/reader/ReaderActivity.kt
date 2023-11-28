@@ -3,14 +3,17 @@ package com.discut.manga.ui.reader
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.FrameLayout
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.discut.manga.R
 import com.discut.manga.ui.base.BaseActivity
+import com.discut.manga.ui.reader.domain.ReaderActivityEffect
+import com.discut.manga.ui.reader.domain.ReaderActivityEvent
 import com.discut.manga.ui.reader.viewer.PageViewer
 import com.discut.manga.ui.reader.viewer.PageViewerAdapter
-import com.discut.manga.util.withUIContext
+import com.discut.manga.util.toast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
@@ -34,8 +37,6 @@ class ReaderActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.reader_layout)
 
-        vm.uiState
-
         val findViewById = findViewById<FrameLayout>(R.id.page_container)
         val pageViewer = PageViewer(this, false)
         val pageViewerAdapter = PageViewerAdapter(this)
@@ -48,18 +49,32 @@ class ReaderActivity : BaseActivity() {
             finish()
             return
         }
-
+        handleUiState()
+        handleEffect()
 
         lifecycleScope.launch(Dispatchers.IO) {
             withContext(NonCancellable) {
-                vm.init(manga, chapter)
-                vm.uiState.collect {
-                    withUIContext {
-                        when(it){
+                vm.sendEvent(ReaderActivityEvent.Initialize(manga, chapter))
+            }
+        }
+    }
 
-                        }
-                    }
+    private fun handleUiState() {
+        vm.collectState {
+
+        }
+    }
+
+    private fun handleEffect() {
+        vm.collectEffect {
+            when (it) {
+                is ReaderActivityEffect.InitChapterError -> {
+                    Log.d("ReaderActivity", it.error.message.orEmpty())
+                    toast(it.error.message)
+                    finish()
                 }
+
+                else -> {}
             }
         }
     }

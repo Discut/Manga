@@ -1,12 +1,13 @@
 package discut.manga.source.local.manager
 
 import android.content.Context
-import discut.manga.source.local.disk.Archive
+import discut.manga.source.local.SupportFormat
 import discut.manga.source.local.disk.LocalSourceFileSystem
 import managa.source.domain.SChapter
 import managa.source.domain.SManga
 import managa.source.domain.utils.ChapterRecognition
 import manga.core.utils.compareToCaseInsensitiveNaturalOrder
+import java.io.File
 
 class LocalMangaManager(
     private val context: Context,
@@ -20,8 +21,8 @@ class LocalMangaManager(
             .filter { it.isDirectory && !it.isHidden }
             // 根据名称排名
             .distinctBy { it.name }
-/*            // 留下内容大于0的文件夹
-            .filter { it.listFiles()?.size?.let { size -> size > 0 } ?: false }*/
+        /*            // 留下内容大于0的文件夹
+                    .filter { it.listFiles()?.size?.let { size -> size > 0 } ?: false }*/
 
         return maybeMangaDirs.map {
             SManga.create().apply {
@@ -34,7 +35,7 @@ class LocalMangaManager(
     fun getChaptersOfManga(manga: SManga): List<SChapter> {
         return fileSystem.getFilesInMangaDir(manga.url)
             // 留下app支持格式的文件或者文件夹
-            .filter { Archive.isSupported(it) }
+            .filter { SupportFormat.isSupport(it) }
             .map {
                 SChapter.create().apply {
                     name = if (it.isDirectory) {
@@ -55,6 +56,14 @@ class LocalMangaManager(
                     }
             }
             .toList()
+    }
+
+    fun getFormat(chapter: SChapter): SupportFormat {
+        val file = File(chapter.url)
+        if (file.exists()) {
+            throw Exception("No found such file.")
+        }
+        return SupportFormat.valueOf(file)
     }
 
 }

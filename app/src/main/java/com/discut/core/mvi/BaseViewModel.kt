@@ -66,6 +66,10 @@ abstract class BaseViewModel<S : UiState, E : UiEvent, F : UiEffect> : ViewModel
         _uiState.value = uiState.value.newState()
     }
 
+    protected fun updateState(newState: S.() -> S) {
+        sendState(newState)
+    }
+
     /**
      * 处理事件，更新状态
      * @param state S

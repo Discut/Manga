@@ -20,7 +20,7 @@ interface ChapterDao : BaseDao<Chapter> {
     @Query(
         "SELECT * FROM chapter WHERE id = :id"
     )
-    fun getById(id: Long): Chapter
+    fun getById(id: Long): Chapter?
 
     @Query(
         "SELECT * FROM chapter WHERE id = :id"

@@ -1,9 +1,11 @@
-package com.discut.manga.ui.reader.viewer.domain
+package com.discut.manga.ui.reader.viewer.loader
 
-interface PageLoader {
+import com.discut.manga.ui.reader.viewer.domain.ReaderPage
+
+interface IPageLoader {
 
 
-    suspend fun getAllPages(): List<ReaderPage>
+    suspend fun buildPages(): List<ReaderPage>
 
 
     /*    suspend fun loadPage(page: Page) {

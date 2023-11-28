@@ -12,6 +12,7 @@ import managa.source.domain.FilterList
 import managa.source.domain.SChapter
 import managa.source.domain.SManga
 import managa.source.domain.SMangas
+import java.io.File
 
 class LocalSource(
     private val context: Context,
@@ -67,4 +68,8 @@ class LocalSource(
 
 
     override fun getFilterList(): FilterList = FilterList()
+
+    fun getFormat(chapter: SChapter): SupportFormat {
+        return localMangaManager.getFormat(chapter)
+    }
 }
