@@ -86,6 +86,7 @@ dependencies {
     // for DI
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
+    implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
 
     // lifecycle
     implementation(libs.lifecycle.runtime.ktx)
@@ -130,6 +131,7 @@ dependencies {
     implementation(libs.disklrucache)
     // stream function
     implementation(libs.okio)
+    implementation(libs.accompanist.permissions)
 
     //// Test
     testImplementation("junit:junit:4.13.2")
