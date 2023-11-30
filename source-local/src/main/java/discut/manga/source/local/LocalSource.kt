@@ -18,14 +18,11 @@ class LocalSource(
     private val context: Context,
 ) : Source {
 
-    private var localMangaManager: LocalMangaManager
+    private var localMangaManager: LocalMangaManager = LocalMangaManager(
+        context,
+        LocalSourceFileSystem(context)
+    )
 
-    init {
-        localMangaManager = LocalMangaManager(
-            context,
-            LocalSourceFileSystem(context)
-        )
-    }
     override val id: Long
         get() = 0L
     override val name: String

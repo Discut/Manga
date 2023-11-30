@@ -13,6 +13,7 @@ import com.discut.manga.ui.reader.domain.ReaderActivityEffect
 import com.discut.manga.ui.reader.domain.ReaderActivityEvent
 import com.discut.manga.ui.reader.viewer.PageViewer
 import com.discut.manga.ui.reader.viewer.PageViewerAdapter
+import com.discut.manga.ui.reader.viewer.domain.ReaderChapter
 import com.discut.manga.util.toast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -23,9 +24,15 @@ import kotlinx.coroutines.withContext
 @AndroidEntryPoint
 class ReaderActivity : BaseActivity() {
 
+    lateinit var pageViewer: PageViewer
+
     companion object {
-        fun startActivity(context: Context) {
+        fun startActivity(context: Context, manga: Long, chapter: Long) {
             val intent = Intent(context, ReaderActivity::class.java)
+            intent.apply {
+                putExtra("manga", manga)
+                putExtra("chapter", chapter)
+            }
             context.startActivity(intent)
         }
     }
@@ -38,10 +45,10 @@ class ReaderActivity : BaseActivity() {
         setContentView(R.layout.reader_layout)
 
         val findViewById = findViewById<FrameLayout>(R.id.page_container)
-        val pageViewer = PageViewer(this, false)
-        val pageViewerAdapter = PageViewerAdapter(this)
+        pageViewer = PageViewer(this, false)
+        //val pageViewerAdapter = PageViewerAdapter(this)
         findViewById.addView(pageViewer)
-        pageViewer.adapter = pageViewerAdapter
+        //pageViewer.adapter = pageViewerAdapter
 
         val manga = intent.extras?.getLong("manga", -1) ?: -1L
         val chapter = intent.extras?.getLong("chapter", -1) ?: -1L
@@ -61,7 +68,28 @@ class ReaderActivity : BaseActivity() {
 
     private fun handleUiState() {
         vm.collectState {
+            when (val chapterState = it.currentChapters?.currReaderChapter?.state) {
+                is ReaderChapter.State.Error -> {
+                    toast(chapterState.error.message)
+                    finish()
+                }
 
+                is ReaderChapter.State.Loaded -> {
+                    chapterState.pages
+                    val pageViewerAdapter = PageViewerAdapter(this, chapterState.pages)
+                    pageViewer.adapter = pageViewerAdapter
+                }
+
+                ReaderChapter.State.Loading -> {
+
+                }
+
+                ReaderChapter.State.Wait -> {
+
+                }
+
+                else -> {}
+            }
         }
     }
 

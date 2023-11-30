@@ -6,6 +6,8 @@ import androidx.compose.material.icons.filled.Bookmarks
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.MoreHoriz
 import com.discut.core.mvi.BaseViewModel
+import com.discut.manga.source.ISourceManager
+import com.discut.manga.source.SourceManager
 import com.discut.manga.ui.bookshelf.BookshelfScreen
 import com.discut.manga.ui.main.domain.MainEffect
 import com.discut.manga.ui.main.domain.MainEvent
@@ -17,8 +19,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor() :
+class MainViewModel @Inject constructor(
+    private val sourceManager: ISourceManager
+) :
     BaseViewModel<MainState, MainEvent, MainEffect>() {
+
 
     companion object {
         const val DEFAULT_SCREEN_ROUTE = "/books"
@@ -30,7 +35,7 @@ class MainViewModel @Inject constructor() :
                 NavBarItem("Books", "/books", Icons.Filled.Bookmarks) { BookshelfScreen() },
                 NavBarItem("History", "/history", Icons.Filled.History) { BookshelfScreen() },
                 NavBarItem("Search", "/search", Icons.Filled.Attribution) { BookshelfScreen() },
-                NavBarItem("Source", "/source", Icons.Filled.Attribution) { SourceScreen() },
+                NavBarItem("Source", "/source", Icons.Filled.Attribution) { SourceScreen(sourceManager) },
                 NavBarItem("More", "more", Icons.Filled.MoreHoriz) { MoreScreen() }
             )
         )

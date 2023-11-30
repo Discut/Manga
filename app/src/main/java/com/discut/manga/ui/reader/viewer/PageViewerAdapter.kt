@@ -1,42 +1,36 @@
 package com.discut.manga.ui.reader.viewer
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.core.graphics.drawable.toBitmap
-import com.discut.manga.R
 import com.discut.manga.ui.reader.viewer.base.BasePageViewerAdapter
 import com.discut.manga.ui.reader.viewer.domain.ReaderPage
-import com.discut.manga.ui.reader.viewer.domain.PageState
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.InputStream
 
-class PageViewerAdapter(context: Context) : BasePageViewerAdapter() {
+class PageViewerAdapter(context: Context, readerPages: List<ReaderPage>) : BasePageViewerAdapter() {
 
-    var readerPages: MutableList<ReaderPage> = mutableListOf(
-/*        ReaderPage.ChapterPage(1, "", null, null).apply {
-            loadPage={
-                var stream: InputStream = ByteArrayInputStream(byteArrayOf())
-                try {
-                    val drawable = context.resources.getDrawable(R.drawable.image_test, null)
-                    val toBitmap = drawable.toBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight)
-                    val baos = ByteArrayOutputStream()
-                    toBitmap.compress(Bitmap.CompressFormat.PNG, 100, baos)
-                    stream = ByteArrayInputStream(baos.toByteArray())
-                } catch (e: Exception) {
-                    state = PageState.ERROR
+    var readerPages: MutableList<ReaderPage> = readerPages.toMutableList()
+    //= mutableListOf(
+    /*        ReaderPage.ChapterPage(1, "", null, null).apply {
+                loadPage={
+                    var stream: InputStream = ByteArrayInputStream(byteArrayOf())
+                    try {
+                        val drawable = context.resources.getDrawable(R.drawable.image_test, null)
+                        val toBitmap = drawable.toBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight)
+                        val baos = ByteArrayOutputStream()
+                        toBitmap.compress(Bitmap.CompressFormat.PNG, 100, baos)
+                        stream = ByteArrayInputStream(baos.toByteArray())
+                    } catch (e: Exception) {
+                        state = PageState.ERROR
+                    }
+                    streamGetter = { stream }
+                    state = PageState.READY
                 }
-                streamGetter = { stream }
-                state = PageState.READY
-            }
 
-        }*/
+            }*/
 
-    )
-        private set
+    //)
+    private set
 
     override fun getCount(): Int {
         return readerPages.size

@@ -35,7 +35,7 @@ class ChapterLoader(
         return when (source) {
             is LocalSource -> {
                 when (val format = source.getFormat(chapter.toSChapter())) {
-                    is SupportFormat.Directory -> LocalPageLoader(format.file)
+                    is SupportFormat.Directory -> DirectoryPageLoader(format.file, context)
                 }
                 // TODO 添加更多的格式支持
             }

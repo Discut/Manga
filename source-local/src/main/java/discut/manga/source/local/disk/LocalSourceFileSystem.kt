@@ -26,7 +26,26 @@ class LocalSourceFileSystem(
     }
 
     fun getFilesInMangaDir(path: String): Sequence<File> {
-        return File(path).listFiles().orEmpty().asSequence()
+        return getBaseDirectories()
+            .flatMap { File(it.absoluteFile, path).listFiles().orEmpty().toList() }
+    }
+
+    fun getFilesInLocalDir(relativePath: String): Sequence<File> {
+        return getBaseDirectories()
+            .flatMap {
+                File(it.absoluteFile, relativePath)
+                    .listFiles()
+                    .orEmpty()
+                    .toList()
+            }
+    }
+
+    fun getFileInLocalDir(relativePath: String): File {
+        val map = getBaseDirectories()
+            .filter { File(it.absoluteFile, relativePath).exists() }
+            .map { File(it.absoluteFile, relativePath) }
+            .toList()
+        return map.getOrElse(0) { File("ERROR") }
     }
 }
 

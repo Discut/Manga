@@ -62,7 +62,8 @@ class ReaderActivityViewModel @Inject constructor(
                 val source = sourceManager.get(manga.source)
                     ?: return@withIOContext Result.success(false)
                 val chapterLoader = ChapterLoader(App.instance, manga, source)
-                val currentChapters = loadViewerChapters(chapterLoader, readerChapter)
+                val currentChapters =
+                    buildViewerChapters(chapterLoader, chaptersForReader, readerChapter)
 
 
                 updateState {
@@ -72,7 +73,7 @@ class ReaderActivityViewModel @Inject constructor(
                         currentChapters = currentChapters
                     )
                 }
-                TODO("需要去实现初始化漫画章节时，不同状态的 sendEffect，例如初始化失败")
+                return@withIOContext Result.success(true)
                 // 参考eu.kanade.tachiyomi.ui.reader.ReaderActivity#onCreate 中的 viewModel.init(manga, chapter)
                 // 与 eu.kanade.tachiyomi.ui.reader.ReaderViewModel#init
             } catch (e: Throwable) {
@@ -88,12 +89,19 @@ class ReaderActivityViewModel @Inject constructor(
         return readerChapters
     }
 
-    private suspend fun loadViewerChapters(
+    private suspend fun buildViewerChapters(
         loader: IChapterLoader,
+        chapters: List<ReaderChapter>,
         chapter: ReaderChapter
     ): CurrentChapters {
         loader.loadChapter(chapter)
-        // TODO 20231128
-        CurrentChapters()
+
+        val index = chapters.indexOf(chapter)
+
+        return CurrentChapters(
+            chapters.getOrNull(index - 1),
+            chapter,
+            chapters.getOrNull(index + 1)
+        )
     }
 }

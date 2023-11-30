@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -29,8 +30,7 @@ import com.discut.manga.ui.main.domain.MainState
 import com.discut.manga.ui.main.domain.NavBarItem
 
 @Composable
-fun MainScreen() {
-    val viewModel: MainViewModel = viewModel()
+fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val navController = rememberNavController()
 

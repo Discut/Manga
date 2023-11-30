@@ -27,7 +27,7 @@ class LocalMangaManager(
         return maybeMangaDirs.map {
             SManga.create().apply {
                 title = it.name
-                url = it.absolutePath
+                url = it.name
             }
         }
     }
@@ -43,7 +43,7 @@ class LocalMangaManager(
                     } else {
                         it.nameWithoutExtension
                     }
-                    url = it.absolutePath
+                    url = "${manga.url}${File.separator}${it.name}"
                     date_upload = it.lastModified()
                     chapter_number = ChapterRecognition
                         .parseChapterNumber(manga.title, this.name, this.chapter_number.toDouble())
@@ -59,8 +59,8 @@ class LocalMangaManager(
     }
 
     fun getFormat(chapter: SChapter): SupportFormat {
-        val file = File(chapter.url)
-        if (file.exists()) {
+        val file = fileSystem.getFileInLocalDir(chapter.url)
+        if (!file.exists()) {
             throw Exception("No found such file.")
         }
         return SupportFormat.valueOf(file)

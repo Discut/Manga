@@ -40,7 +40,9 @@ abstract class MangaAppDatabase : RoomDatabase() {
             INSTANCE = Room.databaseBuilder(
                 context,
                 MangaAppDatabase::class.java, DATABASE_NAME
-            ).build()
+            )
+                //.fallbackToDestructiveMigration()
+                .build()
         }
 
         private fun getDb(): MangaAppDatabase {

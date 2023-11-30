@@ -13,7 +13,13 @@ sealed class ReaderPage(var isLoad: Boolean = false) {
             _stateFlow.value = PageState.READY
         }*/
 
+    val stateFlow = _stateFlow.asStateFlow()
 
+    var state
+        get() = _stateFlow.value
+        set(value) {
+            _stateFlow.value = value
+        }
     class ChapterPage(
         val index: Int,
         val url: String = "",
@@ -23,16 +29,8 @@ sealed class ReaderPage(var isLoad: Boolean = false) {
 
         lateinit var loadPage: suspend () -> Unit
 
-        private val _stateFlow = MutableStateFlow(PageState.WAIT)
+        //private val _stateFlow = MutableStateFlow(PageState.WAIT)
 
-
-        val stateFlow = _stateFlow.asStateFlow()
-
-        var state
-            get() = _stateFlow.value
-            set(value) {
-                _stateFlow.value = value
-            }
         private val _progressFlow = MutableStateFlow(0)
         val progressFlow = _progressFlow.asStateFlow()
         val progress
