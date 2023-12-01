@@ -19,7 +19,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class ReaderActivityViewModel @Inject constructor(
+class ReaderViewModel @Inject constructor(
     private val sourceManager: ISourceManager,
 ) :
     BaseViewModel<ReaderActivityState, ReaderActivityEvent, ReaderActivityEffect>() {
