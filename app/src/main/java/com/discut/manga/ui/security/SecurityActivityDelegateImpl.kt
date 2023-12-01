@@ -24,7 +24,12 @@ class SecurityActivityDelegateImpl : SecurityActivityDelegate,
     }
 
     override fun onCreate(owner: LifecycleOwner) {
-        activity.window.enableSecureScreen()
+        if (settingsPreference.enableSecurityMode().not()) {
+            return
+        }
+        if (securityPreference.enableHidePreview()) {
+            activity.window.enableSecureScreen()
+        }
     }
 
     override fun onResume(owner: LifecycleOwner) {
