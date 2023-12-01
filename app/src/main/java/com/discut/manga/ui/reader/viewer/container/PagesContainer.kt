@@ -2,10 +2,10 @@ package com.discut.manga.ui.reader.viewer.container
 
 import android.content.Context
 
-abstract class PagesContainer<A,C> {
+interface PagesContainer<A,C> {
 
-    abstract var adapter: A
+    var adapter: A
 
-    abstract var isVisible: Boolean
-    protected abstract fun createContainer(context: Context): C
+    var isVisible: Boolean
+    fun createContainer(context: Context): C
 }

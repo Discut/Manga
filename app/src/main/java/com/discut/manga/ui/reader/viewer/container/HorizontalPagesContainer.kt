@@ -13,7 +13,7 @@ import com.discut.manga.ui.reader.viewer.PagesView
 class HorizontalPagesContainer(
     readerViewModel: ReaderViewModel,
     readerActivity: ReaderActivity
-) : PagesContainer<PageViewerAdapter, PagesView>() {
+) : PagesContainer<PageViewerAdapter, PagesView> {
     private var pageViewContainer: PagesView = createContainer(readerActivity)
 
     private lateinit var _adapter: PageViewerAdapter
