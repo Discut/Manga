@@ -4,15 +4,23 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.WindowManager
 import androidx.activity.viewModels
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.ComposeView
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import com.discut.manga.R
 import com.discut.manga.ui.base.BaseActivity
 import com.discut.manga.ui.reader.adapter.RecyclerPagesViewAdapter
+import com.discut.manga.ui.reader.component.ReaderNavigationBar
 import com.discut.manga.ui.reader.domain.ReaderActivityEffect
 import com.discut.manga.ui.reader.domain.ReaderActivityEvent
 import com.discut.manga.ui.reader.viewer.container.VerticalPagesContainer
 import com.discut.manga.ui.reader.viewer.domain.ReaderChapter
+import com.discut.manga.util.setComposeContent
 import com.discut.manga.util.toast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -37,6 +45,13 @@ class ReaderActivity : BaseActivity() {
     }
 
     private val vm: ReaderViewModel by viewModels()
+    private val windowInsetsController by lazy {
+        WindowInsetsControllerCompat(
+            window,
+            window.decorView
+        )
+    }
+
 
     // private lateinit var pagesContainer: PagesContainer<IPagesViewAdapter, View>
 
@@ -44,14 +59,7 @@ class ReaderActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.reader_layout)
-
-        //pagesContainer = HorizontalPagesContainer(vm, this)
-
-        //val findViewById = findViewById<FrameLayout>(R.id.page_container)
-        //pageViewer = PageViewer(this, false)
-        //val pageViewerAdapter = PageViewerAdapter(this)
-        //findViewById.addView(pageViewer)
-        //pageViewer.adapter = pageViewerAdapter
+        initMenuView()
 
         val manga = intent.extras?.getLong("manga", -1) ?: -1L
         val chapter = intent.extras?.getLong("chapter", -1) ?: -1L
@@ -69,32 +77,41 @@ class ReaderActivity : BaseActivity() {
         }
     }
 
-    private fun handleUiState() {
-        vm.collectState {
-            when (val chapterState = it.currentChapters?.currReaderChapter?.state) {
-                is ReaderChapter.State.Error -> {
-                    toast(chapterState.error.message)
-                    finish()
-                }
+    private fun initMenuView() {
+        val menuRoot = findViewById<ComposeView>(R.id.menu_root)
 
-                is ReaderChapter.State.Loaded -> {
-                    val horizontalPagesContainer = VerticalPagesContainer(vm, this)
-                    val pageViewerAdapter = RecyclerPagesViewAdapter(this, chapterState.pages)
-                    horizontalPagesContainer.adapter = pageViewerAdapter
-                    horizontalPagesContainer.isVisible = true
-                    //pageViewer.adapter = pageViewerAdapter
-                }
+        menuRoot.setComposeContent {
+            val state by vm.uiState.collectAsState()
 
-                ReaderChapter.State.Loading -> {
-
-                }
-
-                ReaderChapter.State.Wait -> {
-
-                }
-
-                else -> {}
+            ReaderNavigationBar(
+                visibility = state.isMenuShow,
+                mangaTitle = state.manga?.title,
+                chapterTitle = state.currentChapters?.currReaderChapter?.dbChapter?.name
+            ) {
+                finish()
             }
+        }
+
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onBackPressed() {
+        if (vm.uiState.value.isMenuShow) {
+            vm.sendEvent(ReaderActivityEvent.ReaderNavigationMenuVisibleChange(false))
+            return
+        }
+        super.onBackPressed()
+    }
+
+    private fun handleUiState() {
+        var oldChapterState: ReaderChapter.State? = null
+        vm.collectState {
+            val chapterState = it.currentChapters?.currReaderChapter?.state
+            if (oldChapterState != chapterState) {
+                oldChapterState = chapterState
+                handleChapterStateChange(chapterState)
+            }
+            handleMenuStateChange(it.isMenuShow)
         }
     }
 
@@ -109,6 +126,44 @@ class ReaderActivity : BaseActivity() {
 
                 else -> {}
             }
+        }
+    }
+
+    private fun handleChapterStateChange(chapterState: ReaderChapter.State?) {
+        when (chapterState) {
+            is ReaderChapter.State.Error -> {
+                toast(chapterState.error.message)
+                finish()
+            }
+
+            is ReaderChapter.State.Loaded -> {
+                val horizontalPagesContainer = VerticalPagesContainer(vm, this)
+                val pageViewerAdapter = RecyclerPagesViewAdapter(this, chapterState.pages)
+                horizontalPagesContainer.adapter = pageViewerAdapter
+                horizontalPagesContainer.isVisible = true
+                //pageViewer.adapter = pageViewerAdapter
+            }
+
+            ReaderChapter.State.Loading -> {
+
+            }
+
+            ReaderChapter.State.Wait -> {
+
+            }
+
+            else -> {}
+        }
+    }
+
+    private fun handleMenuStateChange(visible: Boolean) {
+        if (visible) {
+            windowInsetsController.show(WindowInsetsCompat.Type.systemBars())
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+        } else {
+            windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
+            windowInsetsController.systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
     }
 }

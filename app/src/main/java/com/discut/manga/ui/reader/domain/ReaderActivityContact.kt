@@ -13,12 +13,16 @@ data class ReaderActivityState(
     val manga: Manga? = null,
     val readerChapters: List<ReaderChapter> = emptyList(),
     val currentChapters: CurrentChapters? = null,
-    val currentPage: Int = -1
+    val currentPage: Int = -1,
+    val isMenuShow: Boolean = false,
 ) : UiState
 
 sealed interface ReaderActivityEvent : UiEvent {
 
     data class Initialize(val mangaId: Long, val chapterId: Long) : ReaderActivityEvent
+
+    data class ReaderNavigationMenuVisibleChange(val visible: Boolean) : ReaderActivityEvent
+
 }
 
 sealed interface ReaderActivityEffect : UiEffect {

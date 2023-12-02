@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Manga</string>
+
+    <string name="reader_click_nav_menu">Menu</string>
+    <string name="reader_click_nav_next">Next</string>
+    <string name="reader_click_nav_prev">Prev</string>
+    <string name="reader_click_nav_left">Left</string>
+    <string name="reader_click_nav_right">Right</string>
+    <string name="back">Back</string>
 </resources>

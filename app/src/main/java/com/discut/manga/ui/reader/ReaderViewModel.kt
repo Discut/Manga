@@ -36,44 +36,46 @@ class ReaderViewModel @Inject constructor(
             is ReaderActivityEvent.Initialize -> {
                 withContext(NonCancellable) {
                     val initState = init(event.mangaId, event.chapterId)
-                    if (initState.getOrDefault(false).not()) {
+                    val pair = initState.getOrDefault(Pair(false, state))
+                    if (pair.first.not()) {
                         val exception =
                             initState.exceptionOrNull() ?: IllegalStateException("Unknown error")
                         sendEffect(ReaderActivityEffect.InitChapterError(exception))
                     }
+                    pair.second
                 }
-                state
             }
+
+            is ReaderActivityEvent.ReaderNavigationMenuVisibleChange -> {
+                state.copy(isMenuShow = event.visible)
+            }
+
         }
     }
 
-    private suspend fun init(mangaId: Long, chapterId: Long): Result<Boolean> {
+    private suspend fun init(mangaId: Long, chapterId: Long): Result<Pair<Boolean, ReaderActivityState>> {
         return withIOContext {
             try {
                 val manga = dbManager.mangaDao().getById(mangaId)
-                    ?: return@withIOContext Result.success(false)
+                    ?: return@withIOContext Result.success(Pair(false, uiState.value))
                 val chapters = dbManager.chapterDao().getAllInManga(mangaId)
                 if (chapters.isEmpty()) {
-                    return@withIOContext Result.success(false)
+                    return@withIOContext Result.success(Pair(false, uiState.value))
                 }
                 val chaptersForReader = initChaptersForReader(chapters)
                 val readerChapter = chaptersForReader.find { it.dbChapter.id == chapterId }
-                    ?: return@withIOContext Result.success(false)
+                    ?: return@withIOContext Result.success(Pair(false, uiState.value))
                 val source = sourceManager.get(manga.source)
-                    ?: return@withIOContext Result.success(false)
+                    ?: return@withIOContext Result.success(Pair(false, uiState.value))
                 val chapterLoader = ChapterLoader(App.instance, manga, source)
                 val currentChapters =
                     buildViewerChapters(chapterLoader, chaptersForReader, readerChapter)
-
-
-                updateState {
-                    copy(
-                        manga = manga,
-                        readerChapters = chaptersForReader,
-                        currentChapters = currentChapters
-                    )
-                }
-                return@withIOContext Result.success(true)
+                val newValue = uiState.value.copy(
+                    manga = manga,
+                    readerChapters = chaptersForReader,
+                    currentChapters = currentChapters
+                )
+                return@withIOContext Result.success(Pair(true, newValue))
                 // 参考eu.kanade.tachiyomi.ui.reader.ReaderActivity#onCreate 中的 viewModel.init(manga, chapter)
                 // 与 eu.kanade.tachiyomi.ui.reader.ReaderViewModel#init
             } catch (e: Throwable) {

@@ -25,6 +25,8 @@ class RecyclerPageHolder(
 
     private lateinit var imageLoadProgressContainer: ViewGroup
 
+    private val progressIndicatorLayoutHeight = content.resources.displayMetrics.heightPixels /*/ 3*/
+
     private var loadJob: Job? = null
 
     lateinit var readerPage: ReaderPage.ChapterPage
@@ -106,7 +108,7 @@ class RecyclerPageHolder(
         content.addView(
             imageLoadProgressContainer,
             ViewGroup.LayoutParams.MATCH_PARENT,
-            content.resources.displayMetrics.heightPixels / 3
+            progressIndicatorLayoutHeight
         )
         val progress = ReaderProgressIndicatorComponent(context)
         imageLoadProgressContainer.addView(progress)

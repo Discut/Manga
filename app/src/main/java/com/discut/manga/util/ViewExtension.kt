@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionContext
+import androidx.compose.ui.platform.ComposeView
 import com.discut.manga.theme.MangaTheme
 
 fun Window.enableSecureScreen() {
@@ -20,6 +21,14 @@ inline fun ComponentActivity.setComposeContent(
     parent: CompositionContext? = null,
     crossinline content: @Composable () -> Unit
 ) {
+    setContent {
+        MangaTheme {
+            content()
+        }
+    }
+}
+
+fun ComposeView.setComposeContent(content: @Composable () -> Unit) {
     setContent {
         MangaTheme {
             content()
