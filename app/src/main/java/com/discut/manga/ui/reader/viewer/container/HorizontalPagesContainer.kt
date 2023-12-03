@@ -13,12 +13,12 @@ import com.discut.manga.ui.reader.viewer.PagesView
 class HorizontalPagesContainer(
     readerViewModel: ReaderViewModel,
     readerActivity: ReaderActivity
-) : PagesContainer<PageViewerAdapter, PagesView> {
+) : PagesContainer {
     private var pageViewContainer: PagesView = createContainer(readerActivity)
 
     private lateinit var _adapter: PageViewerAdapter
 
-    override var adapter: PageViewerAdapter
+    var adapter: PageViewerAdapter
         set(a) {
             _adapter = a
             pageViewContainer.adapter = _adapter
@@ -44,5 +44,13 @@ class HorizontalPagesContainer(
         readerActivity.findViewById<FrameLayout>(R.id.page_container)
             .addView(pageViewContainer)
     }
-    override fun createContainer(context: Context): PagesView = PagesView(context, true)
+    fun createContainer(context: Context): PagesView = PagesView(context, true)
+    override fun onScrolled(index: Int?) {
+        TODO("Not yet implemented")
+    }
+
+    override fun moveToPage(position: Int) {
+        TODO("Not yet implemented")
+    }
+
 }

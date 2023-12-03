@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.surfaceColorAtElevation
@@ -24,6 +25,17 @@ fun ReaderNavigationBar(
     visibility: Boolean = false,
     mangaTitle: String?,
     chapterTitle: String?,
+
+    currentPage: Int,
+    pageCount: Int,
+    enableNextChapter: Boolean,
+    enablePreviousChapter: Boolean,
+    onSliderChange: (Int) -> Unit,
+    onSliderChangeFinished: (() -> Unit)? = null,
+    onNextChapter: () -> Unit,
+    onPreviousChapter: () -> Unit,
+    onClickSettings: () -> Unit,
+
     onBackActionClick: () -> Unit
 ) {
 
@@ -49,7 +61,17 @@ fun ReaderNavigationBar(
         ComponentSlideUpAndDown(
             visibility = visibility
         ) {
-
+            ReaderNavigationBottomBar(
+                currentPage = currentPage,
+                pageCount = pageCount,
+                enableNextChapter = enableNextChapter,
+                enablePreviousChapter = enablePreviousChapter,
+                onSliderChange = onSliderChange,
+                onNextChapter = onNextChapter,
+                onPreviousChapter = onPreviousChapter,
+                onClickSettings = onClickSettings,
+                onSliderChangeFinished = onSliderChangeFinished
+            )
         }
     }
 

@@ -1,11 +1,12 @@
 package com.discut.manga.ui.reader.viewer.container
 
-import android.content.Context
+interface PagesContainer {
 
-interface PagesContainer<A,C> {
-
-    var adapter: A
 
     var isVisible: Boolean
-    fun createContainer(context: Context): C
+
+    fun onScrolled(index: Int? = null)
+
+    fun moveToPage(position: Int)
+
 }

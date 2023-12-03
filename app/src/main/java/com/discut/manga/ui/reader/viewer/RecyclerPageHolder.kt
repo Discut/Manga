@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 
 class RecyclerPageHolder(
-    context: Context,
+    private val context: Context,
     private val content: PageView
 ) : RecyclerView.ViewHolder(content) {
     private val imageLoadProgress: ReaderProgressIndicatorComponent =
@@ -25,7 +25,8 @@ class RecyclerPageHolder(
 
     private lateinit var imageLoadProgressContainer: ViewGroup
 
-    private val progressIndicatorLayoutHeight = content.resources.displayMetrics.heightPixels /*/ 3*/
+    private val progressIndicatorLayoutHeight
+        get() = context.resources.displayMetrics.heightPixels /*/ 3*/
 
     private var loadJob: Job? = null
 
@@ -33,7 +34,7 @@ class RecyclerPageHolder(
 
     init {
         //content.addView(imageLoadProgressContainer)
-        /*                content.layoutParams = ViewGroup.LayoutParams(
+/*                        content.layoutParams = ViewGroup.LayoutParams(
                             ViewGroup.LayoutParams.WRAP_CONTENT,
                             ViewGroup.LayoutParams.MATCH_PARENT
                         )*/

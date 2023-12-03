@@ -8,6 +8,9 @@ import android.view.WindowManager
 import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -15,9 +18,11 @@ import androidx.lifecycle.lifecycleScope
 import com.discut.manga.R
 import com.discut.manga.ui.base.BaseActivity
 import com.discut.manga.ui.reader.adapter.RecyclerPagesViewAdapter
+import com.discut.manga.ui.reader.component.BottomSheetMenu
 import com.discut.manga.ui.reader.component.ReaderNavigationBar
 import com.discut.manga.ui.reader.domain.ReaderActivityEffect
 import com.discut.manga.ui.reader.domain.ReaderActivityEvent
+import com.discut.manga.ui.reader.viewer.container.PagesContainer
 import com.discut.manga.ui.reader.viewer.container.VerticalPagesContainer
 import com.discut.manga.ui.reader.viewer.domain.ReaderChapter
 import com.discut.manga.util.setComposeContent
@@ -32,6 +37,7 @@ import kotlinx.coroutines.withContext
 class ReaderActivity : BaseActivity() {
 
     //lateinit var pageViewer: PageViewer
+    private var pagesContainer: PagesContainer? = null
 
     companion object {
         fun startActivity(context: Context, manga: Long, chapter: Long) {
@@ -80,28 +86,58 @@ class ReaderActivity : BaseActivity() {
     private fun initMenuView() {
         val menuRoot = findViewById<ComposeView>(R.id.menu_root)
 
+
         menuRoot.setComposeContent {
             val state by vm.uiState.collectAsState()
+            var showBottomSheet by remember { mutableStateOf(false) }
+
 
             ReaderNavigationBar(
                 visibility = state.isMenuShow,
                 mangaTitle = state.manga?.title,
-                chapterTitle = state.currentChapters?.currReaderChapter?.dbChapter?.name
-            ) {
-                finish()
+                chapterTitle = state.currentChapters?.currReaderChapter?.dbChapter?.name,
+
+                currentPage = state.currentPage,
+                pageCount = state.readerPages,
+                enableNextChapter = state.currentChapters?.nextReaderChapter != null,
+                enablePreviousChapter = state.currentChapters?.prevReaderChapter != null,
+                onSliderChange = {
+                    pagesContainer?.moveToPage(it)
+                },
+                onSliderChangeFinished = {
+                },
+                onNextChapter = {
+
+                },
+                onPreviousChapter = {
+
+                },
+                onClickSettings = {
+                    showBottomSheet = true
+                },
+
+                onBackActionClick = {
+                    finish()
+                }
+            )
+
+            BottomSheetMenu(showBottomSheet) {
+                showBottomSheet = false
             }
+
         }
+
 
     }
 
-    @Deprecated("Deprecated in Java")
-    override fun onBackPressed() {
-        if (vm.uiState.value.isMenuShow) {
-            vm.sendEvent(ReaderActivityEvent.ReaderNavigationMenuVisibleChange(false))
-            return
-        }
-        super.onBackPressed()
-    }
+    /*    @Deprecated("Deprecated in Java")
+        override fun onBackPressed() {
+            if (vm.uiState.value.isMenuShow) {
+                vm.sendEvent(ReaderActivityEvent.ReaderNavigationMenuVisibleChange(false))
+                return
+            }
+            super.onBackPressed()
+        }*/
 
     private fun handleUiState() {
         var oldChapterState: ReaderChapter.State? = null
@@ -138,6 +174,7 @@ class ReaderActivity : BaseActivity() {
 
             is ReaderChapter.State.Loaded -> {
                 val horizontalPagesContainer = VerticalPagesContainer(vm, this)
+                pagesContainer = horizontalPagesContainer
                 val pageViewerAdapter = RecyclerPagesViewAdapter(this, chapterState.pages)
                 horizontalPagesContainer.adapter = pageViewerAdapter
                 horizontalPagesContainer.isVisible = true

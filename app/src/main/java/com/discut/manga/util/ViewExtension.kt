@@ -4,6 +4,7 @@ import android.view.Window
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionContext
 import androidx.compose.ui.platform.ComposeView
@@ -27,6 +28,7 @@ inline fun ComponentActivity.setComposeContent(
         }
     }
 }
+
 
 fun ComposeView.setComposeContent(content: @Composable () -> Unit) {
     setContent {

@@ -65,7 +65,7 @@ dependencies {
     implementation(libs.material)
 
     // Material Design 3
-    implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.material3:material3:1.2.0-alpha12")
 
     // Android Studio Preview support
     implementation("androidx.compose.ui:ui-tooling-preview")
@@ -74,8 +74,8 @@ dependencies {
     // UI
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
-    implementation("androidx.compose.material:material-icons-core")// MD icon
-    implementation("androidx.compose.material:material-icons-extended")// Add full set of material icons
+    implementation("androidx.compose.material:material-icons-core:1.5.4")// MD icon
+    implementation("androidx.compose.material:material-icons-extended:1.5.4")// Add full set of material icons
     implementation("androidx.compose.material3:material3-window-size-class")// Add window size utils
     implementation("androidx.activity:activity-compose:1.7.2")// Integration with activities
     implementation(libs.constraintlayout)

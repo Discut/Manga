@@ -1,5 +1,6 @@
 package com.discut.manga.ui.reader.viewer.container
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.PointF
 import android.view.MotionEvent
@@ -7,7 +8,8 @@ import android.view.ScaleGestureDetector
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.view.isVisible
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.WebtoonLayoutManager
 import com.discut.manga.R
 import com.discut.manga.ui.reader.ReaderActivity
 import com.discut.manga.ui.reader.ReaderViewModel
@@ -17,19 +19,23 @@ import com.discut.manga.ui.reader.navigation.BaseReaderClickNavigation.Navigatio
 import com.discut.manga.ui.reader.navigation.LShapeNavigation
 import com.discut.manga.ui.reader.utils.transformToAction
 import com.discut.manga.ui.reader.viewer.RecyclerPagesView
+import com.discut.manga.ui.reader.viewer.domain.ReaderPage
 import com.discut.manga.ui.reader.viewer.scrollDown
 import com.discut.manga.ui.reader.viewer.scrollUp
-import kotlin.math.abs
 
+@SuppressLint("ViewConstructor")
 class VerticalPagesContainer(
-    readerViewModel: ReaderViewModel,
-    readerActivity: ReaderActivity
-) : PagesContainer<RecyclerPagesViewAdapter, RecyclerPagesView>, FrameLayout(readerActivity) {
+    private val readerViewModel: ReaderViewModel,
+    private val readerActivity: ReaderActivity
+) : PagesContainer, FrameLayout(readerActivity) {
 
     private var container: RecyclerPagesView = createContainer(readerActivity)
 
+    private var layoutManager: WebtoonLayoutManager = WebtoonLayoutManager(readerActivity)
+
+
     private lateinit var _adapter: RecyclerPagesViewAdapter
-    override var adapter: RecyclerPagesViewAdapter
+    var adapter: RecyclerPagesViewAdapter
         get() = _adapter
         set(value) {
             container.adapter = value
@@ -50,9 +56,7 @@ class VerticalPagesContainer(
             )
             isFocusable = false
             itemAnimator = null
-            layoutManager = LinearLayoutManager(context).apply {
-                isItemPrefetchEnabled = false
-            }
+            layoutManager = this@VerticalPagesContainer.layoutManager
 
             signalTapListener = {
                 val position = PointF(it.x / width, it.y / height)
@@ -63,11 +67,32 @@ class VerticalPagesContainer(
                         )
                     )
 
-                    NavigationRegion.NEXT, NavigationRegion.RIGHT -> scrollDown(focusLength)
-                    NavigationRegion.PREV, NavigationRegion.LEFT -> scrollUp(focusLength)
+                    NavigationRegion.NEXT, NavigationRegion.RIGHT -> {
+                        scrollDown(focusLength)
+                        changeMenuVisible(false)
+                    }
+
+                    NavigationRegion.PREV, NavigationRegion.LEFT -> {
+                        scrollUp(focusLength)
+                        changeMenuVisible(false)
+                    }
                 }
             }
-            setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+            addOnScrollListener(
+                object : RecyclerView.OnScrollListener() {
+                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                        onScrolled()
+                    }
+
+                    override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                        if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
+                            //isSliderScrolling = false
+                            changeMenuVisible(false)
+                        }
+                    }
+                }
+            )
+            /*setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
                 if (abs(oldScrollY - scrollY) == 0) {
                     return@setOnScrollChangeListener
                 }
@@ -79,7 +104,7 @@ class VerticalPagesContainer(
                         )
                     )
                 }
-            }
+            }*/
         }
         addView(container, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
         readerActivity.findViewById<FrameLayout>(R.id.page_container)
@@ -91,7 +116,39 @@ class VerticalPagesContainer(
      */
     private val focusLength = resources.displayMetrics.heightPixels * 3 / 4
 
-    override fun createContainer(context: Context): RecyclerPagesView = RecyclerPagesView(context)
+    fun createContainer(context: Context): RecyclerPagesView = RecyclerPagesView(context)
+    override fun onScrolled(index: Int?) {
+        val position = index ?: layoutManager.findLastEndVisibleItemPosition()
+        val page = adapter.readerPages.getOrNull(position) ?: return
+        when (page) {
+            is ReaderPage.ChapterPage -> {
+                readerViewModel.sendEvent(
+                    ReaderActivityEvent.PageSelected(position)
+                )
+            }
+
+            is ReaderPage.ChapterTransition -> TODO()
+        }
+    }
+
+    override fun moveToPage(position: Int) {
+        adapter.readerPages.getOrNull(position)?.let {
+            layoutManager.scrollToPositionWithOffset(position, 0)
+        }
+    }
+
+
+    private fun changeMenuVisible(visible: Boolean) {
+        if (visible == readerViewModel.uiState.value.isMenuShow) {
+            return
+        }
+        readerViewModel.sendEvent(
+            ReaderActivityEvent.ReaderNavigationMenuVisibleChange(
+                visible
+            )
+        )
+
+    }
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
         scaleDetector.onTouchEvent(ev)
@@ -118,5 +175,6 @@ class VerticalPagesContainer(
     }
 
 }
+
 
 

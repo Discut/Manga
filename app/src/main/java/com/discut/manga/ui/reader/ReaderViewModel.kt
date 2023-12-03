@@ -50,6 +50,10 @@ class ReaderViewModel @Inject constructor(
                 state.copy(isMenuShow = event.visible)
             }
 
+            is ReaderActivityEvent.PageSelected -> {
+                state.copy(currentPage = event.index)
+            }
+
         }
     }
 

@@ -15,13 +15,22 @@ data class ReaderActivityState(
     val currentChapters: CurrentChapters? = null,
     val currentPage: Int = -1,
     val isMenuShow: Boolean = false,
-) : UiState
+) : UiState {
+    val readerPages: Int by lazy {
+        when (val chapterState = currentChapters?.currReaderChapter?.state) {
+            is ReaderChapter.State.Loaded -> chapterState.pages.size
+            else -> 0
+        }
+    }
+}
 
 sealed interface ReaderActivityEvent : UiEvent {
 
     data class Initialize(val mangaId: Long, val chapterId: Long) : ReaderActivityEvent
 
     data class ReaderNavigationMenuVisibleChange(val visible: Boolean) : ReaderActivityEvent
+
+    data class PageSelected(val index: Int) : ReaderActivityEvent
 
 }
 

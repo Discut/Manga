@@ -9,6 +9,7 @@ import com.discut.core.mvi.BaseViewModel
 import com.discut.manga.source.ISourceManager
 import com.discut.manga.source.SourceManager
 import com.discut.manga.ui.bookshelf.BookshelfScreen
+import com.discut.manga.ui.history.HistoryScreen
 import com.discut.manga.ui.main.domain.MainEffect
 import com.discut.manga.ui.main.domain.MainEvent
 import com.discut.manga.ui.main.domain.MainState
@@ -33,7 +34,7 @@ class MainViewModel @Inject constructor(
         return MainState(
             navBarItems = listOf(
                 NavBarItem("Books", "/books", Icons.Filled.Bookmarks) { BookshelfScreen() },
-                NavBarItem("History", "/history", Icons.Filled.History) { BookshelfScreen() },
+                NavBarItem("History", "/history", Icons.Filled.History) { HistoryScreen() },
                 NavBarItem("Search", "/search", Icons.Filled.Attribution) { BookshelfScreen() },
                 NavBarItem("Source", "/source", Icons.Filled.Attribution) { SourceScreen(sourceManager) },
                 NavBarItem("More", "more", Icons.Filled.MoreHoriz) { MoreScreen() }
