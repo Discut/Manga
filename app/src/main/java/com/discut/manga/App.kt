@@ -33,3 +33,7 @@ class App : Application() {
         // init end
     }
 }
+
+fun Any.getResourceString(resId: Int): String {
+    return App.instance.getString(resId)
+}

@@ -7,4 +7,6 @@
     <string name="reader_click_nav_left">Left</string>
     <string name="reader_click_nav_right">Right</string>
     <string name="back">Back</string>
+    <string name="unknown_manga_title">Unknown Manga</string>
+    <string name="unknown_source">Unknown source</string>
 </resources>

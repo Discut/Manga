@@ -1,56 +1,47 @@
 package com.discut.manga.components.manga
 
 import android.annotation.SuppressLint
-import android.view.LayoutInflater
-import android.widget.TextView
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
-import com.discut.manga.R
+import com.discut.manga.components.domain.toMangaCoverInfo
 import com.discut.manga.theme.MangaTheme
+import com.discut.manga.ui.manga.details.MangaDetails
 
 @SuppressLint("InflateParams")
 @Composable
 fun MangaInfoBox(
-    char1: String,
-    char2: String,
+    modifier: Modifier = Modifier,
+    info: MangaDetails
 ) {
-    val value = MaterialTheme.typography.titleLarge.fontSize.value
-    Row(modifier = Modifier.height(180.dp)) {
-        AndroidView(modifier = Modifier
-            .fillMaxHeight()
-            .weight(1.25f), factory = {
-            val view =
-                LayoutInflater.from(it).inflate(R.layout.cover_layout, null)
-            val char1View = view.findViewById<TextView>(R.id.cover_text_1)
-            val char2View = view.findViewById<TextView>(R.id.cover_text_2)
-            char1View.textSize = value * 8
-            char2View.textSize = value * 13
-            char1View.text = char1
-            char2View.text = char2
-            view
-        })
-        Row(
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(180.dp)
+            .padding(16.dp)
+    ) {
+
+        MangaCover.BOOK(
+            modifier = Modifier,
+            info = info.toMangaCoverInfo()
+        )
+
+        MangaInfo(
             modifier = Modifier
                 .weight(2.75f)
-                .fillMaxSize(),
-            verticalAlignment = Alignment.CenterVertically  // 垂直居中
-        ) {
-            Text(
-                text = "Title",
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onPrimary,
-            )
-        }
+                .fillMaxSize()
+                .padding(vertical = 24.dp, horizontal = 16.dp),
+            title = info.title,
+            author = info.author,
+            artist = info.artist,
+            source = info.source
+        )
     }
 }
 
@@ -59,8 +50,15 @@ fun MangaInfoBox(
 fun MangaInfoBoxPreview() {
     MangaTheme {
         MangaInfoBox(
-            char1 = "A",
-            char2 = "B",
+            info = MangaDetails(
+                coverUrl = "https://pro-api.mgsearcher.com/_next/image?url=https%3A%2F%2Fcover1.baozimh.org%2Fcover%2Ftx%2Fzuijiangneijuanjitong%2F27_17_20_325503b799a59e545f85633395ed7f13_1651051230260.webp&w=640&q=50",
+                title = "内卷系统",
+                author = "作者",
+                artist = "艺术家",
+                source = "源",
+                url = "url",
+                description = "描述",
+            )
         )
     }
 }

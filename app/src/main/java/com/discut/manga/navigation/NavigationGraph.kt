@@ -7,15 +7,27 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.discut.manga.ui.settings.SettingsScreen
 import com.discut.manga.ui.settings.security.SecuritySettingsScreen
 
-sealed class NavigationRoute(val route: String) {
+sealed class NavigationRoute(
+    val route: String,
+    val arguments: List<NamedNavArgument> = emptyList()
+) {
     data object MainScreen : NavigationRoute("main")
+
+    data object MangaDetailsScreen : NavigationRoute(
+        route = "mangaDetails/{mangaId}",
+        arguments = listOf(
+            navArgument("mangaId") { type = NavType.LongType }
+        ))
 
     data object SettingsScreen : NavigationRoute("settings") {
         data object Security : NavigationRoute("security")

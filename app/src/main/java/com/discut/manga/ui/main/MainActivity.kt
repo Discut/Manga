@@ -1,10 +1,12 @@
 package com.discut.manga.ui.main
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -16,6 +18,7 @@ import com.discut.manga.navigation.NavigationRoute
 import com.discut.manga.navigation.settingsGraph
 import com.discut.manga.ui.base.BaseActivity
 import com.discut.manga.ui.main.domain.ToRouteEvent
+import com.discut.manga.ui.manga.details.MangaDetailsScreen
 import com.discut.manga.util.setComposeContent
 import com.discut.manga.util.toast
 import dagger.hilt.android.AndroidEntryPoint
@@ -23,11 +26,13 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : BaseActivity() {
 
+    @SuppressLint("CoroutineCreationDuringComposition")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         checkStorageManagerPermission()
         setComposeContent {
             val navController = rememberNavController()
+            val scope = rememberCoroutineScope()
             LocalLifecycleOwner.current.observeEvent<ToRouteEvent> {
                 navController.navigate(it.route) {
                     popUpTo(navController.graph.findStartDestination().id) {
@@ -46,6 +51,17 @@ class MainActivity : BaseActivity() {
             ) {
                 composable(NavigationRoute.MainScreen.route) {
                     MainScreen()
+                }
+                composable(
+                    route = NavigationRoute.MangaDetailsScreen.route,
+                    arguments = NavigationRoute.MangaDetailsScreen.arguments
+                ) {
+                    val mangaId = it.arguments?.getLong("mangaId")
+                        ?: throw IllegalArgumentException("mangaId is null")
+                    MangaDetailsScreen(mangaId = mangaId) {
+                        navController.popBackStack()
+                    }
+
                 }
                 settingsGraph(navController)
             }
