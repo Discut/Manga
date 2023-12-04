@@ -7,10 +7,10 @@ object Padding{
     val Small = 4.dp
     val Default = 8.dp
     val Medium = 12.dp
-    val Large = 16.dp
-    val ExtraLarge = 24.dp
-    val ExtraBigLarge = 32.dp
-    val ExtraExtraBiggerLarge = 48.dp
+    val Normal = 16.dp
+    val Large = 24.dp
+    val ExtraLarge = 32.dp
+    val ExtraBiggerLarge = 48.dp
 }
 
 val MaterialTheme.padding: Padding

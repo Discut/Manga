@@ -1,12 +1,16 @@
 package com.discut.manga.ui.manga.details
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.filled.Preview
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -19,7 +23,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.discut.manga.components.manga.MangaInfoBox
+import com.discut.manga.theme.padding
 import com.discut.manga.ui.common.LoadingScreen
+import com.discut.manga.ui.manga.details.component.InfoBoxType
+import com.discut.manga.ui.manga.details.component.MoreInfoItem
 import com.discut.manga.ui.manga.details.component.ShortInfoBox
 import discut.manga.common.res.R
 
@@ -60,7 +67,7 @@ fun MangaDetailsScreen(
                 navigationIcon = {
                     IconButton(onClick = onBackPressed) {
                         Icon(
-                            imageVector = Icons.Outlined.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                             contentDescription = "Back"
                         )
                     }
@@ -70,11 +77,47 @@ fun MangaDetailsScreen(
         LazyColumn(modifier = Modifier.padding(it)) {
             item {
                 MangaInfoBox(
+                    modifier = Modifier.padding(horizontal = MaterialTheme.padding.ExtraLarge),
                     info = details
                 )
             }
             item {
-                ShortInfoBox()
+                ShortInfoBox(
+                    modifier = Modifier.wrapContentHeight(),
+                    contexts = listOf(
+                        InfoBoxType.Icon("Preview") {
+                            Icon(
+                                modifier = it,
+                                imageVector = Icons.Default.Preview,
+                                contentDescription = ""
+                            )
+                        },
+                        InfoBoxType.Title("Top", "Bottom"),
+                        InfoBoxType.Icon("Preview") {
+                            Icon(
+                                modifier = it,
+                                imageVector = Icons.Default.Preview,
+                                contentDescription = ""
+                            )
+                        }
+                    )
+                )
+            }
+            item {
+                HorizontalDivider(
+                    modifier = Modifier.padding(
+                        horizontal = MaterialTheme.padding.ExtraLarge,
+                        vertical = MaterialTheme.padding.Large
+                    )
+                )
+            }
+            item {
+                MoreInfoItem(
+                    modifier = Modifier.padding(horizontal = MaterialTheme.padding.ExtraLarge),
+                    title = "关于此漫画",
+                    onClick = {}) {
+
+                }
             }
 
         }

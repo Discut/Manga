@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.discut.manga.theme.alpha
 
 @Composable
@@ -36,7 +37,8 @@ fun MangaInfo(
         Text(
             text = title,
             style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding(8.dp)
+            modifier = Modifier.padding(8.dp),
+            fontSize = 26.sp
         )
         Spacer(modifier = Modifier.weight(1f))
         Column(
