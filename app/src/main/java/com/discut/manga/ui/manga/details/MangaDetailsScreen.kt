@@ -12,19 +12,27 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.discut.manga.components.CustomModalBottomSheet
 import com.discut.manga.components.manga.MangaInfoBox
+import com.discut.manga.theme.alpha
 import com.discut.manga.theme.padding
 import com.discut.manga.ui.common.LoadingScreen
+import com.discut.manga.ui.manga.details.component.AboutBookSheet
 import com.discut.manga.ui.manga.details.component.InfoBoxType
 import com.discut.manga.ui.manga.details.component.MoreInfoItem
 import com.discut.manga.ui.manga.details.component.ShortInfoBox
@@ -39,6 +47,9 @@ fun MangaDetailsScreen(
     onBackPressed: () -> Unit,
 ) {
     val state by vm.uiState.collectAsStateWithLifecycle()
+    var showModalBottomSheet by remember {
+        mutableStateOf(false)
+    }
     LaunchedEffect(key1 = mangaId) {
         if (state.loadState is MangaDetailsState.LoadState.Waiting) {
             vm.sendEvent(MangaDetailsEvent.Init(mangaId))
@@ -54,73 +65,113 @@ fun MangaDetailsScreen(
 
     val loadState = state.loadState as MangaDetailsState.LoadState.Loaded
     val details = loadState.details
-    Scaffold(
-        topBar = {
-            TopAppBar(title = {
-                Text(
-                    text = details.title.ifBlank { stringResource(id = R.string.unknown_manga_title) },
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    // modifier = Modifier.alpha(if (isActionMode) 1f else titleAlphaProvider()),
-                )
-            },
-                navigationIcon = {
-                    IconButton(onClick = onBackPressed) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                })
-        }
-    ) {
-        LazyColumn(modifier = Modifier.padding(it)) {
-            item {
-                MangaInfoBox(
-                    modifier = Modifier.padding(horizontal = MaterialTheme.padding.ExtraLarge),
-                    info = details
-                )
-            }
-            item {
-                ShortInfoBox(
-                    modifier = Modifier.wrapContentHeight(),
-                    contexts = listOf(
-                        InfoBoxType.Icon("Preview") {
+    Surface {
+        Scaffold(
+            topBar = {
+                TopAppBar(title = {
+                    Text(
+                        text = details.title.ifBlank { stringResource(id = R.string.unknown_manga_title) },
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        // modifier = Modifier.alpha(if (isActionMode) 1f else titleAlphaProvider()),
+                    )
+                },
+                    navigationIcon = {
+                        IconButton(onClick = onBackPressed) {
                             Icon(
-                                modifier = it,
-                                imageVector = Icons.Default.Preview,
-                                contentDescription = ""
-                            )
-                        },
-                        InfoBoxType.Title("Top", "Bottom"),
-                        InfoBoxType.Icon("Preview") {
-                            Icon(
-                                modifier = it,
-                                imageVector = Icons.Default.Preview,
-                                contentDescription = ""
+                                imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                                contentDescription = "Back"
                             )
                         }
-                    )
-                )
+                    })
             }
-            item {
-                HorizontalDivider(
-                    modifier = Modifier.padding(
-                        horizontal = MaterialTheme.padding.ExtraLarge,
-                        vertical = MaterialTheme.padding.Large
+        ) {
+            LazyColumn(modifier = Modifier.padding(it)) {
+                item {
+                    MangaInfoBox(
+                        modifier = Modifier.padding(horizontal = MaterialTheme.padding.ExtraLarge),
+                        info = details
                     )
-                )
-            }
-            item {
-                MoreInfoItem(
-                    modifier = Modifier.padding(horizontal = MaterialTheme.padding.ExtraLarge),
-                    title = "关于此漫画",
-                    onClick = {}) {
-
                 }
-            }
+                item {
+                    ShortInfoBox(
+                        modifier = Modifier.wrapContentHeight(),
+                        contexts = listOf(
+                            InfoBoxType.Icon("Preview") {
+                                Icon(
+                                    modifier = it,
+                                    imageVector = Icons.Default.Preview,
+                                    contentDescription = ""
+                                )
+                            },
+                            InfoBoxType.Title("Top", "Bottom"),
+                            InfoBoxType.Icon("Preview") {
+                                Icon(
+                                    modifier = it,
+                                    imageVector = Icons.Default.Preview,
+                                    contentDescription = ""
+                                )
+                            }
+                        )
+                    )
+                }
+                item {
+                    HorizontalDivider(
+                        modifier = Modifier.padding(
+                            horizontal = MaterialTheme.padding.ExtraLarge,
+                            vertical = MaterialTheme.padding.Large
+                        )
+                    )
+                }
+                item {
+                    MoreInfoItem(
+                        modifier = Modifier.padding(horizontal = MaterialTheme.padding.ExtraLarge),
+                        title = "关于此漫画",
+                        onClick = {
+                            showModalBottomSheet = true
+                        }) {
+                        Text(
+                            text = "Modal bottom sheets are used as an alternative to inline menus or simple dialogs on mobile, especially when offering a long list of action items, or when items require longer descriptions and icons. Like dialogs, modal bottom sheets appear in front of app content, disabling all other app functionality when they appear, and remaining on screen until confirmed, dismissed, or a required action has been taken.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.alpha(MaterialTheme.alpha.Normal),
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 3
+                        )
+                    }
+                }
 
+            }
         }
+        CustomModalBottomSheet(
+            isShow = showModalBottomSheet,
+            onDismissRequest = {
+                showModalBottomSheet = !showModalBottomSheet
+            }
+        ) {
+            AboutBookSheet(
+                modifier = Modifier
+                    .padding(horizontal = MaterialTheme.padding.Normal)
+                    .padding(it),
+                description = "Modal bottom sheets are used as an alternative to inline menus or simple dialogs on mobile, especially when offering a long list of action items, or when items require longer descriptions and icons. Like dialogs, modal bottom sheets appear in front of app content, disabling all other app functionality when they appear, and remaining on screen until confirmed, dismissed, or a required action has been taken.",
+                chips = strings
+            )
+        }
+
     }
 
+
 }
+
+private val strings = listOf<String>(
+    "简介",
+    "目录",
+    "作者",
+    "状态",
+    "标签",
+    "更新",
+    "字数",
+    "最新章节",
+    "推荐",
+    "评论",
+    "推荐",
+)
