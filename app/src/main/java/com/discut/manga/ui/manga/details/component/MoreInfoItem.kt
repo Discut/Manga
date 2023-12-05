@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -25,7 +26,7 @@ fun MoreInfoItem(
     modifier: Modifier = Modifier,
     title: String,
     onClick: () -> Unit,
-    content: (@Composable () -> Unit)? = null
+    content: (@Composable ColumnScope.() -> Unit)? = null
 ) {
     Column(modifier = Modifier
         .fillMaxWidth()
@@ -49,7 +50,7 @@ fun MoreInfoItem(
                 tint = MaterialTheme.colorScheme.primary
             )
         }
-        content?.invoke()
+        content?.invoke(this)
     }
 }
 
