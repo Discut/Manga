@@ -79,6 +79,7 @@ dependencies {
     implementation("androidx.compose.material3:material3-window-size-class")// Add window size utils
     implementation("androidx.activity:activity-compose:1.7.2")// Integration with activities
     implementation(libs.constraintlayout)
+    implementation(libs.swipe)
 
     // for unlock app
     implementation(libs.biometric.ktx)
