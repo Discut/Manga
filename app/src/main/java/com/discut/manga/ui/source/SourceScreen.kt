@@ -6,11 +6,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import com.discut.manga.components.preference.TextPreferenceComponent
 import com.discut.manga.data.SnowFlakeUtil
+import com.discut.manga.data.extensions.toManga
 import com.discut.manga.source.ISourceManager
 import com.discut.manga.util.withIOContext
 import discut.manga.data.MangaAppDatabase
 import discut.manga.data.chapter.Chapter
-import discut.manga.data.manga.Manga
 import discut.manga.source.local.LocalSource
 import kotlinx.coroutines.launch
 
@@ -43,12 +43,7 @@ internal fun SourceScreen(sourceManager: ISourceManager) {
                             val popularManga = get.getPopularManga(0)
                             val mangas = popularManga.mangas
                             val map = mangas.map {
-                                Manga.create().copy(
-                                    id = SnowFlakeUtil(0, 0).nextId,
-                                    title = it.title,
-                                    url = it.url,
-                                    source = get.id
-                                )
+                                it.toManga(get.id)
                             }
                             MangaAppDatabase.DB.mangaDao().insert(map.get(0))
                             get.fetchChapterList(mangas[0]).collect {

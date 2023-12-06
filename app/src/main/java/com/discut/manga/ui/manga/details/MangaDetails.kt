@@ -12,7 +12,8 @@ data class MangaDetails(
     val author: String,
     val artist: String,
     val description: String,
-    val source: String
+    val source: String,
+    val tags: List<String> = emptyList(),
 )
 
 internal fun Manga.toMangaDetails(): MangaDetails {
@@ -24,5 +25,8 @@ internal fun Manga.toMangaDetails(): MangaDetails {
         author = author ?: "",
         artist = artist ?: "",
         source = getSource()?.name ?: getResourceString(R.string.unknown_source),
+        tags = genre?.cleanTags() ?: emptyList()
     )
 }
+
+private fun List<String>.cleanTags() = this.filter { it != "" }

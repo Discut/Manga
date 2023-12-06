@@ -24,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -37,7 +38,9 @@ import com.discut.manga.ui.manga.details.component.AboutBookSheet
 import com.discut.manga.ui.manga.details.component.InfoBoxType
 import com.discut.manga.ui.manga.details.component.MoreInfoItem
 import com.discut.manga.ui.manga.details.component.ShortInfoBox
+import com.discut.manga.ui.manga.details.component.SwipeableActionCollection
 import com.discut.manga.ui.manga.details.component.SwipeableChapterItem
+import com.discut.manga.ui.reader.ReaderActivity
 import com.discut.manga.util.toDate
 import discut.manga.common.res.R
 
@@ -50,6 +53,7 @@ fun MangaDetailsScreen(
     onBackPressed: () -> Unit,
 ) {
     val state by vm.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
     var showModalBottomSheet by remember {
         mutableStateOf(false)
     }
@@ -138,7 +142,7 @@ fun MangaDetailsScreen(
                             showModalBottomSheet = true
                         }) {
                         Text(
-                            text = "Modal bottom sheets are used as an alternative to inline menus or simple dialogs on mobile, especially when offering a long list of action items, or when items require longer descriptions and icons. Like dialogs, modal bottom sheets appear in front of app content, disabling all other app functionality when they appear, and remaining on screen until confirmed, dismissed, or a required action has been taken.",
+                            text = details.description,
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.alpha(MaterialTheme.alpha.Normal),
                             overflow = TextOverflow.Ellipsis,
@@ -159,18 +163,37 @@ fun MangaDetailsScreen(
                             )
                         })
                 }
-                state.chapters.forEach {
+                state.chapters.forEachIndexed { index, chapter ->
                     item {
-                        SwipeableChapterItem(
-                            modifier = Modifier.padding(
-                                horizontal = MaterialTheme.padding.ExtraLarge,
-                                vertical = MaterialTheme.padding.Normal
-                            ),
-                            title = it.name,
-                            subtitle = it.lastModifiedAt.toDate(),
-                            onClick = {}) {
-
+                        var alpha by remember {
+                            mutableStateOf(1f)
                         }
+                        SwipeableChapterItem(
+                            modifier = Modifier
+                                .padding(
+                                    horizontal = MaterialTheme.padding.ExtraLarge,
+                                    vertical = MaterialTheme.padding.Normal
+                                )
+                                .alpha(alpha),
+                            title = chapter.name,
+                            subtitle = chapter.lastModifiedAt.toDate(),
+                            leftAction = SwipeableActionCollection.Read {},
+
+                            onSwipe = {
+                                alpha = if (alpha == 1f) {
+                                    MaterialTheme.alpha.Lowest
+                                } else {
+                                    MaterialTheme.alpha.Highest
+                                }
+                            },
+                            onClick = {
+                                ReaderActivity.startActivity(
+                                    context,
+                                    mangaId,
+                                    chapter.id
+                                )
+                            }
+                        )
                     }
                 }
 
@@ -187,8 +210,8 @@ fun MangaDetailsScreen(
                 modifier = Modifier
                     .padding(horizontal = MaterialTheme.padding.Normal)
                     .padding(it),
-                description = "Modal bottom sheets are used as an alternative to inline menus or simple dialogs on mobile, especially when offering a long list of action items, or when items require longer descriptions and icons. Like dialogs, modal bottom sheets appear in front of app content, disabling all other app functionality when they appear, and remaining on screen until confirmed, dismissed, or a required action has been taken.",
-                chips = strings
+                description = details.description,
+                chips = details.tags
             )
         }
 
@@ -197,16 +220,3 @@ fun MangaDetailsScreen(
 
 }
 
-private val strings = listOf<String>(
-    "简介",
-    "目录",
-    "作者",
-    "状态",
-    "标签",
-    "更新",
-    "字数",
-    "最新章节",
-    "推荐",
-    "评论",
-    "推荐",
-)

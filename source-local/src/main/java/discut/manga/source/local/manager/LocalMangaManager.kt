@@ -6,6 +6,7 @@ import discut.manga.source.local.disk.LocalSourceFileSystem
 import managa.source.domain.SChapter
 import managa.source.domain.SManga
 import managa.source.domain.utils.ChapterRecognition
+import manga.core.utils.ImageUtil
 import manga.core.utils.compareToCaseInsensitiveNaturalOrder
 import java.io.File
 
@@ -28,6 +29,10 @@ class LocalMangaManager(
             SManga.create().apply {
                 title = it.name
                 url = it.name
+                getCover(it)?.let {
+                    thumbnail_url = it.absolutePath
+                }
+                parserMetadata(it, this)
             }
         }
     }
@@ -66,4 +71,25 @@ class LocalMangaManager(
         return SupportFormat.valueOf(file)
     }
 
+    private fun getCover(mangaFile: File): File? {
+        return mangaFile.listFiles()?.filter {
+            it.isFile && it.nameWithoutExtension.equals(
+                "cover",
+                ignoreCase = true
+            )
+        }?.firstOrNull {
+            ImageUtil.isImage(it.name) { it.inputStream() }
+        }
+    }
+
+    private fun parserMetadata(mangaFile: File, manga: SManga) {
+        val metadataParser = XmlMetadataParser()
+        val file = mangaFile.walk()
+            .maxDepth(2)
+            .filter { it.isFile && it.nameWithoutExtension.equals(NODE_ROOT, ignoreCase = true) }
+            .firstOrNull()
+        file?.let {
+            metadataParser.parse(it.inputStream(), manga)
+        }
+    }
 }

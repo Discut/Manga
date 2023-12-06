@@ -4,14 +4,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material.icons.filled.PersonOutline
 import androidx.compose.material.icons.filled.Storage
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,37 +39,40 @@ fun MangaInfo(
         Text(
             text = title,
             style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier
+                .padding(top = 8.dp, end = 8.dp, bottom = 8.dp),
             fontSize = 26.sp
         )
         Spacer(modifier = Modifier.weight(1f))
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .alpha(MaterialTheme.alpha.Normal),
-            horizontalAlignment = Alignment.End,
-            verticalArrangement = Arrangement.Bottom
-        ) {
-            TextWithIcon(text = author) {
-                Icon(
-                    imageVector = Icons.Filled.PersonOutline,
-                    contentDescription = "Author",
-                    modifier = it
-                )
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Column(
+                modifier = Modifier
+                    .alpha(MaterialTheme.alpha.Normal),
+            ) {
+                TextWithIcon(text = author) {
+                    Icon(
+                        imageVector = Icons.Filled.PersonOutline,
+                        contentDescription = "Author",
+                        modifier = it
+                    )
+                }
+                TextWithIcon(text = artist) {
+                    Icon(
+                        imageVector = Icons.Filled.Brush,
+                        contentDescription = "Pinter",
+                        modifier = it
+                    )
+                }
+                TextWithIcon(text = source) {
+                    Icon(
+                        imageVector = Icons.Filled.Storage,
+                        contentDescription = "Source",
+                        modifier = it
+                    )
+                }
             }
-            TextWithIcon(text = artist) {
-                Icon(
-                    imageVector = Icons.Filled.Brush,
-                    contentDescription = "Pinter",
-                    modifier = it
-                )
-            }
-            TextWithIcon(text = source) {
-                Icon(
-                    imageVector = Icons.Filled.Storage,
-                    contentDescription = "Source",
-                    modifier = it
-                )
+            LikeButton {
+
             }
         }
     }
@@ -84,10 +89,19 @@ internal fun TextWithIcon(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        icon(Modifier.size(16.dp))
         Text(
             text = text,
             style = MaterialTheme.typography.titleSmall,
         )
-        icon(Modifier.size(16.dp))
+    }
+}
+
+@Composable
+internal fun LikeButton(
+    onClick: () -> Unit
+) {
+    IconButton(onClick = { onClick() }) {
+        Icon(imageVector = Icons.Outlined.FavoriteBorder, contentDescription = "Like")
     }
 }
