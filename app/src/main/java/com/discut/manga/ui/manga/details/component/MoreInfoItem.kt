@@ -1,7 +1,6 @@
 package com.discut.manga.ui.manga.details.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -11,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.NavigateNext
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -20,18 +20,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.sp
 import com.discut.manga.theme.padding
+import com.discut.manga.util.addClick
 
 @Composable
 fun MoreInfoItem(
     modifier: Modifier = Modifier,
     title: String,
-    onClick: () -> Unit,
+    onClick: (() -> Unit)? = null,
+    icon: @Composable (() -> Unit)? = null,
     content: (@Composable ColumnScope.() -> Unit)? = null
 ) {
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .clickable { onClick() }
-        .then(modifier)) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .addClick(onClick)
+            .then(modifier)
+    ) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
@@ -44,11 +48,16 @@ fun MoreInfoItem(
                 style = MaterialTheme.typography.titleLarge,
                 fontSize = 18.sp
             )
-            Icon(
-                imageVector = Icons.AutoMirrored.Outlined.NavigateNext,
-                contentDescription = "Next",
-                tint = MaterialTheme.colorScheme.primary
-            )
+            if (icon == null) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Outlined.NavigateNext,
+                    contentDescription = "Next",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            } else {
+                icon.invoke()
+            }
+
         }
         content?.invoke(this)
     }

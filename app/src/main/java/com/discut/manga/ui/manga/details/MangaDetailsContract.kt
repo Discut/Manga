@@ -3,11 +3,13 @@ package com.discut.manga.ui.manga.details
 import com.discut.core.mvi.contract.UiEffect
 import com.discut.core.mvi.contract.UiEvent
 import com.discut.core.mvi.contract.UiState
+import discut.manga.data.chapter.Chapter
 import discut.manga.data.manga.Manga
 
 data class MangaDetailsState(
     internal val loadState: LoadState = LoadState.Waiting,
-    internal val manga: Manga? = null
+    internal val manga: Manga? = null,
+    internal val chapters: List<Chapter> = emptyList()
 ) : UiState {
     sealed class LoadState {
         data object Waiting : LoadState()

@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Preview
+import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -36,6 +37,8 @@ import com.discut.manga.ui.manga.details.component.AboutBookSheet
 import com.discut.manga.ui.manga.details.component.InfoBoxType
 import com.discut.manga.ui.manga.details.component.MoreInfoItem
 import com.discut.manga.ui.manga.details.component.ShortInfoBox
+import com.discut.manga.ui.manga.details.component.SwipeableChapterItem
+import com.discut.manga.util.toDate
 import discut.manga.common.res.R
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -89,7 +92,8 @@ fun MangaDetailsScreen(
             LazyColumn(modifier = Modifier.padding(it)) {
                 item {
                     MangaInfoBox(
-                        modifier = Modifier.padding(horizontal = MaterialTheme.padding.ExtraLarge),
+                        modifier = Modifier
+                            .padding(horizontal = MaterialTheme.padding.ExtraLarge),
                         info = details
                     )
                 }
@@ -117,15 +121,18 @@ fun MangaDetailsScreen(
                 }
                 item {
                     HorizontalDivider(
-                        modifier = Modifier.padding(
-                            horizontal = MaterialTheme.padding.ExtraLarge,
-                            vertical = MaterialTheme.padding.Large
-                        )
+                        modifier = Modifier
+                            .padding(
+                                horizontal = MaterialTheme.padding.ExtraLarge,
+                                vertical = MaterialTheme.padding.Large
+                            )
                     )
                 }
                 item {
                     MoreInfoItem(
-                        modifier = Modifier.padding(horizontal = MaterialTheme.padding.ExtraLarge),
+                        modifier = Modifier
+                            .padding(horizontal = MaterialTheme.padding.ExtraLarge)
+                            .padding(bottom = MaterialTheme.padding.Medium),
                         title = "关于此漫画",
                         onClick = {
                             showModalBottomSheet = true
@@ -139,6 +146,34 @@ fun MangaDetailsScreen(
                         )
                     }
                 }
+                item {
+                    MoreInfoItem(
+                        modifier = Modifier
+                            .padding(horizontal = MaterialTheme.padding.ExtraLarge),
+                        title = "Chapters",
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Outlined.ExpandMore,
+                                contentDescription = "",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        })
+                }
+                state.chapters.forEach {
+                    item {
+                        SwipeableChapterItem(
+                            modifier = Modifier.padding(
+                                horizontal = MaterialTheme.padding.ExtraLarge,
+                                vertical = MaterialTheme.padding.Normal
+                            ),
+                            title = it.name,
+                            subtitle = it.lastModifiedAt.toDate(),
+                            onClick = {}) {
+
+                        }
+                    }
+                }
+
 
             }
         }
