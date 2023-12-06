@@ -1,15 +1,19 @@
 package com.discut.manga.ui.reader
 
+import androidx.lifecycle.viewModelScope
 import com.discut.core.mvi.BaseViewModel
 import com.discut.manga.App
+import com.discut.manga.data.extensions.shouldRead
 import com.discut.manga.source.ISourceManager
 import com.discut.manga.ui.reader.domain.CurrentChapters
 import com.discut.manga.ui.reader.domain.ReaderActivityEffect
 import com.discut.manga.ui.reader.domain.ReaderActivityEvent
 import com.discut.manga.ui.reader.domain.ReaderActivityState
 import com.discut.manga.ui.reader.viewer.domain.ReaderChapter
+import com.discut.manga.ui.reader.viewer.domain.ReaderPage
 import com.discut.manga.ui.reader.viewer.loader.ChapterLoader
 import com.discut.manga.ui.reader.viewer.loader.IChapterLoader
+import com.discut.manga.util.launchIO
 import com.discut.manga.util.withIOContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import discut.manga.data.MangaAppDatabase
@@ -17,6 +21,7 @@ import discut.manga.data.chapter.Chapter
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlin.math.abs
 
 @HiltViewModel
 class ReaderViewModel @Inject constructor(
@@ -25,6 +30,8 @@ class ReaderViewModel @Inject constructor(
     BaseViewModel<ReaderActivityState, ReaderActivityEvent, ReaderActivityEffect>() {
 
     private val dbManager = MangaAppDatabase.DB
+
+    private val scope = viewModelScope
     override fun initialState(): ReaderActivityState = ReaderActivityState(
     )
 
@@ -51,13 +58,40 @@ class ReaderViewModel @Inject constructor(
             }
 
             is ReaderActivityEvent.PageSelected -> {
+                scope.launchIO {
+                    if (state.manga == null) {
+                        return@launchIO
+                    }
+                    state.currentChapters?.currReaderChapter?.let { rc ->
+                        when (val chapterState = rc.state) {
+                            is ReaderChapter.State.Loaded -> {
+                                val count =
+                                    chapterState.pages.filterIsInstance<ReaderPage.ChapterPage>().count()
+                                rc.dbChapter.apply {
+                                    dbManager.chapterDao().update(
+                                        this.copy(
+                                            lastPageRead = event.index.toLong(),
+                                            read = shouldRead(),
+                                            pagesCount = count.toLong()
+                                        )
+                                    )
+                                }
+                            }
+
+                            else -> {}
+                        }
+                    }
+                }
                 state.copy(currentPage = event.index)
             }
 
         }
     }
 
-    private suspend fun init(mangaId: Long, chapterId: Long): Result<Pair<Boolean, ReaderActivityState>> {
+    private suspend fun init(
+        mangaId: Long,
+        chapterId: Long
+    ): Result<Pair<Boolean, ReaderActivityState>> {
         return withIOContext {
             try {
                 val manga = dbManager.mangaDao().getById(mangaId)

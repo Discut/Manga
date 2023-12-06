@@ -1,5 +1,9 @@
 package com.discut.manga.ui.manga.details
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,6 +15,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -27,10 +32,13 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.discut.manga.components.CustomModalBottomSheet
+import com.discut.manga.components.SwipeDirection
 import com.discut.manga.components.manga.MangaInfoBox
+import com.discut.manga.data.extensions.shouldRead
 import com.discut.manga.theme.alpha
 import com.discut.manga.theme.padding
 import com.discut.manga.ui.common.LoadingScreen
@@ -43,6 +51,7 @@ import com.discut.manga.ui.manga.details.component.SwipeableChapterItem
 import com.discut.manga.ui.reader.ReaderActivity
 import com.discut.manga.util.toDate
 import discut.manga.common.res.R
+import discut.manga.data.chapter.Chapter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -92,8 +101,8 @@ fun MangaDetailsScreen(
                         }
                     })
             }
-        ) {
-            LazyColumn(modifier = Modifier.padding(it)) {
+        ) { pv ->
+            LazyColumn(modifier = Modifier.padding(pv)) {
                 item {
                     MangaInfoBox(
                         modifier = Modifier
@@ -163,10 +172,22 @@ fun MangaDetailsScreen(
                             )
                         })
                 }
-                state.chapters.forEachIndexed { index, chapter ->
+                state.chapters.forEachIndexed { index, c ->
                     item {
+
+                        var visibleProgress by remember {
+                            mutableStateOf(!c.shouldRead() && c.lastPageRead > 0)
+                        }
+                        val chapter by vm.collectionChapterInfo(c)
+                            .collectAsStateWithLifecycle(initialValue = c)
                         var alpha by remember {
-                            mutableStateOf(1f)
+                            mutableStateOf(
+                                if (chapter.read) {
+                                    MaterialTheme.alpha.Lowest
+                                } else {
+                                    MaterialTheme.alpha.Highest
+                                }
+                            )
                         }
                         SwipeableChapterItem(
                             modifier = Modifier
@@ -176,15 +197,20 @@ fun MangaDetailsScreen(
                                 )
                                 .alpha(alpha),
                             title = chapter.name,
-                            subtitle = chapter.lastModifiedAt.toDate(),
+                            subtitle = chapter.getSubtitle(),
                             leftAction = SwipeableActionCollection.Read {},
 
                             onSwipe = {
-                                alpha = if (alpha == 1f) {
-                                    MaterialTheme.alpha.Lowest
-                                } else {
-                                    MaterialTheme.alpha.Highest
+                                if (it == SwipeDirection.R) {
+                                    alpha = if (alpha == MaterialTheme.alpha.Highest) {
+                                        visibleProgress = false
+                                        vm.sendEvent(MangaDetailsEvent.ReadChapter(chapter))
+                                        MaterialTheme.alpha.Lowest
+                                    } else {
+                                        MaterialTheme.alpha.Highest
+                                    }
                                 }
+
                             },
                             onClick = {
                                 ReaderActivity.startActivity(
@@ -194,6 +220,21 @@ fun MangaDetailsScreen(
                                 )
                             }
                         )
+                        AnimatedVisibility(
+                            visible = visibleProgress,
+                            exit = shrinkVertically()
+                        ) {
+                            LinearProgressIndicator(
+                                progress = {
+                                    chapter.getReadProgress()
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(2.dp),
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+
                     }
                 }
 
@@ -219,4 +260,16 @@ fun MangaDetailsScreen(
 
 
 }
+
+private fun Chapter.getSubtitle(): String {
+    var result = lastModifiedAt.toDate()
+    if (!shouldRead()) {
+        result += "• ${lastPageRead + 1}/${pagesCount + 1} 页"
+    }
+    return result
+}
+
+private fun Chapter.getReadProgress(): Float =
+    (lastPageRead + 1) / (pagesCount + 1).toFloat()
+
 

@@ -13,6 +13,7 @@ data class Chapter(
     val read: Boolean,
     val bookmark: Boolean,
     val lastPageRead: Long,
+    val pagesCount: Long,
     val dateFetch: Long,
     val sourceOrder: Long,
     val url: String,
@@ -50,6 +51,7 @@ data class Chapter(
             chapterNumber = -1.0,
             scanlator = null,
             lastModifiedAt = 0,
+            pagesCount = 0
         )
     }
 }

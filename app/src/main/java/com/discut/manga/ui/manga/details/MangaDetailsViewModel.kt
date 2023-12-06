@@ -1,12 +1,15 @@
 package com.discut.manga.ui.manga.details
 
+import androidx.lifecycle.viewModelScope
 import com.discut.core.mvi.BaseViewModel
 import com.discut.manga.source.ISourceManager
+import com.discut.manga.util.launchIO
 import com.discut.manga.util.withIOContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import discut.manga.data.MangaAppDatabase
 import discut.manga.data.chapter.Chapter
 import discut.manga.data.manga.Manga
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 @HiltViewModel
@@ -20,7 +23,7 @@ class MangaDetailsViewModel @Inject constructor(
         event: MangaDetailsEvent,
         state: MangaDetailsState
     ): MangaDetailsState? {
-        when (event) {
+        return when (event) {
             is MangaDetailsEvent.Init -> {
                 return try {
                     val manga = getManga(event.mangaId)
@@ -33,6 +36,18 @@ class MangaDetailsViewModel @Inject constructor(
                 } catch (e: Exception) {
                     state.copy(loadState = MangaDetailsState.LoadState.Error(e))
                 }
+            }
+
+            is MangaDetailsEvent.ReadChapter -> {
+                launchIO {
+                    db.chapterDao().update(
+                        event.chapter.copy(
+                            read = true,
+                            lastPageRead = event.chapter.pagesCount
+                        )
+                    )
+                }
+                state
             }
         }
     }
@@ -48,6 +63,10 @@ class MangaDetailsViewModel @Inject constructor(
         return withIOContext {
             db.chapterDao().getAllInManga(mangaId)
         }
+    }
+
+    fun collectionChapterInfo(chapter: Chapter): Flow<Chapter> {
+        return db.chapterDao().getByIdAsFlow(chapter.id)
     }
 
     class InitMangaDetailsException(msg: String) : Exception(msg)
