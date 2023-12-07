@@ -1,6 +1,5 @@
 package com.discut.manga.ui.manga.details
 
-import androidx.lifecycle.viewModelScope
 import com.discut.core.mvi.BaseViewModel
 import com.discut.manga.source.ISourceManager
 import com.discut.manga.util.launchIO
@@ -44,6 +43,18 @@ class MangaDetailsViewModel @Inject constructor(
                         event.chapter.copy(
                             read = true,
                             lastPageRead = event.chapter.pagesCount
+                        )
+                    )
+                }
+                state
+            }
+
+            is MangaDetailsEvent.UnreadChapter -> {
+                launchIO {
+                    db.chapterDao().update(
+                        event.chapter.copy(
+                            read = false,
+                            lastPageRead = 0
                         )
                     )
                 }

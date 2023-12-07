@@ -23,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -174,20 +175,21 @@ fun MangaDetailsScreen(
                 }
                 state.chapters.forEachIndexed { index, c ->
                     item {
-
-                        var visibleProgress by remember {
-                            mutableStateOf(!c.shouldRead() && c.lastPageRead > 0)
-                        }
                         val chapter by vm.collectionChapterInfo(c)
                             .collectAsStateWithLifecycle(initialValue = c)
-                        var alpha by remember {
-                            mutableStateOf(
+                        val visibleProgress by remember {
+                            derivedStateOf {
+                                !chapter.shouldRead() && chapter.lastPageRead > 0
+                            }
+                        }
+                        val alpha by remember {
+                            derivedStateOf {
                                 if (chapter.read) {
                                     MaterialTheme.alpha.Lowest
                                 } else {
                                     MaterialTheme.alpha.Highest
                                 }
-                            )
+                            }
                         }
                         SwipeableChapterItem(
                             modifier = Modifier
@@ -202,12 +204,10 @@ fun MangaDetailsScreen(
 
                             onSwipe = {
                                 if (it == SwipeDirection.R) {
-                                    alpha = if (alpha == MaterialTheme.alpha.Highest) {
-                                        visibleProgress = false
+                                    if (chapter.read) {
+                                        vm.sendEvent(MangaDetailsEvent.UnreadChapter(chapter))
+                                    }else {
                                         vm.sendEvent(MangaDetailsEvent.ReadChapter(chapter))
-                                        MaterialTheme.alpha.Lowest
-                                    } else {
-                                        MaterialTheme.alpha.Highest
                                     }
                                 }
 

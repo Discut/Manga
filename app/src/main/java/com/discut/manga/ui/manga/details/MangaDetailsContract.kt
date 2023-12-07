@@ -24,6 +24,9 @@ sealed interface MangaDetailsEvent : UiEvent {
     data class Init(val mangaId: Long) : MangaDetailsEvent
 
     data class ReadChapter(val chapter: Chapter) : MangaDetailsEvent
+
+    data class UnreadChapter(val chapter: Chapter) : MangaDetailsEvent
+
 }
 
 sealed interface MangaDetailsEffect : UiEffect {
