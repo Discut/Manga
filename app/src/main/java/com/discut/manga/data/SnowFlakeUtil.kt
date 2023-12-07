@@ -63,5 +63,11 @@ class SnowFlakeUtil(private val datacenterId: Long,private val  machineId: Long)
         private const val MACHINE_LEFT = SEQUENCE_BIT
         private const val DATACENTER_LEFT = SEQUENCE_BIT + MACHINE_BIT
         private const val TIMESTMP_LEFT = DATACENTER_LEFT + DATACENTER_BIT
+
+        private val snowFlake = SnowFlakeUtil(datacenterId = 1L, machineId = 1L)
+
+        fun generateSnowFlake(): Long {
+            return snowFlake.nextId
+        }
     }
 }
