@@ -1,5 +1,7 @@
 package com.discut.manga.navigation
 
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
@@ -7,8 +9,13 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.runtime.Composable
 import androidx.navigation.NamedNavArgument
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
+import androidx.navigation.NavDeepLink
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
@@ -40,22 +47,10 @@ fun NavGraphBuilder.settingsGraph(navController: NavController) {
         startDestination = NavigationRoute.SettingsScreen.SettingsMain.route,
         route = NavigationRoute.SettingsScreen.route
     ) {
-        composable(route = NavigationRoute.SettingsScreen.SettingsMain.route,
-            enterTransition = {
-                scaleIntoContainer()
-            },
-            exitTransition = {
-                scaleOutOfContainer(direction = ScaleTransitionDirection.INWARDS)
-            },
-            popEnterTransition = {
-                scaleIntoContainer(direction = ScaleTransitionDirection.OUTWARDS)
-            },
-            popExitTransition = {
-                scaleOutOfContainer()
-            }) {
+        composableWithAnimation(route = NavigationRoute.SettingsScreen.SettingsMain.route) {
             SettingsScreen(navController)
         }
-        composable(NavigationRoute.SettingsScreen.Security.route) {
+        composableWithAnimation(route = NavigationRoute.SettingsScreen.Security.route) {
             SecuritySettingsScreen()
         }
     }
@@ -89,4 +84,40 @@ fun scaleOutOfContainer(
             delayMillis = 90
         ), targetScale = targetScale
     ) + fadeOut(tween(delayMillis = 90))
+}
+
+internal fun NavGraphBuilder.composableWithAnimation(
+    route: String,
+    arguments: List<NamedNavArgument> = emptyList(),
+    deepLinks: List<NavDeepLink> = emptyList(),
+    enterTransition: (@JvmSuppressWildcards
+    AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition?)? = {
+        slideInHorizontally(initialOffsetX = { it / 10 }) + fadeIn()
+    },
+    exitTransition: (@JvmSuppressWildcards
+    AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition?)? = null/*{
+        slideOutHorizontally(targetOffsetX = { it / 8 }) + fadeOut()
+    }*/,
+    popEnterTransition: (@JvmSuppressWildcards
+    AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition?)? =
+        {
+            fadeIn(initialAlpha = .5f)
+        },
+    popExitTransition: (@JvmSuppressWildcards
+    AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition?)? =
+        {
+            slideOutHorizontally(targetOffsetX = { it / 10 }) + fadeOut()
+        },
+    content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit
+) {
+    composable(
+        route = route,
+        arguments = arguments,
+        deepLinks = deepLinks,
+        enterTransition = enterTransition,
+        exitTransition = exitTransition,
+        popEnterTransition = popEnterTransition,
+        popExitTransition = popExitTransition,
+        content = content
+    )
 }
