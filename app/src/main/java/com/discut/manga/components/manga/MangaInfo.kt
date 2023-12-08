@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Brush
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.PersonOutline
 import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material.icons.outlined.FavoriteBorder
@@ -30,7 +31,10 @@ fun MangaInfo(
     title: String,
     author: String,
     artist: String,
-    source: String
+    source: String,
+    favorite: Boolean,
+
+    onFavorite: () -> Unit
 ) {
     Column(
         modifier = modifier,
@@ -44,7 +48,10 @@ fun MangaInfo(
             fontSize = 26.sp
         )
         Spacer(modifier = Modifier.weight(1f))
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        Row(
+            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Bottom
+        ) {
             Column(
                 modifier = Modifier
                     .alpha(MaterialTheme.alpha.Normal),
@@ -71,9 +78,10 @@ fun MangaInfo(
                     )
                 }
             }
-            LikeButton {
-
-            }
+            LikeButton(
+                onClick = onFavorite,
+                favorite = favorite
+            )
         }
     }
 }
@@ -99,9 +107,14 @@ internal fun TextWithIcon(
 
 @Composable
 internal fun LikeButton(
+    favorite: Boolean,
     onClick: () -> Unit
 ) {
-    IconButton(onClick = { onClick() }) {
-        Icon(imageVector = Icons.Outlined.FavoriteBorder, contentDescription = "Like")
+    IconButton(onClick = onClick) {
+        Icon(
+            imageVector = if (favorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+            contentDescription = "Like",
+            tint = MaterialTheme.colorScheme.primary
+        )
     }
 }

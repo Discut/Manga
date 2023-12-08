@@ -60,6 +60,19 @@ class MangaDetailsViewModel @Inject constructor(
                 }
                 state
             }
+
+            is MangaDetailsEvent.FavoriteManga -> {
+                val manga = event.manga.copy(
+                    favorite = !event.manga.favorite
+                )
+                launchIO {
+                    db.mangaDao().update(manga)
+                }
+                state.copy(
+                    loadState = MangaDetailsState.LoadState.Loaded(manga.toMangaDetails()),
+                    manga = manga
+                )
+            }
         }
     }
 

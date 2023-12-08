@@ -7,6 +7,7 @@ import discut.manga.data.manga.Manga
 
 data class MangaDetails(
     val title: String,
+    val favorite: Boolean,
     val url: String,
     val coverUrl: String,
     val author: String,
@@ -19,6 +20,7 @@ data class MangaDetails(
 internal fun Manga.toMangaDetails(): MangaDetails {
     return MangaDetails(
         title = title.ifBlank { getResourceString(R.string.unknown_manga_title) },
+        favorite = favorite,
         description = description ?: "",
         url = url,
         coverUrl = thumbnailUrl ?: "",

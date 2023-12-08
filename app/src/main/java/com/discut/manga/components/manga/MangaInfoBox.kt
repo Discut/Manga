@@ -20,7 +20,9 @@ import com.discut.manga.ui.manga.details.MangaDetails
 @Composable
 fun MangaInfoBox(
     modifier: Modifier = Modifier,
-    info: MangaDetails
+    info: MangaDetails,
+
+    onFavoriteClick: () -> Unit,
 ) {
     Row(
         modifier = modifier
@@ -42,7 +44,9 @@ fun MangaInfoBox(
             title = info.title,
             author = info.author,
             artist = info.artist,
-            source = info.source
+            source = info.source,
+            favorite = info.favorite,
+            onFavorite = onFavoriteClick
         )
     }
 }
@@ -60,7 +64,9 @@ fun MangaInfoBoxPreview() {
                 source = "源",
                 url = "url",
                 description = "描述",
-            )
+                favorite = false
+            ),
+            onFavoriteClick = {}
         )
     }
 }

@@ -27,6 +27,8 @@ sealed interface MangaDetailsEvent : UiEvent {
 
     data class UnreadChapter(val chapter: Chapter) : MangaDetailsEvent
 
+    data class FavoriteManga(val manga: Manga) : MangaDetailsEvent
+
 }
 
 sealed interface MangaDetailsEffect : UiEffect {

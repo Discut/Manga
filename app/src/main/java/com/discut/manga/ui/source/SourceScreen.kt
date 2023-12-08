@@ -17,20 +17,6 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun SourceScreen(sourceManager: ISourceManager) {
-    /*Scaffold(
-
-    ) {
-
-    }*/
-
-    /*    val localSource = LocalSource(App.instance)
-        LaunchedEffect(key1 = localSource ){
-            withIOContext {
-                val popularManga = localSource.getPopularManga(0)
-                val single = localSource.fetchChapterList(popularManga.mangas[0]).single()
-
-            }
-        }*/
     val rememberCoroutineScope = rememberCoroutineScope()
 
     Column {
@@ -49,7 +35,7 @@ internal fun SourceScreen(sourceManager: ISourceManager) {
                             get.fetchChapterList(mangas[0]).collect {
                                 val chapters = it.map {
                                     Chapter.create().copy(
-                                        id = SnowFlakeUtil(0, 0).nextId,
+                                        id = SnowFlakeUtil.generateSnowFlake(),
                                         mangaId = map.get(0).id,
                                         name = it.name,
                                         url = it.url,

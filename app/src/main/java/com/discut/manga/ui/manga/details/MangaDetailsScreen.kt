@@ -7,11 +7,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Preview
 import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -50,6 +53,8 @@ import com.discut.manga.ui.manga.details.component.ShortInfoBox
 import com.discut.manga.ui.manga.details.component.SwipeableActionCollection
 import com.discut.manga.ui.manga.details.component.SwipeableChapterItem
 import com.discut.manga.ui.reader.ReaderActivity
+import com.discut.manga.util.isScrolledToEnd
+import com.discut.manga.util.isScrollingUp
 import com.discut.manga.util.toDate
 import discut.manga.common.res.R
 import discut.manga.data.chapter.Chapter
@@ -82,6 +87,7 @@ fun MangaDetailsScreen(
 
     val loadState = state.loadState as MangaDetailsState.LoadState.Loaded
     val details = loadState.details
+    val chapterListState = rememberLazyListState()
     Surface {
         Scaffold(
             topBar = {
@@ -101,14 +107,36 @@ fun MangaDetailsScreen(
                             )
                         }
                     })
+            },
+            floatingActionButton = {
+                ExtendedFloatingActionButton(
+                    text = {
+                        Text(
+                            text = "Read"
+                        )
+                    },
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Filled.PlayArrow,
+                            contentDescription = null
+                        )
+                    },
+                    onClick = {},
+                    expanded = chapterListState.isScrollingUp() || chapterListState.isScrolledToEnd(),
+                )
             }
         ) { pv ->
-            LazyColumn(modifier = Modifier.padding(pv)) {
+            LazyColumn(modifier = Modifier.padding(pv), state = chapterListState) {
                 item {
                     MangaInfoBox(
                         modifier = Modifier
                             .padding(horizontal = MaterialTheme.padding.ExtraLarge),
-                        info = details
+                        info = details,
+                        onFavoriteClick = {
+                            state.manga?.let {
+                                vm.sendEvent(MangaDetailsEvent.FavoriteManga(it))
+                            }
+                        }
                     )
                 }
                 item {
@@ -122,7 +150,7 @@ fun MangaDetailsScreen(
                                     contentDescription = ""
                                 )
                             },
-                            InfoBoxType.Title("Top", "Bottom"),
+                            InfoBoxType.Title(state.chapters.size.toString(), "章"),
                             InfoBoxType.Icon("Preview") {
                                 Icon(
                                     modifier = it,
@@ -164,7 +192,7 @@ fun MangaDetailsScreen(
                     MoreInfoItem(
                         modifier = Modifier
                             .padding(horizontal = MaterialTheme.padding.ExtraLarge),
-                        title = "Chapters",
+                        title = "章节",
                         icon = {
                             Icon(
                                 imageVector = Icons.Outlined.ExpandMore,
@@ -206,7 +234,7 @@ fun MangaDetailsScreen(
                                 if (it == SwipeDirection.R) {
                                     if (chapter.read) {
                                         vm.sendEvent(MangaDetailsEvent.UnreadChapter(chapter))
-                                    }else {
+                                    } else {
                                         vm.sendEvent(MangaDetailsEvent.ReadChapter(chapter))
                                     }
                                 }
