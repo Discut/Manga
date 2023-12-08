@@ -21,4 +21,14 @@ interface MangaDao : BaseDao<Manga> {
         "SELECT * FROM manga WHERE id = :id"
     )
     fun getByIdAsFlow(id: Long): Flow<Manga>
+
+    @Query(
+        "SELECT * FROM manga WHERE category = :category"
+    )
+    fun getAllByCategory(category: String): List<Manga>
+
+    @Query(
+        "SELECT * FROM manga WHERE category = :category"
+    )
+    fun getAllByCategoryAsFlow(category: String): Flow<List<Manga>>
 }

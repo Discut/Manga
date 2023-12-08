@@ -229,6 +229,7 @@ fun MangaDetailsScreen(
                             title = chapter.name,
                             subtitle = chapter.getSubtitle(),
                             leftAction = SwipeableActionCollection.Read {},
+                            visibleProgress = visibleProgress,
 
                             onSwipe = {
                                 if (it == SwipeDirection.R) {
@@ -240,6 +241,9 @@ fun MangaDetailsScreen(
                                 }
 
                             },
+                            progress = {
+                                chapter.getReadProgress()
+                            },
                             onClick = {
                                 ReaderActivity.startActivity(
                                     context,
@@ -248,7 +252,7 @@ fun MangaDetailsScreen(
                                 )
                             }
                         )
-                        AnimatedVisibility(
+/*                        AnimatedVisibility(
                             visible = visibleProgress,
                             exit = shrinkVertically()
                         ) {
@@ -261,7 +265,7 @@ fun MangaDetailsScreen(
                                     .height(2.dp),
                                 color = MaterialTheme.colorScheme.primary
                             )
-                        }
+                        }*/
 
                     }
                 }
@@ -297,7 +301,7 @@ private fun Chapter.getSubtitle(): String {
     return result
 }
 
-private fun Chapter.getReadProgress(): Float =
+internal fun Chapter.getReadProgress(): Float =
     (lastPageRead + 1) / (pagesCount + 1).toFloat()
 
 

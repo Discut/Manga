@@ -4,6 +4,7 @@ package discut.manga.data.manga
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
+import discut.manga.data.category.Category
 import java.io.Serializable
 
 @Entity(
@@ -31,6 +32,7 @@ data class Manga(
     val status: Long,
     val thumbnailUrl: String?,
     //val updateStrategy: UpdateStrategy,
+    val category: Long?,
     val initialized: Boolean,
     val lastModifiedAt: Long,
     val favoriteModifiedAt: Long?,
@@ -51,19 +53,19 @@ data class Manga(
     val bookmarkedFilterRaw: Long
         get() = chapterFlags and CHAPTER_BOOKMARKED_MASK
 
-/*    val unreadFilter: TriState
-        get() = when (unreadFilterRaw) {
-            CHAPTER_SHOW_UNREAD -> TriState.ENABLED_IS
-            CHAPTER_SHOW_READ -> TriState.ENABLED_NOT
-            else -> TriState.DISABLED
-        }
+    /*    val unreadFilter: TriState
+            get() = when (unreadFilterRaw) {
+                CHAPTER_SHOW_UNREAD -> TriState.ENABLED_IS
+                CHAPTER_SHOW_READ -> TriState.ENABLED_NOT
+                else -> TriState.DISABLED
+            }
 
-    val bookmarkedFilter: TriState
-        get() = when (bookmarkedFilterRaw) {
-            CHAPTER_SHOW_BOOKMARKED -> TriState.ENABLED_IS
-            CHAPTER_SHOW_NOT_BOOKMARKED -> TriState.ENABLED_NOT
-            else -> TriState.DISABLED
-        }*/
+        val bookmarkedFilter: TriState
+            get() = when (bookmarkedFilterRaw) {
+                CHAPTER_SHOW_BOOKMARKED -> TriState.ENABLED_IS
+                CHAPTER_SHOW_NOT_BOOKMARKED -> TriState.ENABLED_NOT
+                else -> TriState.DISABLED
+            }*/
 
     fun sortDescending(): Boolean {
         return chapterFlags and CHAPTER_SORT_DIR_MASK == CHAPTER_SORT_DESC
@@ -122,6 +124,7 @@ data class Manga(
             initialized = false,
             lastModifiedAt = 0L,
             favoriteModifiedAt = null,
+            category = Category.UNCATEGORIZED_ID,
         )
     }
 }

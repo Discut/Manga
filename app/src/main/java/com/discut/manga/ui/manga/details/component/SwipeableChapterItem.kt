@@ -1,10 +1,15 @@
 package com.discut.manga.ui.manga.details.component
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -16,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import com.discut.manga.components.SwipeAction
 import com.discut.manga.components.SwipeDirection
 import com.discut.manga.components.SwipeableItem
@@ -27,12 +33,14 @@ fun SwipeableChapterItem(
 
     title: String,
     subtitle: String,
+    visibleProgress: Boolean,
 
-    onClick: () -> Unit,
+    progress: () -> Float,
     leftAction: SwipeableActionCollection? = null,
     rightAction: SwipeableActionCollection? = null,
 
-    onSwipe:(SwipeDirection) -> Unit = {},
+    onClick: () -> Unit,
+    onSwipe: (SwipeDirection) -> Unit = {},
 
     leftContent: (@Composable () -> Unit)? = null,
     rightContent: (@Composable () -> Unit)? = null
@@ -55,7 +63,7 @@ fun SwipeableChapterItem(
         onSwipe = {
             when (it) {
                 SwipeDirection.R -> {
-                    if (rightWipeAction==null) {
+                    if (rightWipeAction == null) {
                         return@SwipeableItem
                     }
                     rightWipeAction = if (rightWipeAction == leftAction?.action1) {
@@ -66,7 +74,7 @@ fun SwipeableChapterItem(
                 }
 
                 SwipeDirection.L -> {
-                    if (leftWipeAction==null) {
+                    if (leftWipeAction == null) {
                         return@SwipeableItem
                     }
                     leftWipeAction = if (leftWipeAction == rightAction?.action1) {
@@ -95,6 +103,18 @@ fun SwipeableChapterItem(
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.alpha(MaterialTheme.alpha.Normal)
             )
+            AnimatedVisibility(
+                visible = visibleProgress,
+                exit = shrinkVertically()
+            ) {
+                LinearProgressIndicator(
+                    progress = progress,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(2.dp),
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
         }
         rightContent?.invoke()
     }

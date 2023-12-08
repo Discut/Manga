@@ -26,12 +26,11 @@ import kotlinx.coroutines.launch
 @Composable
 fun BookshelfScreen() {
     val context = LocalContext.current
-    //val all = MangaAppDatabase.DB.mangaDao().getAll()
     var all by remember {
         mutableStateOf<List<Manga>>(listOf())
     }
 
-    val permissionState =
+/*    val permissionState =
         rememberPermissionState(permission = Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
     val rememberPermissionState =
@@ -39,7 +38,7 @@ fun BookshelfScreen() {
     LaunchedEffect(Unit) {
         permissionState.launchPermissionRequest()
         rememberPermissionState.launchPermissionRequest()
-    }
+    }*/
 
     val rememberCoroutineScope = rememberCoroutineScope()
     LaunchedEffect(key1 = all) {
