@@ -1,6 +1,5 @@
 package com.discut.manga.ui.bookshelf
 
-import android.Manifest
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
@@ -13,14 +12,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import com.discut.manga.components.preference.TextPreferenceComponent
 import com.discut.manga.navigation.NavigationEvent
+import com.discut.manga.ui.bookshelf.component.BookshelfPage
 import com.discut.manga.ui.reader.ReaderActivity
 import com.discut.manga.util.postBy
 import com.discut.manga.util.withIOContext
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.rememberPermissionState
 import discut.manga.data.MangaAppDatabase
 import discut.manga.data.manga.Manga
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -29,16 +27,6 @@ fun BookshelfScreen() {
     var all by remember {
         mutableStateOf<List<Manga>>(listOf())
     }
-
-/*    val permissionState =
-        rememberPermissionState(permission = Manifest.permission.WRITE_EXTERNAL_STORAGE)
-
-    val rememberPermissionState =
-        rememberPermissionState(permission = Manifest.permission.READ_EXTERNAL_STORAGE)
-    LaunchedEffect(Unit) {
-        permissionState.launchPermissionRequest()
-        rememberPermissionState.launchPermissionRequest()
-    }*/
 
     val rememberCoroutineScope = rememberCoroutineScope()
     LaunchedEffect(key1 = all) {
@@ -55,23 +43,11 @@ fun BookshelfScreen() {
                 item {
                     TextPreferenceComponent(title = it.title, subTitle = it.url) {
                         NavigationEvent("mangaDetails/${it.id}").postBy(rememberCoroutineScope)
-                        /*rememberCoroutineScope.launch {
-                            withIOContext {
-                                val allInManga =
-                                    MangaAppDatabase.DB.chapterDao().getAllInManga(it.id)
-
-                                ReaderActivity.startActivity(
-                                    context,
-                                    it.id,
-                                    allInManga.getOrNull(0)?.id ?: -1
-                                )
-                            }
-                        }*/
-
                     }
                 }
             }
         }
+        BookshelfPage(state = , getBooks = )
     }
 
 }
