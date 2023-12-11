@@ -32,9 +32,6 @@ fun MangaInfo(
     author: String,
     artist: String,
     source: String,
-    favorite: Boolean,
-
-    onFavorite: () -> Unit
 ) {
     Column(
         modifier = modifier,
@@ -78,10 +75,6 @@ fun MangaInfo(
                     )
                 }
             }
-            LikeButton(
-                onClick = onFavorite,
-                favorite = favorite
-            )
         }
     }
 }
