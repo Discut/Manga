@@ -1,53 +1,52 @@
 package com.discut.manga.ui.bookshelf
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
-import com.discut.manga.components.preference.TextPreferenceComponent
-import com.discut.manga.navigation.NavigationEvent
-import com.discut.manga.ui.bookshelf.component.BookshelfPage
-import com.discut.manga.ui.reader.ReaderActivity
-import com.discut.manga.util.postBy
-import com.discut.manga.util.withIOContext
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import discut.manga.data.MangaAppDatabase
-import discut.manga.data.manga.Manga
 
-@OptIn(ExperimentalPermissionsApi::class)
+@OptIn(ExperimentalPermissionsApi::class, ExperimentalFoundationApi::class,
+    ExperimentalMaterial3Api::class
+)
 @Composable
-fun BookshelfScreen() {
-    val context = LocalContext.current
-    var all by remember {
-        mutableStateOf<List<Manga>>(listOf())
-    }
-
-    val rememberCoroutineScope = rememberCoroutineScope()
-    LaunchedEffect(key1 = all) {
-        withIOContext {
-            all = MangaAppDatabase.DB.mangaDao().getAll()
-        }
-    }
-    Column {
-        TextPreferenceComponent(title = "进入Reader") {
-            ReaderActivity.startActivity(context, -3618642300592193536L, -3686196295002750976L)
-        }
-        LazyColumn {
-            all.forEach {
-                item {
-                    TextPreferenceComponent(title = it.title, subTitle = it.url) {
-                        NavigationEvent("mangaDetails/${it.id}").postBy(rememberCoroutineScope)
-                    }
+fun BookshelfScreen(
+    vm: BookshelfViewModel = hiltViewModel()
+) {
+    val state by vm.uiState.collectAsStateWithLifecycle()
+    val coercedCurrentPage = remember { currentPage().coerceAtMost(categories.lastIndex) }
+    vm.sendEvent(BookshelfEvent.Init)
+    Scaffold(topBar = {
+        TopAppBar(title = { Text(text = ) })
+    }) {
+        Box(modifier = Modifier.padding(it)) {
+            when (state.loadState) {
+                is BookshelfState.LoadState.Error -> TODO()
+                is BookshelfState.LoadState.Loaded -> BookshelfScreenImpl(vm = vm, state = state)
+                BookshelfState.LoadState.Waiting -> {
+                    LinearProgressIndicator(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(2.dp)
+                    )
                 }
+
+                else -> {}
             }
         }
-        BookshelfPage(state = , getBooks = )
     }
 
 }

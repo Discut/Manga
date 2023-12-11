@@ -11,7 +11,7 @@ interface CategoryDao : BaseDao<Category> {
     @Query(
         "SELECT * FROM category"
     )
-    fun getAll(): List<Chapter>
+    fun getAll(): List<Category>
 
     @Query(
         "SELECT * FROM category"

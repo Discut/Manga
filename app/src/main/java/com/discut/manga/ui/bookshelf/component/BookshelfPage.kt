@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import discut.manga.data.manga.Manga
 
@@ -13,10 +14,12 @@ import discut.manga.data.manga.Manga
 fun BookshelfPage(
     state: PagerState,
 
+    onBookClick: (Manga) -> Unit,
     getBooks: (Int) -> List<Manga>
 ) {
     HorizontalPager(
         modifier = Modifier.fillMaxSize(),
+        verticalAlignment = Alignment.Top,
         state = state
     ) {
         if (it !in ((state.currentPage - 1)..(state.currentPage + 1))) {
@@ -25,7 +28,8 @@ fun BookshelfPage(
         }
         val books = getBooks(it)
         LazyBookshelfVerticalGrid(
-            items = books
+            items = books,
+            onBookClick = onBookClick
         )
     }
 }

@@ -4,13 +4,15 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import discut.manga.data.category.Category
+import discut.manga.data.category.CategoryDao
 import discut.manga.data.chapter.Chapter
 import discut.manga.data.chapter.ChapterDao
 import discut.manga.data.manga.Manga
 import discut.manga.data.manga.MangaDao
 
 @Database(
-    entities = [Manga::class, Chapter::class],
+    entities = [Manga::class, Chapter::class, Category::class],
     version = 1,
     exportSchema = false
 )
@@ -18,6 +20,8 @@ abstract class MangaAppDatabase : RoomDatabase() {
     abstract fun mangaDao(): MangaDao
 
     abstract fun chapterDao(): ChapterDao
+
+    abstract fun categoryDao(): CategoryDao
 
     companion object {
         private var INSTANCE: MangaAppDatabase? = null
