@@ -62,7 +62,7 @@ abstract class BaseViewModel<S : UiState, E : UiEvent, F : UiEffect> : ViewModel
     }
 
 
-    private fun sendState(newState: S.() -> S) {
+    internal fun sendState(newState: S.() -> S) {
         _uiState.value = uiState.value.newState()
     }
 
