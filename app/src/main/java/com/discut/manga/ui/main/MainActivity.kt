@@ -17,6 +17,7 @@ import com.discut.manga.navigation.NavigationEvent
 import com.discut.manga.navigation.NavigationRoute
 import com.discut.manga.navigation.settingsGraph
 import com.discut.manga.ui.base.BaseActivity
+import com.discut.manga.ui.categories.CategoryScreen
 import com.discut.manga.ui.main.domain.ToRouteEvent
 import com.discut.manga.ui.manga.details.MangaDetailsScreen
 import com.discut.manga.util.setComposeContent
@@ -62,6 +63,9 @@ class MainActivity : BaseActivity() {
                         navController.popBackStack()
                     }
 
+                }
+                composable(NavigationRoute.CategoryScreen.route) {
+                    CategoryScreen(navController)
                 }
                 settingsGraph(navController)
             }

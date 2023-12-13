@@ -10,7 +10,7 @@ import java.io.Serializable
 )
 data class Category(
     @PrimaryKey
-    open val id: Long,
+    val id: Long,
     val name: String,
     val order: Long,
     /*val flags: Long,*/

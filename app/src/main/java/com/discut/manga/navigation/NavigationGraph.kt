@@ -36,6 +36,8 @@ sealed class NavigationRoute(
             navArgument("mangaId") { type = NavType.LongType }
         ))
 
+    data object CategoryScreen : NavigationRoute("category")
+
     data object SettingsScreen : NavigationRoute("settings") {
         data object Security : NavigationRoute("security")
         data object SettingsMain : NavigationRoute("settingsMain")

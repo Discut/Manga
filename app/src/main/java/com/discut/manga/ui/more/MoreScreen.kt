@@ -2,6 +2,7 @@ package com.discut.manga.ui.more
 
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -37,14 +38,23 @@ fun MoreScreen() {
                 state = state.enableSecurityMode,
                 onSwitchClick = {
                     viewModel.sendEvent(
-                        MoreScreenEvent.ClickSecurityMode(
+                        MoreScreenEvent.SecurityModeChanged(
                             !state.enableSecurityMode
                         )
                     )
                 }
             ) { old, new ->
                 FlowBus.with<ToRouteEvent>()
-                    .post(rememberCoroutineScope, ToRouteEvent("settings/security"))
+                    .post(rememberCoroutineScope, ToRouteEvent("security"))
+            }
+        }
+        item {
+            TextPreferenceComponent(title = "书架", icon = Icons.Default.Category) {
+                FlowBus.with<NavigationEvent>()
+                    .post(
+                        rememberCoroutineScope,
+                        NavigationEvent(NavigationRoute.CategoryScreen.route)
+                    )
             }
         }
         item {
