@@ -1,6 +1,8 @@
 package com.discut.manga.components.preference
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Preview
@@ -13,25 +15,31 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.discut.manga.theme.MangaTheme
+import com.discut.manga.theme.padding
 
 @Composable
 fun TextPreferenceComponent(
-    modifier: Modifier = Modifier,
+    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier.padding(vertical = MaterialTheme.padding.Default),
     title: String,
     subTitle: String? = null,
     icon: ImageVector? = null,
     iconTint: Color = MaterialTheme.colorScheme.primary,
-    endWidget: @Composable (() -> Unit)? = null,
+    endWidget: @Composable ((PaddingValues) -> Unit)? = null,
     onPreferenceClick: (() -> Unit)? = null
 ) {
     BasePreferenceComponent(
-        modifier = modifier,
+        modifier = modifier
+            .padding(horizontal = MaterialTheme.padding.Normal),
         title = title,
         iconWidget = {
             if (icon != null) {
-                Icon(imageVector = icon, tint = iconTint, contentDescription = "")
+                Icon(
+                    modifier = Modifier.padding(it),
+                    imageVector = icon,
+                    tint = iconTint,
+                    contentDescription = ""
+                )
             }
         },
         subWidget = {
@@ -39,7 +47,6 @@ fun TextPreferenceComponent(
                 Text(
                     text = subTitle,
                     modifier = Modifier
-                        .padding(horizontal = 16.dp)
                         .alpha(0.7f),
                     style = MaterialTheme.typography.bodySmall,
                     maxLines = 5,

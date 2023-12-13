@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.discut.manga.theme.MangaTheme
+import com.discut.manga.theme.padding
 
 @Composable
 fun SwitchPreferenceComponent(
@@ -35,7 +36,7 @@ fun SwitchPreferenceComponent(
     onPreferenceClick: ((oldValue: Boolean, newValue: Boolean) -> Unit)? = null,
 ) {
     TextPreferenceComponent(
-        modifier = modifier,
+        modifier = modifier.padding(vertical = MaterialTheme.padding.Small),
         title = title,
         subTitle = subTitle,
         icon = icon,
@@ -43,14 +44,15 @@ fun SwitchPreferenceComponent(
         endWidget = {
             Row(
                 modifier = Modifier
-                    .requiredHeight(IntrinsicSize.Min),
+                    .requiredHeight(IntrinsicSize.Min)
+                    .padding(it),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 if (onSwitchClick != null) {
                     VerticalDivider(
                         Modifier
                             .height(32.0.dp)
-                            .padding(horizontal = 16.dp)
+                            .padding(horizontal = MaterialTheme.padding.Normal)
                     )
                 }
                 Switch(
@@ -97,7 +99,7 @@ private fun SwitchPreferenceComponentPreview() {
                 icon = Icons.Default.Preview,
                 onSwitchClick = { state = !state }
             ) { old, new ->
-               // state = !state
+                // state = !state
             }
             SwitchPreferenceComponent(
                 title = "Switch preference",
@@ -105,7 +107,7 @@ private fun SwitchPreferenceComponentPreview() {
                 state = state,
                 onSwitchClick = { state = !state }
             ) { old, new ->
-               // state = !state
+                // state = !state
             }
         }
     }
