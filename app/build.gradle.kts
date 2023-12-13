@@ -78,6 +78,7 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:1.5.4")// Add full set of material icons
     implementation("androidx.compose.material3:material3-window-size-class")// Add window size utils
     implementation("androidx.activity:activity-compose:1.7.2")// Integration with activities
+    implementation(libs.reorderable)
     implementation(libs.constraintlayout)
     implementation(libs.swipe)
 

@@ -65,6 +65,8 @@ accompanist-permissions = { module = "com.google.accompanist:accompanist-permiss
 
 swipe = "me.saket.swipe:swipe:1.2.0"
 
+reorderable = "org.burnoutcrew.composereorderable:reorderable:0.9.6"
+
 
 
 
