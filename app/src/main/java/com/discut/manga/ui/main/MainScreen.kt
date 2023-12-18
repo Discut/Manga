@@ -2,7 +2,10 @@ package com.discut.manga.ui.main
 
 import android.content.Intent
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -17,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -33,7 +35,6 @@ import com.discut.manga.ui.main.domain.NavBarItem
 fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val navController = rememberNavController()
-
     viewModel.CollectSideEffect {
         when (it) {
             is MainEffect.NavigateTo -> navController.navigate(it.route) {
@@ -57,10 +58,16 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
         NavHost(
             navController = navController,
             startDestination = MainViewModel.DEFAULT_SCREEN_ROUTE,
-            modifier = Modifier.padding(it)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(it)
         ) {
             state.navBarItems.forEach { navBarItem ->
-                composable(navBarItem.route) {
+                composable(
+                    route = navBarItem.route,
+                    enterTransition = { fadeIn()},
+                    exitTransition = { fadeOut()},
+                ) {
                     navBarItem.screen.invoke()
                 }
             }

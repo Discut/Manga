@@ -15,6 +15,7 @@ import androidx.navigation.compose.rememberNavController
 import com.discut.core.flowbus.observeEvent
 import com.discut.manga.navigation.NavigationEvent
 import com.discut.manga.navigation.NavigationRoute
+import com.discut.manga.navigation.composableWithAnimation
 import com.discut.manga.navigation.settingsGraph
 import com.discut.manga.ui.base.BaseActivity
 import com.discut.manga.ui.categories.CategoryScreen
@@ -50,7 +51,7 @@ class MainActivity : BaseActivity() {
                 navController = navController,
                 startDestination = NavigationRoute.MainScreen.route
             ) {
-                composable(NavigationRoute.MainScreen.route) {
+                composableWithAnimation(NavigationRoute.MainScreen.route) {
                     MainScreen()
                 }
                 composable(
