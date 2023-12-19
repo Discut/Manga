@@ -6,7 +6,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -34,7 +33,6 @@ class MainActivity : BaseActivity() {
         checkStorageManagerPermission()
         setComposeContent {
             val navController = rememberNavController()
-            val scope = rememberCoroutineScope()
             LocalLifecycleOwner.current.observeEvent<ToRouteEvent> {
                 navController.navigate(it.route) {
                     popUpTo(navController.graph.findStartDestination().id) {
@@ -65,7 +63,7 @@ class MainActivity : BaseActivity() {
                     }
 
                 }
-                composable(NavigationRoute.CategoryScreen.route) {
+                composableWithAnimation(NavigationRoute.CategoryScreen.route) {
                     CategoryScreen(navController)
                 }
                 settingsGraph(navController)
