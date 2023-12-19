@@ -8,7 +8,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -19,7 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
 
 @OptIn(
     ExperimentalFoundationApi::class,
@@ -34,13 +38,20 @@ fun BookshelfScreen(
     val pagerState = rememberPagerState {
         state.categories.size
     }
-    vm.sendEvent(BookshelfEvent.Init)
     Scaffold(topBar = {
         TopAppBar(
             title = {
                 Text(
                     text = state.categories.getOrNull(pagerState.currentPage)?.name ?: "书架",
                 )
+            },
+            actions = {
+                IconButton(onClick = { /*TODO*/ }) {
+                    Icon(imageVector = Icons.Outlined.Search, contentDescription = "Search")
+                }
+                IconButton(onClick = { /*TODO*/ }) {
+                    Icon(imageVector = Icons.Outlined.MoreVert, contentDescription = "")
+                }
             },
             windowInsets = WindowInsets.captionBar,
         )

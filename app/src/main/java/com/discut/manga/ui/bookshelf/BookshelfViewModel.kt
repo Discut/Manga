@@ -17,6 +17,10 @@ class BookshelfViewModel @Inject constructor(
 ) : BaseViewModel<BookshelfState, BookshelfEvent, BookshelfEffect>() {
     override fun initialState(): BookshelfState = BookshelfState()
 
+    init {
+        sendEvent(BookshelfEvent.Init)
+    }
+
     override suspend fun handleEvent(
         event: BookshelfEvent,
         state: BookshelfState
