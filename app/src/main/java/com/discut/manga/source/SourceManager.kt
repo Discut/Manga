@@ -25,4 +25,8 @@ class SourceManager @Inject constructor(@ApplicationContext private val context:
     override fun get(sourceKey: Long): Source? {
         return sourcesMapFlow.value[sourceKey]
     }
+
+    override fun getAll(): List<Source> {
+        return sourcesMapFlow.value.values.toList()
+    }
 }
