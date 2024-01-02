@@ -124,6 +124,10 @@ dependencies {
     implementation(libs.room.paging)// Paging 3 Integration
     testImplementation(libs.room.test)// Test helpers
 
+    // Paging
+    implementation(libs.paging.runtime)
+    implementation(libs.paging.compose)
+
     //// Network
     // okhttp
     implementation(libs.bundles.okhttp)

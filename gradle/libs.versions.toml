@@ -26,6 +26,7 @@ espresso-core = "3.5.1"
 appcompat = "1.6.1"
 material = "1.8.0"
 accompanist = "0.33.1-alpha"
+paging_version = "3.2.1"
 
 [libraries]
 datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
@@ -66,6 +67,9 @@ accompanist-permissions = { module = "com.google.accompanist:accompanist-permiss
 swipe = "me.saket.swipe:swipe:1.2.0"
 
 reorderable = "org.burnoutcrew.composereorderable:reorderable:0.9.6"
+
+paging-runtime = { module = "androidx.paging:paging-runtime", version.ref = "paging_version" }
+paging-compose = { module = "androidx.paging:paging-compose", version.ref = "paging_version" }
 
 
 
