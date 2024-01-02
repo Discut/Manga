@@ -20,6 +20,7 @@ import com.discut.manga.ui.base.BaseActivity
 import com.discut.manga.ui.categories.CategoryScreen
 import com.discut.manga.ui.main.domain.ToRouteEvent
 import com.discut.manga.ui.manga.details.MangaDetailsScreen
+import com.discut.manga.ui.source.viewer.MangasViewer
 import com.discut.manga.util.setComposeContent
 import com.discut.manga.util.toast
 import dagger.hilt.android.AndroidEntryPoint
@@ -51,6 +52,18 @@ class MainActivity : BaseActivity() {
             ) {
                 composableWithAnimation(NavigationRoute.MainScreen.route) {
                     MainScreen()
+                }
+                composableWithAnimation(
+                    route = NavigationRoute.MangasViewerScreen.route,
+                    arguments = NavigationRoute.MangasViewerScreen.arguments
+                ) {
+                    val sourceId = it.arguments?.getLong("sourceId")
+                        ?: throw IllegalArgumentException("sourceId is null")
+                    val queryKey = it.arguments?.getString("queryKey")
+                        ?: ""
+                    MangasViewer(sourceId = sourceId, queryKey = queryKey) {
+                        navController.popBackStack()
+                    }
                 }
                 composable(
                     route = NavigationRoute.MangaDetailsScreen.route,

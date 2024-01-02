@@ -11,3 +11,6 @@ fun NavigationEvent.postBy(scope: CoroutineScope) {
             NavigationEvent(route)
         )
 }
+fun NavigationEvent.dispatchBy(scope: CoroutineScope) {
+    postBy(scope)
+}

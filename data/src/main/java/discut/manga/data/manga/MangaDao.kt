@@ -31,4 +31,9 @@ interface MangaDao : BaseDao<Manga> {
         "SELECT * FROM manga WHERE category = :category"
     )
     fun getAllByCategoryAsFlow(category: Long): Flow<List<Manga>>
+
+    @Query(
+        "SELECT * FROM manga WHERE url = :url AND source = :sourceId"
+    )
+    fun getByUrlAndSource(url: String, sourceId: Long): Manga?
 }

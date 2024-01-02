@@ -36,6 +36,17 @@ sealed class NavigationRoute(
             navArgument("mangaId") { type = NavType.LongType }
         ))
 
+    data object MangasViewerScreen : NavigationRoute(
+        route = "mangasViewer/{sourceId}?queryKey={queryKey}",
+        arguments = listOf(
+            navArgument("sourceId") { type = NavType.LongType },
+            navArgument("queryKey") {
+                type = NavType.StringType
+                defaultValue = ""
+            },
+        )
+    )
+
     data object CategoryScreen : NavigationRoute("category")
 
     data object SettingsScreen : NavigationRoute("settings") {
