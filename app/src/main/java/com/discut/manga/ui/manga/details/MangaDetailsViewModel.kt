@@ -1,20 +1,22 @@
 package com.discut.manga.ui.manga.details
 
 import com.discut.core.mvi.BaseViewModel
-import com.discut.manga.source.ISourceManager
+import com.discut.manga.service.chapter.ChapterSaver
 import com.discut.manga.util.launchIO
 import com.discut.manga.util.withIOContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import discut.manga.data.MangaAppDatabase
 import discut.manga.data.chapter.Chapter
 import discut.manga.data.manga.Manga
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 @HiltViewModel
 class MangaDetailsViewModel @Inject constructor(
     private val db: MangaAppDatabase,
-    private val sourceManager: ISourceManager
+    private val chapterSaver: ChapterSaver
 ) : BaseViewModel<MangaDetailsState, MangaDetailsEvent, MangaDetailsEffect>() {
     override fun initialState(): MangaDetailsState = MangaDetailsState()
 
@@ -26,15 +28,27 @@ class MangaDetailsViewModel @Inject constructor(
             is MangaDetailsEvent.Init -> {
                 return try {
                     val manga = getManga(event.mangaId)
-                    val chapters = getChapter(event.mangaId)
+                    launchIO {
+                        collectChapters(manga.id)
+                    }
+                    launchIO {
+                        chapterSaver.update(manga.source, manga.id)
+                    }
                     state.copy(
                         loadState = MangaDetailsState.LoadState.Loaded(manga.toMangaDetails()),
                         manga = manga,
-                        chapters = chapters
                     )
                 } catch (e: Exception) {
                     state.copy(loadState = MangaDetailsState.LoadState.Error(e))
                 }
+            }
+
+            is MangaDetailsEvent.Syncing -> {
+                state
+            }
+
+            is MangaDetailsEvent.Synced -> {
+                state
             }
 
             is MangaDetailsEvent.ReadChapter -> {
@@ -73,6 +87,18 @@ class MangaDetailsViewModel @Inject constructor(
                     manga = manga
                 )
             }
+
+            is MangaDetailsEvent.ChaptersUpdated -> {
+                state.copy(
+                    chapters = event.chapters
+                )
+            }
+        }
+    }
+
+    private suspend fun collectChapters(mangaId: Long) {
+        db.chapterDao().getAllInMangaAsFlow(mangaId).collect {
+            sendEvent(MangaDetailsEvent.ChaptersUpdated(it))
         }
     }
 
@@ -91,6 +117,18 @@ class MangaDetailsViewModel @Inject constructor(
 
     fun collectionChapterInfo(chapter: Chapter): Flow<Chapter> {
         return db.chapterDao().getByIdAsFlow(chapter.id)
+    }
+
+    private fun asyncFetchMangaAndChapters(mangaId: Long) {
+        sendEvent(MangaDetailsEvent.Syncing)
+        launchIO {
+            val manga = getManga(mangaId)
+            val fetchTask = listOf(
+                async { chapterSaver.update(manga.source, manga.id) },
+            )
+            fetchTask.awaitAll()
+            sendEvent(MangaDetailsEvent.Synced)
+        }
     }
 
     class InitMangaDetailsException(msg: String) : Exception(msg)

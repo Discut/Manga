@@ -15,9 +15,9 @@ suspend inline fun <T> withUIContext(noinline block: suspend CoroutineScope.() -
     block,
 )
 fun CoroutineScope.launchIO(block: suspend CoroutineScope.() -> Unit) = launch(Dispatchers.IO) {
-    block()
+    block(this)
 }
 
 fun CoroutineScope.launchUI(block: suspend CoroutineScope.() -> Unit) = launch(Dispatchers.Main) {
-    block()
+    block(this)
 }

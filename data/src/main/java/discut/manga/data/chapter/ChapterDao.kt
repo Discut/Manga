@@ -18,6 +18,11 @@ interface ChapterDao : BaseDao<Chapter> {
     fun getAllInManga(mangaId: Long): List<Chapter>
 
     @Query(
+        "SELECT * FROM chapter WHERE mangaId = :mangaId"
+    )
+    fun getAllInMangaAsFlow(mangaId: Long): Flow<List<Chapter>>
+
+    @Query(
         "SELECT * FROM chapter WHERE id = :id"
     )
     fun getById(id: Long): Chapter?
