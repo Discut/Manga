@@ -42,7 +42,7 @@ import com.discut.manga.components.indicator.AppLinearIndicator
 import com.discut.manga.components.manga.MangaInfoBox
 import com.discut.manga.components.scaffold.AppBarAction
 import com.discut.manga.components.scaffold.AppBarActions
-import com.discut.manga.data.extensions.shouldRead
+import com.discut.manga.data.shouldRead
 import com.discut.manga.theme.alpha
 import com.discut.manga.theme.padding
 import com.discut.manga.ui.common.LoadingScreen
@@ -117,7 +117,7 @@ fun MangaDetailsScreen(
                             AppBarAction.OverflowAction(
                                 title = "refresh",
                                 onClick = {
-                                    vm.sendEvent(MangaDetailsEvent.BootSync)
+                                    vm.sendEvent(MangaDetailsEvent.BootSync(mangaId))
                                 }
                             )
                         ))

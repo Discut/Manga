@@ -1,9 +1,9 @@
 package com.discut.manga.service.chapter
 
 import com.discut.manga.data.SnowFlakeUtil
-import com.discut.manga.data.extensions.shouldUpdate
-import com.discut.manga.data.extensions.toChapter
-import com.discut.manga.data.extensions.toSManga
+import com.discut.manga.data.shouldUpdate
+import com.discut.manga.data.toChapter
+import com.discut.manga.data.manga.toSManga
 import com.discut.manga.service.manga.FetchWindow
 import com.discut.manga.service.manga.IMangaProvider
 import com.discut.manga.source.ISourceManager
@@ -11,7 +11,7 @@ import discut.manga.data.MangaAppDatabase
 import discut.manga.data.chapter.Chapter
 import discut.manga.data.chapter.ChapterDao
 import discut.manga.data.manga.MangaDao
-import kotlinx.coroutines.flow.single
+import kotlinx.coroutines.flow.first
 import managa.source.domain.utils.ChapterRecognition
 import java.time.ZonedDateTime
 import java.util.Date
@@ -29,13 +29,14 @@ class ChapterSaver @Inject constructor(
     private val mangaDb: MangaDao = MangaAppDatabase.DB.mangaDao()
     private val chapterDb: ChapterDao = MangaAppDatabase.DB.chapterDao()
     suspend fun update(
-        sourceId: Long, mangaId: Long,
+        mangaId: Long,
+        sourceId: Long,
         manualFetch: Boolean = false,
         fetchWindow: FetchWindow = Pair(0, 0),
     ): List<Chapter> {
         val manga = mangaDb.getById(mangaId) ?: throw Exception("Manga not found")
         val source = sourceManager.get(sourceId) ?: throw Exception("Source not found")
-        val sChapters = source.fetchChapterList(manga.toSManga()).single()
+        val sChapters = source.fetchChapterList(manga.toSManga()).first()
             .distinctBy { it.url }
             .mapIndexed { index, sChapter ->
                 sChapter.toChapter().copy(
@@ -172,7 +173,7 @@ class ChapterSaver @Inject constructor(
         }
 
         if (updatedToAdd.isNotEmpty()) {
-            updatedToAdd.map{
+            updatedToAdd.map {
                 it.copy(
                     id = SnowFlakeUtil.generateSnowFlake()
                 )
@@ -195,11 +196,14 @@ class ChapterSaver @Inject constructor(
         // Set this manga as updated since chapters were changed
         // Note that last_update actually represents last time the chapter list changed at all
         //updateManga.awaitUpdateLastUpdate(manga.id)
-        mangaDb.update(
+        mangaProvider.update(manga.id){
+            lastUpdate = Date().time
+        }
+/*        mangaDb.update(
             manga.copy(
                 lastUpdate = Date().time,
             )
-        )
+        )*/
 
         val reAddedUrls = reAdded.map { it.url }.toHashSet()
 

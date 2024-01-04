@@ -1,6 +1,7 @@
 package com.discut.manga.service.manga
 
 import androidx.paging.PagingSource
+import com.discut.manga.data.manga.UpdateManga
 import discut.manga.data.manga.Manga
 import kotlinx.coroutines.flow.Flow
 import managa.source.domain.FilterList
@@ -18,6 +19,10 @@ interface IMangaProvider {
     fun getLatest(sourceId: Long): PagingSource<Long, SManga>
 
     fun subscribe(mangaId: Long): Flow<Manga>
+
+    fun update(mangaId: Long, builder: UpdateManga.() -> Unit): Int
+
+    fun update(updateManga: UpdateManga): Int
 
     suspend fun updateFetchInterval(
         manga: Manga,

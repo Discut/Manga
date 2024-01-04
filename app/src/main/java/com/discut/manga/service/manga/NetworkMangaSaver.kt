@@ -1,6 +1,6 @@
 package com.discut.manga.service.manga
 
-import com.discut.manga.data.extensions.toManga
+import com.discut.manga.data.manga.toManga
 import com.discut.manga.util.withIOContext
 import discut.manga.data.MangaAppDatabase
 import discut.manga.data.manga.Manga

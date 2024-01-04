@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -66,6 +67,12 @@ enum class MangaCover(private val ratio: Float) {
             mutableStateOf(true)
         }
         val rememberCoroutineScope = rememberCoroutineScope()
+
+        LaunchedEffect(key1 = model){
+            model?.apply {
+
+            }
+        }
         Surface(
             modifier = modifier
                 .aspectRatio(ratio)

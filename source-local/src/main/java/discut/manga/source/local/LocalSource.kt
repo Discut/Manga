@@ -18,13 +18,17 @@ class LocalSource(
     private val context: Context,
 ) : Source {
 
+    companion object{
+        const val ID = 0L
+    }
+
     private var localMangaManager: LocalMangaManager = LocalMangaManager(
         context,
         LocalSourceFileSystem(context)
     )
 
     override val id: Long
-        get() = 0L
+        get() = ID
     override val name: String
         get() = "LocalSource"
     override val language: String

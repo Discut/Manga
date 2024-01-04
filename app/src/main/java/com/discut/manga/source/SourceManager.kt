@@ -5,6 +5,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import discut.manga.source.local.LocalSource
 import kotlinx.coroutines.flow.MutableStateFlow
 import managa.source.Source
+import managa.source.online.Baimangu
 import manga.core.base.BaseManager
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
@@ -18,7 +19,9 @@ class SourceManager @Inject constructor(@ApplicationContext private val context:
     override fun initManager() {
         val concurrentHashMap = ConcurrentHashMap<Long, Source>()
         val localSource = LocalSource(context)
+        val baimangu = Baimangu()
         concurrentHashMap[localSource.id] = localSource
+        concurrentHashMap[baimangu.id] = baimangu
         sourcesMapFlow.value = concurrentHashMap
     }
 

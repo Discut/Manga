@@ -1,10 +1,11 @@
-package com.discut.manga.data.extensions
+package com.discut.manga.data.manga
 
 import com.discut.manga.App
 import com.discut.manga.data.SnowFlakeUtil
 import com.discut.manga.source.SourceManagerInterface
 import dagger.hilt.EntryPoints
 import discut.manga.data.manga.Manga
+import discut.manga.source.local.LocalSource
 import managa.source.Source
 import managa.source.domain.SManga
 
@@ -39,3 +40,9 @@ fun Manga.toSManga(): SManga {
         it.initialized = true
     }
 }
+
+fun Manga.toUpdateManga():UpdateManga{
+    return UpdateManga(id = id)
+}
+
+fun Manga.isLocal() = source == LocalSource.ID

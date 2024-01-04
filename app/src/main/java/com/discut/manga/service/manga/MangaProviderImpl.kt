@@ -1,6 +1,7 @@
 package com.discut.manga.service.manga
 
 import androidx.paging.PagingSource
+import com.discut.manga.data.manga.UpdateManga
 import com.discut.manga.service.manga.paging.SourcePopularPagingSource
 import com.discut.manga.source.ISourceManager
 import discut.manga.data.MangaAppDatabase
@@ -40,6 +41,44 @@ class MangaProviderImpl @Inject constructor(
         return mangaDb.getByIdAsFlow(mangaId)
     }
 
+    override fun update(mangaId: Long, builder: UpdateManga.() -> Unit): Int {
+        val updateManga = UpdateManga(mangaId)
+        builder(updateManga)
+        return update(updateManga)
+    }
+
+
+    override fun update(updateManga: UpdateManga): Int {
+        synchronized(this) {
+            return mangaDb.getById(updateManga.id)?.let {
+                mangaDb.update(
+                    it.copy(
+                        source = updateManga.source ?: it.source,
+                        favorite = updateManga.favorite ?: it.favorite,
+                        lastUpdate = updateManga.lastUpdate ?: it.lastUpdate,
+                        nextUpdate = updateManga.nextUpdate ?: it.nextUpdate,
+                        fetchInterval = updateManga.fetchInterval ?: it.fetchInterval,
+                        dateAdded = updateManga.dateAdded ?: it.dateAdded,
+                        viewerFlags = updateManga.viewerFlags ?: it.viewerFlags,
+                        chapterFlags = updateManga.chapterFlags ?: it.chapterFlags,
+                        coverLastModified = updateManga.coverLastModified ?: it.coverLastModified,
+                        url = updateManga.url ?: it.url,
+                        title = updateManga.title ?: it.title,
+                        artist = updateManga.artist ?: it.artist,
+                        author = updateManga.author ?: it.author,
+                        description = updateManga.description ?: it.description,
+                        genre = updateManga.genre ?: it.genre,
+                        status = updateManga.status ?: it.status,
+                        thumbnailUrl = updateManga.thumbnailUrl ?: it.thumbnailUrl,
+                        category = updateManga.category ?: it.category,
+                        initialized = updateManga.initialized ?: it.initialized
+                    )
+                )
+            } ?: 0
+        }
+    }
+
+
     override suspend fun updateFetchInterval(
         manga: Manga,
         dateTime: ZonedDateTime?,
@@ -52,7 +91,7 @@ class MangaProviderImpl @Inject constructor(
             innerDataTime,
             innerWindow
         )?.let {
-            mangaDb.update(it) > 0
+            update(it) > 0
         } ?: false
     }
 

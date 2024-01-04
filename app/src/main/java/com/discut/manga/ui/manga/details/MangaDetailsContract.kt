@@ -24,11 +24,13 @@ sealed interface MangaDetailsEvent : UiEvent {
 
     data class Init(val mangaId: Long) : MangaDetailsEvent
 
-    data object BootSync : MangaDetailsEvent
+    data class BootSync(val mangaId: Long) : MangaDetailsEvent
 
     data object Synced : MangaDetailsEvent
 
     data class ChaptersUpdated(val chapters: List<Chapter>) : MangaDetailsEvent
+
+    data class MangaUpdated(val manga: Manga) : MangaDetailsEvent
 
     data class ReadChapter(val chapter: Chapter) : MangaDetailsEvent
 

@@ -1,6 +1,6 @@
 package com.discut.manga.ui.manga.details
 
-import com.discut.manga.data.extensions.getSource
+import com.discut.manga.data.manga.getSource
 import com.discut.manga.getResourceString
 import discut.manga.common.res.R
 import discut.manga.data.manga.Manga

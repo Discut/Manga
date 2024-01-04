@@ -1,4 +1,4 @@
-package com.discut.manga.data.extensions
+package com.discut.manga.data
 
 import discut.manga.data.chapter.Chapter
 import managa.source.domain.SChapter

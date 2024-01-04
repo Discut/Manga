@@ -33,6 +33,8 @@ abstract class BaseViewModel<S : UiState, E : UiEvent, F : UiEffect> : ViewModel
 
     protected abstract suspend fun handleEvent(event: E, state: S): S?
 
+    protected open fun isSyncReduceEvent(): Boolean = true
+
     /**
      * 收集事件
      */
@@ -71,8 +73,12 @@ abstract class BaseViewModel<S : UiState, E : UiEvent, F : UiEffect> : ViewModel
      * @param state S
      * @param event E
      */
-    private fun reduceEvent(state: S, event: E) {
-        viewModelScope.launch {
+    private suspend fun reduceEvent(state: S, event: E) {
+        if (isSyncReduceEvent()) {
+            viewModelScope.launch {
+                handleEvent(event, state)?.let { newState -> sendState { newState } }
+            }
+        } else {
             handleEvent(event, state)?.let { newState -> sendState { newState } }
         }
     }

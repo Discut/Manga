@@ -3,7 +3,7 @@ package com.discut.manga.ui.reader
 import androidx.lifecycle.viewModelScope
 import com.discut.core.mvi.BaseViewModel
 import com.discut.manga.App
-import com.discut.manga.data.extensions.shouldRead
+import com.discut.manga.data.shouldRead
 import com.discut.manga.source.ISourceManager
 import com.discut.manga.ui.reader.domain.CurrentChapters
 import com.discut.manga.ui.reader.domain.ReaderActivityEffect
@@ -21,7 +21,6 @@ import discut.manga.data.chapter.Chapter
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import kotlin.math.abs
 
 @HiltViewModel
 class ReaderViewModel @Inject constructor(

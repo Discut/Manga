@@ -1,5 +1,6 @@
 package com.discut.manga.service.manga
 
+import com.discut.manga.data.manga.UpdateManga
 import discut.manga.data.MangaAppDatabase
 import discut.manga.data.chapter.Chapter
 import discut.manga.data.manga.Manga
@@ -29,7 +30,7 @@ class FetchInterval @Inject constructor() {
         manga: Manga,
         dateTime: ZonedDateTime,
         window: Pair<Long, Long>,
-    ): Manga? {
+    ): UpdateManga? {
         val currentWindow = if (window.first == 0L && window.second == 0L) {
             getWindow(ZonedDateTime.now())
         } else {
@@ -47,13 +48,17 @@ class FetchInterval @Inject constructor() {
         return if (manga.nextUpdate == nextUpdate && manga.fetchInterval == interval) {
             null
         } else {
-            manga.copy(
+            UpdateManga(
+                id = manga.id, nextUpdate = nextUpdate, fetchInterval = interval
+            )
+            /*manga.copy(
                 nextUpdate = nextUpdate,
                 fetchInterval = interval
-            )
+            )*/
             //MangaUpdate(id = manga.id, nextUpdate = nextUpdate, fetchInterval = interval)
         }
     }
+
     internal fun calculateInterval(chapters: List<Chapter>, zone: ZoneId): Int {
         val uploadDates = chapters.asSequence()
             .filter { it.dateUpload > 0L }
@@ -119,11 +124,13 @@ class FetchInterval @Inject constructor() {
                 interval.absoluteValue.takeIf { interval < 0 }
                     ?: doubleInterval(interval, timeSinceLatest, doubleWhenOver = 10),
             )
-            latestDate.plusDays((cycle + 1) * interval.toLong()).toEpochSecond(dateTime.offset) * 1000
+            latestDate.plusDays((cycle + 1) * interval.toLong())
+                .toEpochSecond(dateTime.offset) * 1000
         } else {
             manga.nextUpdate
         }
     }
+
     private fun doubleInterval(delta: Int, timeSinceLatest: Int, doubleWhenOver: Int): Int {
         if (delta >= MAX_INTERVAL) return MAX_INTERVAL
 
