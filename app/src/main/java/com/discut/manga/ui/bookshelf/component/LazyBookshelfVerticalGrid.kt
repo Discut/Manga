@@ -22,7 +22,7 @@ fun LazyBookshelfVerticalGrid(
         contentPadding = PaddingValues(MaterialTheme.padding.Default)
     ) {
         items(items.size) {
-            BookItem(info = items[it].toMangaCoverInfo(),
+            LooseBookItem(info = items[it].toMangaCoverInfo(),
                 onClick = { onBookClick(items[it]) })
         }
     }

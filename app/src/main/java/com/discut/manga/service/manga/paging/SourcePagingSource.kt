@@ -18,22 +18,21 @@ abstract class SourcePagingSource(
 
     override suspend fun load(params: LoadParams<Long>): LoadResult<Long, SManga> {
         val page = params.key ?: 1
-
-        val mangasPage = try {
-            withIOContext {
+        val size = params.loadSize
+        return try {
+            val loadMore = withIOContext {
                 nextPage(page.toInt())
                     .takeIf { it.mangas.isNotEmpty() }
                     ?: throw NoResultsException()
             }
+            LoadResult.Page(
+                data = loadMore.mangas,
+                prevKey = null,
+                nextKey = if (loadMore.hasNextPage) page + 1 else null,
+            )
         } catch (e: Exception) {
-            return LoadResult.Error(e)
+            LoadResult.Error(e)
         }
-
-        return LoadResult.Page(
-            data = mangasPage.mangas,
-            prevKey = null,
-            nextKey = if (mangasPage.hasNextPage) page + 1 else null,
-        )
     }
 
     override fun getRefreshKey(state: PagingState<Long, SManga>): Long? {

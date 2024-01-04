@@ -26,3 +26,16 @@ fun SManga.toManga(fromSource: Long): Manga {
         genre = genre?.split(",")?.toList() ?: emptyList(),
     )
 }
+
+fun Manga.toSManga(): SManga {
+    return SManga.create().also {
+        it.title = title
+        it.url = url
+        it.thumbnail_url = thumbnailUrl
+        it.description = description
+        it.author = author
+        it.artist = artist
+        it.genre = genre?.joinToString()
+        it.initialized = true
+    }
+}

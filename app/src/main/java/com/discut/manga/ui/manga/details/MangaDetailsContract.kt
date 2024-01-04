@@ -8,6 +8,7 @@ import discut.manga.data.manga.Manga
 
 data class MangaDetailsState(
     internal val loadState: LoadState = LoadState.Waiting,
+    internal val isLoading: Boolean = false,
     internal val manga: Manga? = null,
     internal val chapters: List<Chapter> = emptyList()
 ) : UiState {
@@ -23,7 +24,7 @@ sealed interface MangaDetailsEvent : UiEvent {
 
     data class Init(val mangaId: Long) : MangaDetailsEvent
 
-    data object Syncing : MangaDetailsEvent
+    data object BootSync : MangaDetailsEvent
 
     data object Synced : MangaDetailsEvent
 

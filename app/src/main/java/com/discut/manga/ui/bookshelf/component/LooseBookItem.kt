@@ -11,7 +11,7 @@ import com.discut.manga.components.domain.MangaCoverInfo
 import com.discut.manga.components.manga.MangaCover
 
 @Composable
-fun BookItem(
+fun LooseBookItem(
     modifier: Modifier = Modifier,
     info: MangaCoverInfo,
     onClick: () -> Unit
@@ -20,6 +20,6 @@ fun BookItem(
         .fillMaxSize()
         .clickable { onClick() }) {
         MangaCover.BOOK(info = info)
-        Text(text = info.title, style = MaterialTheme.typography.bodyMedium)
+        Text(text = info.title, style = MaterialTheme.typography.bodyMedium, maxLines = 3)
     }
 }

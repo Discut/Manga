@@ -1,7 +1,9 @@
 package com.discut.manga.ui.manga.details
 
 import com.discut.core.mvi.BaseViewModel
+import com.discut.manga.data.extensions.sortedByChapterNumber
 import com.discut.manga.service.chapter.ChapterSaver
+import com.discut.manga.service.chapter.IChapterProvider
 import com.discut.manga.util.launchIO
 import com.discut.manga.util.withIOContext
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,6 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MangaDetailsViewModel @Inject constructor(
     private val db: MangaAppDatabase,
+    private val chapterProvider: IChapterProvider,
     private val chapterSaver: ChapterSaver
 ) : BaseViewModel<MangaDetailsState, MangaDetailsEvent, MangaDetailsEffect>() {
     override fun initialState(): MangaDetailsState = MangaDetailsState()
@@ -43,12 +46,19 @@ class MangaDetailsViewModel @Inject constructor(
                 }
             }
 
-            is MangaDetailsEvent.Syncing -> {
-                state
+            is MangaDetailsEvent.BootSync -> {
+                state.manga?.let {
+                    asyncFetchMangaAndChapters(it.id)
+                    state.copy(
+                        isLoading = true
+                    )
+                }
             }
 
             is MangaDetailsEvent.Synced -> {
-                state
+                state.copy(
+                    isLoading = false
+                )
             }
 
             is MangaDetailsEvent.ReadChapter -> {
@@ -90,14 +100,14 @@ class MangaDetailsViewModel @Inject constructor(
 
             is MangaDetailsEvent.ChaptersUpdated -> {
                 state.copy(
-                    chapters = event.chapters
+                    chapters = event.chapters.sortedByChapterNumber().asReversed()
                 )
             }
         }
     }
 
     private suspend fun collectChapters(mangaId: Long) {
-        db.chapterDao().getAllInMangaAsFlow(mangaId).collect {
+        chapterProvider.subscribe(mangaId).collect {
             sendEvent(MangaDetailsEvent.ChaptersUpdated(it))
         }
     }
@@ -120,7 +130,6 @@ class MangaDetailsViewModel @Inject constructor(
     }
 
     private fun asyncFetchMangaAndChapters(mangaId: Long) {
-        sendEvent(MangaDetailsEvent.Syncing)
         launchIO {
             val manga = getManga(mangaId)
             val fetchTask = listOf(

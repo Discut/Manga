@@ -10,12 +10,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.discut.manga.components.domain.toMangaCoverInfo
 import com.discut.manga.theme.padding
-import com.discut.manga.ui.bookshelf.component.BookItem
+import com.discut.manga.ui.bookshelf.component.LooseBookItem
 import discut.manga.data.manga.Manga
 import kotlinx.coroutines.flow.StateFlow
 
@@ -28,20 +27,25 @@ internal fun LooseGridLayout(
 ) {
     LazyVerticalGrid(
         modifier = modifier,
-        columns = GridCells.Fixed(4),
+        columns = GridCells.Fixed(3),
         contentPadding = PaddingValues(MaterialTheme.padding.Default),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalArrangement = Arrangement.spacedBy(MaterialTheme.padding.Default),
+        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.Default),
     ) {
-        if (mangaList.loadState.prepend is LoadState.Loading) {
+/*        if (mangaList.loadState.prepend is LoadState.Loading) {
             item(span = { GridItemSpan(maxLineSpan) }) {
                 LoadingMangasItem()
             }
-        }
+        }*/
         items(count = mangaList.itemCount) { index ->
             val manga by mangaList[index]?.collectAsState() ?: return@items
-            BookItem(info = manga.toMangaCoverInfo(),
+            LooseBookItem(info = manga.toMangaCoverInfo(),
                 onClick = { onBookClick(manga) })
+        }
+        if (mangaList.loadState.refresh is LoadState.Loading || mangaList.loadState.append is LoadState.Loading){
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                LoadingMangasItem()
+            }
         }
     }
 }

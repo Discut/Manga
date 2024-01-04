@@ -8,12 +8,14 @@ import discut.manga.data.manga.Manga
 import kotlinx.coroutines.flow.Flow
 import managa.source.domain.FilterList
 import managa.source.domain.SManga
+import java.time.ZonedDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class MangaProviderImpl @Inject constructor(
-    private val sourceManager: ISourceManager
+    private val sourceManager: ISourceManager,
+    private val fetchInterval: FetchInterval
 ) : IMangaProvider {
 
     private val mangaDb = MangaAppDatabase.DB.mangaDao()
@@ -36,6 +38,22 @@ class MangaProviderImpl @Inject constructor(
 
     override fun subscribe(mangaId: Long): Flow<Manga> {
         return mangaDb.getByIdAsFlow(mangaId)
+    }
+
+    override suspend fun updateFetchInterval(
+        manga: Manga,
+        dateTime: ZonedDateTime?,
+        window: FetchWindow?,
+    ): Boolean {
+        val innerDataTime = dateTime ?: ZonedDateTime.now()
+        val innerWindow = window ?: fetchInterval.getWindow(innerDataTime)
+        return fetchInterval.toUpdatedMangaOrNull(
+            manga,
+            innerDataTime,
+            innerWindow
+        )?.let {
+            mangaDb.update(it) > 0
+        } ?: false
     }
 
 }
