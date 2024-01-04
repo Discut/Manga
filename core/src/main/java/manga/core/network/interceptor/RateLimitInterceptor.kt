@@ -184,12 +184,18 @@ internal class RateLimitInterceptor(
         if (response.networkResponse == null) { // response is cached, remove it from queue
             synchronized(requestQueue) {
                 if (requestQueue.isEmpty() || timestamp < requestQueue.first()) return@synchronized
-                requestQueue.forEach {
+                for (it in requestQueue) {
+                    if (it == timestamp) {
+                        requestQueue.remove(it)
+                        break
+                    }
+                }
+/*                requestQueue.forEach {
                     if (it == timestamp) {
                         requestQueue.remove(it)
                         return@forEach
                     }
-                }
+                }*/
                 (requestQueue as Object).notifyAll()
             }
         }
