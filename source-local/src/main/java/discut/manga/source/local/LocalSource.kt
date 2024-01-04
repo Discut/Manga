@@ -3,22 +3,19 @@ package discut.manga.source.local
 import android.content.Context
 import discut.manga.source.local.disk.LocalSourceFileSystem
 import discut.manga.source.local.manager.LocalMangaManager
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
 import managa.source.Source
 import managa.source.domain.FilterList
 import managa.source.domain.SChapter
 import managa.source.domain.SManga
 import managa.source.domain.SMangas
-import java.io.File
 
 class LocalSource(
     private val context: Context,
 ) : Source {
 
-    companion object{
+    companion object {
         const val ID = 0L
     }
 
@@ -39,6 +36,10 @@ class LocalSource(
             val chaptersOfManga = localMangaManager.getChaptersOfManga(manga)
             emit(chaptersOfManga)
         }
+    }
+
+    override fun fetchMangaDetails(manga: SManga): Flow<SManga> = flow {
+        emit(manga)
     }
 
     override suspend fun getPopularManga(page: Int): SMangas =
