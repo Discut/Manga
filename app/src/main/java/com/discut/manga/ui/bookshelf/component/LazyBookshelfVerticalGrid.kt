@@ -1,5 +1,6 @@
 package com.discut.manga.ui.bookshelf.component
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -18,7 +19,9 @@ fun LazyBookshelfVerticalGrid(
 ) {
     LazyVerticalGrid(
         modifier = modifier,
-        columns = GridCells.Fixed(4),
+        columns = GridCells.Fixed(3),
+        verticalArrangement = Arrangement.spacedBy(MaterialTheme.padding.Default),
+        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.Default),
         contentPadding = PaddingValues(MaterialTheme.padding.Default)
     ) {
         items(items.size) {
