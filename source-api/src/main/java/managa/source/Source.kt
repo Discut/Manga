@@ -1,6 +1,7 @@
 package managa.source
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.single
 import managa.source.domain.FilterList
 import managa.source.domain.Page
@@ -37,7 +38,7 @@ interface Source : BaseSource {
      */
     @Suppress("DEPRECATION")
     suspend fun getPopularManga(page: Int): SMangas {
-        return fetchPopularManga(page).single()
+        return fetchPopularManga(page).first()
     }
 
     /**
@@ -50,7 +51,7 @@ interface Source : BaseSource {
      */
     @Suppress("DEPRECATION")
     suspend fun getSearchManga(page: Int, query: String, filters: FilterList): SMangas {
-        return fetchSearchManga(page, query, filters).single()
+        return fetchSearchManga(page, query, filters).first()
     }
 
     /**
@@ -62,7 +63,7 @@ interface Source : BaseSource {
     @Suppress("DEPRECATION")
     suspend fun getLatestUpdates(page: Int): SMangas {
         return fetchLatestUpdates(page)
-            .single()
+            .first()
     }
 
     /**
