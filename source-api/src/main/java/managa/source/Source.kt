@@ -2,7 +2,6 @@ package managa.source
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.single
 import managa.source.domain.FilterList
 import managa.source.domain.Page
 import managa.source.domain.SChapter
@@ -29,6 +28,16 @@ interface Source : BaseSource {
 
     fun fetchPageList(chapter: SChapter): Flow<List<Page>> =
         throw IllegalStateException("Not used")
+
+
+    /**
+     * Get info about a manga.
+     *
+     *
+     */
+    suspend fun getMangaDetails(manga: SManga): SManga {
+        return fetchMangaDetails(manga).first()
+    }
 
     /**
      * Get a page with a list of manga.
