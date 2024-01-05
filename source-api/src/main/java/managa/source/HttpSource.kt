@@ -7,6 +7,7 @@ import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import managa.source.domain.FilterList
 import managa.source.domain.Page
 import managa.source.domain.SChapter
@@ -14,7 +15,9 @@ import managa.source.domain.SManga
 import managa.source.domain.SMangas
 import manga.core.application.application
 import manga.core.network.GET
+import manga.core.network.HttpException
 import manga.core.network.NetworkHelper
+import manga.core.network.ProgressResponseBody
 import manga.core.network.asFlow
 import okhttp3.Headers
 import okhttp3.Request
@@ -174,6 +177,11 @@ abstract class HttpSource : Source, ConfigurationSource {
         }
     }
 
+    suspend fun getImageUrl(page: Page): String {
+        return fetchImageUrl(page).first()
+    }
+
+
     /**
      * Returns the request for getting the page list. Override only if it's needed to override the
      * url, send different headers or request method like POST.
@@ -214,8 +222,8 @@ abstract class HttpSource : Source, ConfigurationSource {
      *
      * @param page the chapter whose page list has to be fetched
      */
-    protected open fun imageUrlRequest(page: Page): Request {
-        return GET(page.url, headers)
+    protected open fun imageUrlRequest    (page: Page): Request {
+        return GET(page.imageUrl!!, headers)
     }
 
     /**
@@ -254,6 +262,33 @@ abstract class HttpSource : Source, ConfigurationSource {
         } catch (e: URISyntaxException) {
             orig
         }
+    }
+
+
+    /**
+     * Returns the response of the source image.
+     * Typically does not need to be overridden.
+     *
+     * @param page the page whose source image has to be downloaded.
+     */
+    open suspend fun getImage(page: Page): Response {
+        val newCall = client
+            .newBuilder()
+            .cache(null)
+            .addNetworkInterceptor {
+                val progressInterceptor = it.proceed(it.request())
+                progressInterceptor.newBuilder()
+                    .body(ProgressResponseBody(progressInterceptor.body, page))
+                    .build()
+            }
+            .build()
+            .newCall(imageUrlRequest(page))
+        val execute = newCall.execute()
+        if (!execute.isSuccessful) {
+            execute.close()
+            throw HttpException(execute.code)
+        }
+        return execute
     }
 
 

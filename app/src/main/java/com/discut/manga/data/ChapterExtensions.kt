@@ -28,3 +28,14 @@ fun Chapter.shouldUpdate(other: Chapter): Boolean {
 
 fun Collection<Chapter>.sortedByChapterNumber(): List<Chapter> =
     sortedBy { it.chapterNumber }
+
+fun Chapter.toSChapter(): SChapter =
+    SChapter.create().let {
+        it.url = this.url
+        it.chapter_number = this.chapterNumber.toFloat()
+        it.name = this.name
+        it.scanlator = this.scanlator
+        it.date_upload = this.dateUpload
+        it
+    }
+

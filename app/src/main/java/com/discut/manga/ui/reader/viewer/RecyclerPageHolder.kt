@@ -12,6 +12,7 @@ import com.discut.manga.ui.reader.viewer.domain.ReaderPage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
@@ -42,6 +43,7 @@ class RecyclerPageHolder(
 
     fun bind(readerPage: ReaderPage.ChapterPage) {
         this.readerPage = readerPage
+        loadJob?.cancel()
         loadJob = MainScope().launch {
             loadPage()
         }
@@ -66,6 +68,7 @@ class RecyclerPageHolder(
     private suspend fun loadPage() {
         supervisorScope {
             launch(Dispatchers.IO) {
+                readerPage.loadUrl()
                 readerPage.loadPage() // 加载stream
             }
             readerPage.stateFlow.collectLatest(::subscribeState)
@@ -78,11 +81,16 @@ class RecyclerPageHolder(
                 imageLoadProgress.show()
             }
 
-            PageState.LOAD_PAGE -> {
-
+            PageState.LOAD_URL -> {
+                imageLoadProgress.show()
             }
 
             PageState.DOWNLOAD_IMAGE -> {
+                imageLoadProgress.show()
+                readerPage.progressFlow.collectLatest(imageLoadProgress::setProgress)
+            }
+
+            PageState.LOAD_PAGE -> {
 
             }
 

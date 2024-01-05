@@ -2,7 +2,7 @@ package com.discut.manga.ui.bookshelf
 
 import com.discut.core.mvi.BaseViewModel
 import com.discut.manga.data.category.DefaultCategories
-import com.discut.manga.source.ISourceManager
+import com.discut.manga.service.source.ISourceManager
 import com.discut.manga.util.withIOContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import discut.manga.data.MangaAppDatabase

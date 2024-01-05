@@ -20,6 +20,7 @@ class DirectoryPageLoader(private val file: File, private val context: Context) 
                     streamGetter = streamFn
                     state = PageState.READY
                     loadPage = {}
+                    loadUrl = {}
                 }
             }
             .orEmpty()

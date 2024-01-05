@@ -6,7 +6,7 @@ import androidx.compose.material.icons.filled.Bookmarks
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.MoreHoriz
 import com.discut.core.mvi.BaseViewModel
-import com.discut.manga.source.ISourceManager
+import com.discut.manga.service.source.ISourceManager
 import com.discut.manga.ui.bookshelf.BookshelfScreen
 import com.discut.manga.ui.history.HistoryScreen
 import com.discut.manga.ui.main.domain.MainEffect

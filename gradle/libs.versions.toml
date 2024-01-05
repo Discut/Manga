@@ -1,5 +1,6 @@
 [versions]
 aboutlib_version = "10.9.2"
+serialization_version = "1.6.0"
 datastore = "1.0.0"
 navigation-compose = "2.7.5"
 lifecycle-viewmodel-compose = "2.6.2"
@@ -71,6 +72,8 @@ reorderable = "org.burnoutcrew.composereorderable:reorderable:0.9.6"
 paging-runtime = { module = "androidx.paging:paging-runtime", version.ref = "paging_version" }
 paging-compose = { module = "androidx.paging:paging-compose", version.ref = "paging_version" }
 
+serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization_version" }
+serialization-json-okio = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json-okio", version.ref = "serialization_version" }
 
 
 
@@ -149,6 +152,7 @@ appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "a
 com-google-android-material-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 [bundles]
+serialization = ["serialization-json", "serialization-json-okio"]
 okhttp = ["okhttp-core", "okhttp-logging", "okhttp-brotli", "okhttp-dnsoverhttps"]
 js-engine = ["quickjs-android"]
 sqlite = ["sqlite-framework", "sqlite-ktx", "sqlite-android"]

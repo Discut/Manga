@@ -17,6 +17,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import com.discut.manga.R
 import com.discut.manga.ui.base.BaseActivity
+import com.discut.manga.ui.common.LoadingScreen
 import com.discut.manga.ui.reader.adapter.RecyclerPagesViewAdapter
 import com.discut.manga.ui.reader.component.BottomSheetMenu
 import com.discut.manga.ui.reader.component.ReaderNavigationBar
@@ -124,7 +125,12 @@ class ReaderActivity : BaseActivity() {
             BottomSheetMenu(showBottomSheet) {
                 showBottomSheet = false
             }
-
+            if (state.currentChapters == null ||
+                state.currentChapters?.currReaderChapter?.state is ReaderChapter.State.Loading ||
+                state.currentChapters?.currReaderChapter?.state is ReaderChapter.State.Wait
+            ) {
+                LoadingScreen(placeholderText = "Loading...")
+            }
         }
 
 
@@ -157,6 +163,7 @@ class ReaderActivity : BaseActivity() {
                 is ReaderActivityEffect.InitChapterError -> {
                     Log.d("ReaderActivity", it.error.message.orEmpty())
                     toast(it.error.message)
+                    Log.e("ReaderActivity", it.error.message.orEmpty(), it.error)
                     finish()
                 }
 

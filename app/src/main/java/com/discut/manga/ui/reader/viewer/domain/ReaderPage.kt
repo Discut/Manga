@@ -20,21 +20,27 @@ sealed class ReaderPage(var isLoad: Boolean = false) {
         set(value) {
             _stateFlow.value = value
         }
+
     class ChapterPage(
         val index: Int,
         val url: String = "",
-        val imageUrl: String? = null,
+        var imageUrl: String? = null,
         var streamGetter: (() -> InputStream)? = null,
     ) : ReaderPage() {
 
         lateinit var loadPage: suspend () -> Unit
+        lateinit var loadUrl: suspend () -> Unit
 
         //private val _stateFlow = MutableStateFlow(PageState.WAIT)
 
         private val _progressFlow = MutableStateFlow(0)
-        val progressFlow = _progressFlow.asStateFlow()
-        val progress
+        var progressFlow = _progressFlow.asStateFlow()
+
+        internal var progress: Int
             get() = _progressFlow.value
+            set(value) {
+                _progressFlow.value = value
+            }
 
     }
 
@@ -45,6 +51,7 @@ sealed class ReaderPage(var isLoad: Boolean = false) {
 
 enum class PageState {
     WAIT,
+    LOAD_URL,
     LOAD_PAGE,
     DOWNLOAD_IMAGE,
     READY,

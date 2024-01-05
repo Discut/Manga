@@ -51,7 +51,13 @@ class ChapterPageHolder(
                             imageLoadProgress.show()
                         }
 
+                        PageState.LOAD_URL -> {
+                            imageLoadProgress.show()
+
+                        }
+
                         PageState.LOAD_PAGE -> {
+                            imageLoadProgress.show()
 
                         }
 

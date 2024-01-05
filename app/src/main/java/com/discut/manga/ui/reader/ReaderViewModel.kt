@@ -4,7 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.discut.core.mvi.BaseViewModel
 import com.discut.manga.App
 import com.discut.manga.data.shouldRead
-import com.discut.manga.source.ISourceManager
+import com.discut.manga.service.source.ISourceManager
 import com.discut.manga.ui.reader.domain.CurrentChapters
 import com.discut.manga.ui.reader.domain.ReaderActivityEffect
 import com.discut.manga.ui.reader.domain.ReaderActivityEvent

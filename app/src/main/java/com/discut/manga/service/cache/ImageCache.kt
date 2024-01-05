@@ -3,7 +3,10 @@ package com.discut.manga.service.cache
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import com.discut.manga.App
+import com.discut.manga.service.GlobalModuleEntrypoint
 import com.jakewharton.disklrucache.DiskLruCache
+import dagger.hilt.EntryPoints
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import java.io.FileDescriptor
@@ -27,6 +30,15 @@ class ImageCache @Inject constructor(
                 decodeSampledBitmapFromFileDescriptor(fileDescriptor)
             decodeSampledBitmapFromFileDescriptor
         }
+    }
+
+    fun getAsStream(key: String): InputStream {
+        return cache.get(key)?.getInputStream(DISK_IMAGE_CACHE_INDEX)
+            ?: throw Exception("key not found")
+    }
+
+    fun isExist(key: String): Boolean {
+        return cache.get(key) != null
     }
 
     fun put(key: String, value: InputStream) {
@@ -111,3 +123,6 @@ class ImageCache @Inject constructor(
         private const val DISK_IMAGE_CACHE_INDEX = 0
     }
 }
+
+val ImageCache.Companion.instance: ImageCache
+    get() = EntryPoints.get(App.instance, GlobalModuleEntrypoint::class.java).getImageCacheInstance()

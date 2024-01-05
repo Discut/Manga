@@ -2,7 +2,7 @@ package com.discut.manga.data.manga
 
 import com.discut.manga.App
 import com.discut.manga.data.SnowFlakeUtil
-import com.discut.manga.source.SourceManagerInterface
+import com.discut.manga.service.GlobalModuleEntrypoint
 import dagger.hilt.EntryPoints
 import discut.manga.data.manga.Manga
 import discut.manga.source.local.LocalSource
@@ -10,7 +10,7 @@ import managa.source.Source
 import managa.source.domain.SManga
 
 fun Manga.getSource(): Source? {
-    val instance = EntryPoints.get(App.instance, SourceManagerInterface::class.java).getInstance()
+    val instance = EntryPoints.get(App.instance, GlobalModuleEntrypoint::class.java).getSourceManagerInstance()
     return instance.get(source)
 }
 

@@ -3,7 +3,7 @@ package com.discut.manga.service.manga
 import com.discut.manga.data.manga.isLocal
 import com.discut.manga.data.manga.toSManga
 import com.discut.manga.data.manga.toUpdateManga
-import com.discut.manga.source.ISourceManager
+import com.discut.manga.service.source.ISourceManager
 import discut.manga.data.MangaAppDatabase
 import java.util.Date
 import javax.inject.Inject

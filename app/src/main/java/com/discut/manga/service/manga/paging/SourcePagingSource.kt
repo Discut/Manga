@@ -1,5 +1,6 @@
 package com.discut.manga.service.manga.paging
 
+import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.discut.manga.util.withIOContext
@@ -25,11 +26,13 @@ abstract class SourcePagingSource(
                     .takeIf { it.mangas.isNotEmpty() }
                     ?: throw NoResultsException()
             }
-            LoadResult.Page(
+            val page1 = LoadResult.Page(
                 data = loadMore.mangas,
                 prevKey = null,
                 nextKey = if (loadMore.hasNextPage) page + 1 else null,
             )
+            Log.d("SourcePagingSource", "load: $page1")
+            page1
         } catch (e: Exception) {
             LoadResult.Error(e)
         }

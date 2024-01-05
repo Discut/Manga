@@ -6,7 +6,7 @@ import com.discut.manga.data.toChapter
 import com.discut.manga.data.manga.toSManga
 import com.discut.manga.service.manga.FetchWindow
 import com.discut.manga.service.manga.IMangaProvider
-import com.discut.manga.source.ISourceManager
+import com.discut.manga.service.source.ISourceManager
 import discut.manga.data.MangaAppDatabase
 import discut.manga.data.chapter.Chapter
 import discut.manga.data.chapter.ChapterDao

@@ -3,7 +3,7 @@ package com.discut.manga.service.manga
 import androidx.paging.PagingSource
 import com.discut.manga.data.manga.UpdateManga
 import com.discut.manga.service.manga.paging.SourcePopularPagingSource
-import com.discut.manga.source.ISourceManager
+import com.discut.manga.service.source.ISourceManager
 import discut.manga.data.MangaAppDatabase
 import discut.manga.data.manga.Manga
 import kotlinx.coroutines.flow.Flow

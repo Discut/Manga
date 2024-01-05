@@ -1,12 +1,14 @@
 package com.discut.manga.ui.reader.viewer.loader
 
 import android.content.Context
+import com.discut.manga.data.toSChapter
 import com.discut.manga.ui.reader.viewer.domain.ReaderChapter
 import com.discut.manga.util.withIOContext
 import discut.manga.data.chapter.Chapter
 import discut.manga.data.manga.Manga
 import discut.manga.source.local.LocalSource
 import discut.manga.source.local.SupportFormat
+import managa.source.HttpSource
 import managa.source.Source
 import managa.source.domain.SChapter
 
@@ -39,7 +41,7 @@ class ChapterLoader(
                 }
                 // TODO 添加更多的格式支持
             }
-
+            is HttpSource -> HttpPageLoader(chapter, source)
             else -> {
                 throw Exception("Unsupported")
             }
@@ -52,15 +54,5 @@ class ChapterLoader(
             else -> false
         }
     }
-
-    private fun Chapter.toSChapter(): SChapter =
-        SChapter.create().let {
-            it.url = this.url
-            it.chapter_number = this.chapterNumber.toFloat()
-            it.name = this.name
-            it.scanlator = this.scanlator
-            it.date_upload = this.dateUpload
-            it
-        }
 
 }

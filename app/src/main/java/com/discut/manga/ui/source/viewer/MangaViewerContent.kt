@@ -1,5 +1,6 @@
 package com.discut.manga.ui.source.viewer
 
+import android.util.Log
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
@@ -49,6 +50,10 @@ internal fun MangaViewerContent(
             }
         }
     }
+
+    Log.d("MangaViewerContent", "mangaList.itemCount = ${mangaList.itemCount}")
+    Log.d("MangaViewerContent", "mangaList.loadState.refresh = ${mangaList.loadState.refresh}")
+    Log.d("MangaViewerContent", "mangaList.loadState.append = ${mangaList.loadState.append}")
 
     if (mangaList.itemCount == 0 && mangaList.loadState.refresh is LoadState.Loading) {
         LoadingScreen(
