@@ -16,7 +16,7 @@ fun Manga.getSource(): Source? {
 
 fun SManga.toManga(fromSource: Long): Manga {
     return Manga.create().copy(
-        id = SnowFlakeUtil(0, 0).nextId,
+        id = SnowFlakeUtil.generateSnowFlake(),
         title = title,
         url = url,
         source = fromSource,

@@ -1,6 +1,6 @@
 package com.discut.manga.data
 
-class SnowFlakeUtil(private val datacenterId: Long,private val  machineId: Long) {
+class SnowFlakeUtil(private val datacenterId: Long, private val machineId: Long) {
 
     private var sequence = 0L // 序列号
     private var lastStmp = -1L // 上次的时间戳
@@ -34,7 +34,7 @@ class SnowFlakeUtil(private val datacenterId: Long,private val  machineId: Long)
         }
     private val nextMill: Long
         // 获取新的毫秒数
-        private get() {
+        get() {
             var mill = newstmp
             while (mill <= lastStmp) {
                 mill = newstmp
@@ -43,7 +43,7 @@ class SnowFlakeUtil(private val datacenterId: Long,private val  machineId: Long)
         }
     private val newstmp: Long
         // 获取当前的毫秒数
-        private get() = System.currentTimeMillis()
+        get() = System.currentTimeMillis()
 
     companion object {
         // 起始时间戳
@@ -64,7 +64,7 @@ class SnowFlakeUtil(private val datacenterId: Long,private val  machineId: Long)
         private const val DATACENTER_LEFT = SEQUENCE_BIT + MACHINE_BIT
         private const val TIMESTMP_LEFT = DATACENTER_LEFT + DATACENTER_BIT
 
-        private val snowFlake = SnowFlakeUtil(datacenterId = 1L, machineId = 1L)
+        private val snowFlake = SnowFlakeUtil(datacenterId = 20L, machineId = 24L)
 
         fun generateSnowFlake(): Long {
             return snowFlake.nextId
