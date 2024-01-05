@@ -30,7 +30,9 @@ class NetworkMangaSaver @Inject constructor(
                 }
 
                 else -> {
-                    manga
+                    manga.copy(
+                        id = dbManga.id,
+                    )
                 }
             }
         }

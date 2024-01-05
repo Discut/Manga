@@ -3,6 +3,7 @@ package com.discut.manga.ui.source.viewer
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import androidx.paging.map
 import com.discut.core.mvi.BaseViewModel
 import com.discut.manga.service.manga.IMangaProvider
@@ -62,7 +63,7 @@ class MangaViewerViewModel
         return createPager(info, sourceId).flow
             .map {
                 it.toManga(sourceId)
-            }//.cachedIn(CoroutineScope(Dispatchers.IO))
+            }.cachedIn(CoroutineScope(Dispatchers.IO))
     }
 
     // 定义一个函数来创建分页对象
@@ -85,7 +86,6 @@ class MangaViewerViewModel
     }
 
     companion object {
-        const val TAG = "MangaViewerViewModel"
         const val PAGE_SIZE = 12
     }
 
