@@ -1,4 +1,4 @@
-package com.discut.manga.source
+package com.discut.manga.service.source
 
 import managa.source.Source
 

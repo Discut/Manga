@@ -8,7 +8,7 @@ import androidx.paging.map
 import com.discut.core.mvi.BaseViewModel
 import com.discut.manga.service.manga.IMangaProvider
 import com.discut.manga.service.manga.NetworkMangaSaver
-import com.discut.manga.source.ISourceManager
+import com.discut.manga.service.source.ISourceManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import discut.manga.data.manga.Manga
 import kotlinx.coroutines.CoroutineScope

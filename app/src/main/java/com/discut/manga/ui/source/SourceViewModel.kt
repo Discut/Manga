@@ -1,8 +1,8 @@
 package com.discut.manga.ui.source
 
 import com.discut.core.mvi.BaseViewModel
-import com.discut.manga.source.ISourceManager
-import com.discut.manga.source.isLocal
+import com.discut.manga.service.source.ISourceManager
+import com.discut.manga.service.source.isLocal
 import dagger.hilt.android.lifecycle.HiltViewModel
 import managa.source.Source
 import javax.inject.Inject

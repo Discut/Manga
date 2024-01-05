@@ -42,6 +42,8 @@ enum class MangaCover(private val ratio: Float) {
             modifier = modifier,
             model = info.coverUrl,
             title = info.title,
+            placeholderCoverBackgroundColor = info.placeholderCoverBackgroundColor,
+            placeholderTitle = info.placeholderTitle,
             shape = shape,
             onClick = onClick,
             contentDescription = info.contentDescription
@@ -54,12 +56,13 @@ enum class MangaCover(private val ratio: Float) {
         modifier: Modifier = Modifier,
         model: Any?,
         title: String,
+        placeholderCoverBackgroundColor: Int,
+        placeholderTitle: Pair<String, String>,
         contentDescription: String = "",
         shape: Shape = MaterialTheme.shapes.extraSmall,
         onClick: (() -> Unit)? = null,
     ) {
         val value = MaterialTheme.typography.titleLarge.fontSize.value
-        val chars = getChars(title)
         var enablePlaceholderCover by remember {
             mutableStateOf(true)
         }
@@ -68,7 +71,7 @@ enum class MangaCover(private val ratio: Float) {
         }
         val rememberCoroutineScope = rememberCoroutineScope()
 
-        LaunchedEffect(key1 = model){
+        LaunchedEffect(key1 = model) {
             model?.apply {
 
             }
@@ -118,9 +121,9 @@ enum class MangaCover(private val ratio: Float) {
                             val char2View = view.findViewById<TextView>(R.id.cover_text_2)
                             char1View.textSize = value * 8
                             char2View.textSize = value * 13
-                            char1View.text = chars.first
-                            char2View.text = chars.second
-                            view.setBackgroundColor(placeholderCoverBackgroundColors.random())
+                            char1View.text = placeholderTitle.first
+                            char2View.text = placeholderTitle.second
+                            view.setBackgroundColor(placeholderCoverBackgroundColor)
                             view
                         })
                 },
@@ -130,28 +133,3 @@ enum class MangaCover(private val ratio: Float) {
     }
 }
 
-private fun getChars(str: String): Pair<String, String> {
-    try {
-        var chars = str.uppercase()
-        if (str.isBlank()) {
-            return "N" to "O"
-        }
-        if (str.length == 1) {
-            return str to ""
-        }
-        val char1 = chars[(chars.indices).random()].toString()
-        chars = chars.replace(char1, "", true)
-        val char2 = chars[(chars.indices).random()].toString()
-        return char1 to char2
-    } catch (e: Exception) {
-        return "N" to "O"
-    }
-}
-
-private val placeholderCoverBackgroundColors = listOf(
-    Color.parseColor("#196A71"),
-    Color.parseColor("#f9d3e3"),
-    Color.parseColor("#6a8d52"),
-    Color.parseColor("#f0908d"),
-    Color.parseColor("#d9883d"),
-)

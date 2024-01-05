@@ -3,6 +3,7 @@ package managa.source.domain
 import android.net.Uri
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import manga.core.network.ProgressListener
 
 
 open class Page(
@@ -10,7 +11,7 @@ open class Page(
     val url: String = "",
     var imageUrl: String? = null,
     @Transient var uri: Uri? = null, // Deprecated but can't be deleted due to extensions
-) {
+) :ProgressListener{
 
     val number: Int
         get() = index + 1
@@ -42,5 +43,13 @@ open class Page(
         DOWNLOAD_IMAGE,
         READY,
         ERROR,
+    }
+
+    override fun update(bytesRead: Long, contentLength: Long, done: Boolean) {
+        progress = if (contentLength > 0) {
+            (100 * bytesRead / contentLength).toInt()
+        } else {
+            -1
+        }
     }
 }

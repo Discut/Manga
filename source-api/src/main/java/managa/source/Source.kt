@@ -40,6 +40,19 @@ interface Source : BaseSource {
     }
 
     /**
+     * Get a list of chapters.
+     */
+    suspend fun getChapterList(manga: SManga): List<SChapter> {
+        return fetchChapterList(manga).first()
+    }
+
+    /**
+     * Get a list of pages.
+     */
+    suspend fun getPageList(chapter: SChapter): List<Page> {
+        return fetchPageList(chapter).first()
+    }
+    /**
      * Get a page with a list of manga.
      *
      * @since extensions-lib 1.5

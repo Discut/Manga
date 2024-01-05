@@ -11,7 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.discut.manga.source.ISourceManager
+import com.discut.manga.service.source.ISourceManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

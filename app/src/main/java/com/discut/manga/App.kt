@@ -1,7 +1,7 @@
 package com.discut.manga
 
 import android.app.Application
-import com.discut.manga.source.SourceManager
+import com.discut.manga.service.source.SourceManager
 import dagger.hilt.android.HiltAndroidApp
 import discut.manga.data.MangaAppDatabase
 import manga.core.application.application
