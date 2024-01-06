@@ -41,6 +41,10 @@ class MangaProviderImpl @Inject constructor(
         return mangaDb.getByIdAsFlow(mangaId)
     }
 
+    override fun subscribeCategory(category: Long): Flow<List<Manga>> {
+        return mangaDb.getAllByCategoryAsFlow(category)
+    }
+
     override fun update(mangaId: Long, builder: UpdateManga.() -> Unit): Int {
         val updateManga = UpdateManga(mangaId)
         builder(updateManga)

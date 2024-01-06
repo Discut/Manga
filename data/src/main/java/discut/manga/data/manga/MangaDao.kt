@@ -28,7 +28,7 @@ interface MangaDao : BaseDao<Manga> {
     fun getAllByCategory(category: Long): List<Manga>
 
     @Query(
-        "SELECT * FROM manga WHERE category = :category"
+        "SELECT * FROM manga WHERE category = :category AND favorite = 1"
     )
     fun getAllByCategoryAsFlow(category: Long): Flow<List<Manga>>
 

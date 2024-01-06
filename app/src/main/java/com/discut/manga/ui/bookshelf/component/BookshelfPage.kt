@@ -15,7 +15,7 @@ fun BookshelfPage(
     state: PagerState,
 
     onBookClick: (Manga) -> Unit,
-    getBooks: (Int) -> List<Manga>
+    getBooks: @Composable (Int) -> List<Manga>
 ) {
     HorizontalPager(
         modifier = Modifier.fillMaxSize(),
@@ -26,9 +26,8 @@ fun BookshelfPage(
             // To make sure only one offscreen page is being composed
             return@HorizontalPager
         }
-        val books = getBooks(it)
         LazyBookshelfVerticalGrid(
-            items = books,
+            items = getBooks(it),
             onBookClick = onBookClick
         )
     }

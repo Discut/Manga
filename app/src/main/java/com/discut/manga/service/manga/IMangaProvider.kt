@@ -20,6 +20,8 @@ interface IMangaProvider {
 
     fun subscribe(mangaId: Long): Flow<Manga>
 
+    fun subscribeCategory(category: Long): Flow<List<Manga>>
+
     fun update(mangaId: Long, builder: UpdateManga.() -> Unit): Int
 
     fun update(updateManga: UpdateManga): Int
