@@ -1,6 +1,7 @@
 package com.discut.manga
 
 import android.app.Application
+import com.discut.core.handle.GlobalExceptionHandler
 import com.discut.manga.service.source.SourceManager
 import dagger.hilt.android.HiltAndroidApp
 import discut.manga.data.MangaAppDatabase
@@ -30,6 +31,7 @@ class App : Application() {
         appPreference.initManager()
         sourceManager.initManager()
         MangaAppDatabase.init(this)
+        GlobalExceptionHandler.init(this)
         // init end
     }
 }
