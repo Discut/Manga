@@ -1,5 +1,6 @@
 plugins {
     kotlin("kapt")
+    kotlin("plugin.serialization")
     id("com.google.devtools.ksp")
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -131,6 +132,7 @@ dependencies {
     //// Network
     // okhttp
     implementation(libs.bundles.okhttp)
+    implementation(libs.bundles.serialization)
 
     //// Disk
     // cache

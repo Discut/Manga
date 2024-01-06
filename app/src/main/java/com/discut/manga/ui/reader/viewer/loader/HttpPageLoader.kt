@@ -3,6 +3,7 @@ package com.discut.manga.ui.reader.viewer.loader
 import com.discut.manga.data.generateHashKey
 import com.discut.manga.data.toSChapter
 import com.discut.manga.service.cache.ImageCache
+import com.discut.manga.service.cache.PagesCache
 import com.discut.manga.service.cache.instance
 import com.discut.manga.ui.reader.viewer.domain.PageState
 import com.discut.manga.ui.reader.viewer.domain.ReaderPage
@@ -10,16 +11,28 @@ import discut.manga.data.chapter.Chapter
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import managa.source.HttpSource
+import managa.source.domain.Page
 import managa.source.extensions.toInputStream
 
 class HttpPageLoader(
     private val chapter: Chapter,
     private val source: HttpSource,
-    private val imageCache: ImageCache = ImageCache.instance
+    private val imageCache: ImageCache = ImageCache.instance,
+    private val pagesCache: PagesCache = PagesCache.instance
 ) : IPageLoader {
     override suspend fun buildPages(): List<ReaderPage> {
-        return source.getPageList(chapter.toSChapter()).map {
+        val pagesHashKey = "${chapter.id}${chapter.url}".generateHashKey()
+        val pages = if (pagesCache.isExist(pagesHashKey)) {
+            Json.decodeFromString(pagesCache.get(pagesHashKey)!!)
+        } else {
+            source.getPageList(chapter.toSChapter()).apply {
+                pagesCache.put(pagesHashKey, Json.encodeToString(this))
+            }
+        }
+        return pages.map {
             ReaderPage.ChapterPage(index = it.index, url = source.baseUrl + chapter.url).apply {
                 state = PageState.WAIT
                 loadUrl = {

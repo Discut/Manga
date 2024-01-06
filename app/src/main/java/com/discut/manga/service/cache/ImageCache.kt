@@ -20,7 +20,6 @@ import javax.inject.Singleton
 class ImageCache @Inject constructor(
     @ApplicationContext context: Context
 ) {
-
     private val cache: DiskLruCache
 
     fun get(key: String): Bitmap? {
@@ -63,7 +62,7 @@ class ImageCache @Inject constructor(
             diskCacheDir,
             DISK_IMAGE_CACHE_VERSION,
             1,
-            DISK_IMAGE_CACHE_SIZE
+            DISK_IMAGE_CACHE_SIZE.toLong()
         )
     }
 
@@ -117,11 +116,12 @@ class ImageCache @Inject constructor(
     }
 
     companion object {
-        private const val DISK_IMAGE_CACHE_SIZE = 1024L * 1024 * 1024 //1024MB
+        private const val DISK_IMAGE_CACHE_SIZE = 512 * 1024 * 1024 // 512MB
         private const val DISK_IMAGE_CACHE_VERSION = 1
-        private const val DISK_IMAGE_CACHE_NAME = "image_cache"
+        private const val DISK_IMAGE_CACHE_NAME = "chapter_pages_cache"
         private const val DISK_IMAGE_CACHE_INDEX = 0
     }
+
 }
 
 val ImageCache.Companion.instance: ImageCache

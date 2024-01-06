@@ -1,7 +1,6 @@
 package com.discut.manga.ui.manga.details
 
 import com.discut.core.mvi.BaseViewModel
-import com.discut.manga.data.manga.toUpdateManga
 import com.discut.manga.data.sortedByChapterNumber
 import com.discut.manga.service.chapter.ChapterSaver
 import com.discut.manga.service.chapter.IChapterProvider
@@ -79,24 +78,24 @@ class MangaDetailsViewModel @Inject constructor(
             }
 
             is MangaDetailsEvent.FavoriteManga -> {
-/*                val manga = event.manga.copy(
-                    favorite = !event.manga.favorite
-                )*/
+                /*                val manga = event.manga.copy(
+                                    favorite = !event.manga.favorite
+                                )*/
                 launchIO {
-                    mangaProvider.update(event.manga.id){
+                    mangaProvider.update(event.manga.id) {
                         favorite = !event.manga.favorite
                     }
-/*                    mangaProvider.update(
-                        manga.toUpdateManga().copy(
+                    /*                    mangaProvider.update(
+                                            manga.toUpdateManga().copy(
 
-                        )
-                    )
-                    db.mangaDao().update(manga)*/
+                                            )
+                                        )
+                                        db.mangaDao().update(manga)*/
                 }
-/*                state.copy(
-                    loadState = MangaDetailsState.LoadState.Loaded(manga.toMangaDetails()),
-                    manga = manga
-                )*/
+                /*                state.copy(
+                                    loadState = MangaDetailsState.LoadState.Loaded(manga.toMangaDetails()),
+                                    manga = manga
+                                )*/
                 state
             }
 
@@ -151,13 +150,16 @@ class MangaDetailsViewModel @Inject constructor(
 
     private fun asyncFetchMangaAndChapters(mangaId: Long) {
         launchIO {
-            val manga = getManga(mangaId)
-            val fetchTask = listOf(
-                async { chapterSaver.update(mangaId = mangaId, sourceId = manga.source) },
-                async { mangaSaver.update(mangaId = mangaId, sourceId = manga.source) }
-            )
-            fetchTask.awaitAll()
-            sendEvent(MangaDetailsEvent.Synced)
+            try {
+                val manga = getManga(mangaId)
+                val fetchTask = listOf(
+                    async { chapterSaver.update(mangaId = mangaId, sourceId = manga.source) },
+                    async { mangaSaver.update(mangaId = mangaId, sourceId = manga.source) }
+                )
+                fetchTask.awaitAll()
+            } finally {
+                sendEvent(MangaDetailsEvent.Synced)
+            }
         }
     }
 

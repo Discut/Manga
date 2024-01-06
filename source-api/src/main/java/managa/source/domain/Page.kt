@@ -1,17 +1,17 @@
 package managa.source.domain
 
-import android.net.Uri
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import manga.core.network.ProgressListener
 
-
+@Serializable
 open class Page(
     val index: Int,
     val url: String = "",
     var imageUrl: String? = null,
-    @Transient var uri: Uri? = null, // Deprecated but can't be deleted due to extensions
-) :ProgressListener{
+) : ProgressListener {
 
     val number: Int
         get() = index + 1
@@ -32,11 +32,13 @@ open class Page(
 
     @Transient
     val progressFlow = _progressFlow.asStateFlow()
+
     var progress: Int
         get() = _progressFlow.value
         set(value) {
             _progressFlow.value = value
         }
+
     enum class State {
         QUEUE,
         LOAD_PAGE,
