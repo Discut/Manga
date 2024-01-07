@@ -47,8 +47,8 @@ import com.discut.manga.components.manga.MangaCover
 import com.discut.manga.domain.history.MangaChapterHistory
 import com.discut.manga.theme.MangaTheme
 import com.discut.manga.theme.padding
+import com.discut.manga.util.getHourAndMinute
 import com.discut.manga.util.toPx
-import java.text.SimpleDateFormat
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -179,7 +179,7 @@ fun HistoryCompactItem(
                         style = MaterialTheme.typography.titleMedium
                     )
                     Text(
-                        text = "${history.chapterName} • ${SimpleDateFormat("hh: mm").format(history.readAt)}",
+                        text = "${history.chapterName} • ${history.readAt.getHourAndMinute()}",
                         maxLines = 1,
                         style = MaterialTheme.typography.bodySmall
                     )
@@ -295,7 +295,7 @@ fun HistoryLooseItem(
                         style = MaterialTheme.typography.titleMedium
                     )
                     Text(
-                        text = "${history.chapterName} • ${SimpleDateFormat("hh: mm").format(history.readAt)}",
+                        text = "${history.chapterName} • ${history.readAt.getHourAndMinute()}",
                         maxLines = 1,
                         style = MaterialTheme.typography.bodySmall
                     )
@@ -329,7 +329,7 @@ fun HistoryLooseItem(
 }
 
 enum class HistoryItemType {
-     LOOSE,COMPACT,
+    LOOSE, COMPACT,
 }
 
 @Preview(

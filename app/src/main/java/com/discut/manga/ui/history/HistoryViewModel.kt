@@ -6,6 +6,7 @@ import com.discut.manga.domain.history.MangaChapterHistory
 import com.discut.manga.service.history.IHistoryProvider
 import com.discut.manga.ui.history.component.HistoryItemType
 import com.discut.manga.util.get
+import com.discut.manga.util.getYearAndMonthAndDay
 import com.discut.manga.util.withIOContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -19,7 +20,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import manga.core.preference.HistoryPreference
 import manga.core.preference.PreferenceManager
-import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import javax.inject.Inject
 import kotlin.math.abs
@@ -93,7 +94,7 @@ class HistoryViewModel @Inject constructor(
     private fun paresDateToHistoryAction(histories: List<MangaChapterHistory>): List<HistoryAction> {
         var lastHistoryDate = Date(System.currentTimeMillis() + (24 * 60 * 60 * 1000))
         val historyActions: MutableList<HistoryAction> = mutableListOf()
-        histories.forEachIndexed { index, mangaChapterHistory ->
+        histories.forEachIndexed { _, mangaChapterHistory ->
             mangaChapterHistory.readAt.toDate().let {
                 if (abs(lastHistoryDate.rinse().time - it.rinse().time - 24 * 60 * 60 * 1000) < 1000 * 5) {
                     historyActions.add(
@@ -112,13 +113,18 @@ class HistoryViewModel @Inject constructor(
     private fun paresDateString(date: Date): String {
         val now = Date()
         val diff = now.time - date.time
-        val dayDiff = diff / (24 * 60 * 60 * 1000)
-        return if (dayDiff == 0L) {
-            "Today"
-        } else if (dayDiff == 1L) {
-            "Yesterday"
-        } else {
-            SimpleDateFormat("dd-MMM-yyyy").format(date)
+        return when (diff / (24 * 60 * 60 * 1000)) {
+            0L -> {
+                "Today"
+            }
+
+            1L -> {
+                "Yesterday"
+            }
+
+            else -> {
+                date.time.getYearAndMonthAndDay()
+            }
         }
 
     }
@@ -140,10 +146,11 @@ class HistoryViewModel @Inject constructor(
     }
 
     private fun Date.rinse(): Date {
-        hours = 0
-        minutes = 0
-        seconds = 0
-        return this
+        val localDate = toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate()
+        val calendar = Calendar.getInstance().apply {
+            this.set(localDate.year, localDate.monthValue - 1, localDate.dayOfMonth)
+        }
+        return calendar.time
     }
 
 }
