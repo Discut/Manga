@@ -11,6 +11,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -70,6 +71,12 @@ class HistoryViewModel @Inject constructor(
                 state
             }
 
+            is HistoryEvent.Search -> {
+                state.apply {
+                    queryKeyFlow.value = event.query
+                }
+            }
+
             is HistoryEvent.ChangeListLayout -> {
                 historyPreference.setHistoryListLayout(event.layout.ordinal)
                 state
@@ -117,10 +124,16 @@ class HistoryViewModel @Inject constructor(
     }
 
     private suspend fun subscribe(): StateFlow<List<HistoryAction>> =
-        historyProvider.subscribeAll()
-            .map { it ->
-                paresDateToHistoryAction(it.sortedBy { it.readAt }.reversed())
+        historyProvider
+            .subscribeAll()
+            .combine(uiState.value.queryKeyFlow) { histories, query ->
+                paresDateToHistoryAction(
+                    histories
+                        .sortedBy { it.readAt }
+                        .filter { it.mangaTitle.contains(query) }.reversed()
+                )
             }.stateIn(CoroutineScope(Dispatchers.IO))
+
 
     private fun Long.toDate(): Date {
         return Date(this)

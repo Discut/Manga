@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 data class HistoryState(
+    internal val queryKeyFlow: MutableStateFlow<String> = MutableStateFlow(""),
     internal val histories: StateFlow<List<HistoryAction>> = MutableStateFlow(listOf()),
     internal val historyListLayout: HistoryItemType = HistoryItemType.LOOSE
 ) : UiState
@@ -19,6 +20,8 @@ sealed interface HistoryEvent : UiEvent {
     data class Remove(val history: MangaChapterHistory) : HistoryEvent
 
     data object ClearAll : HistoryEvent
+
+    data class Search(val query: String) : HistoryEvent
 
     data class ChangeListLayout(val layout: HistoryItemType) : HistoryEvent
 
