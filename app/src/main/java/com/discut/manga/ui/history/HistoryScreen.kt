@@ -1,27 +1,142 @@
 package com.discut.manga.ui.history
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.captionBar
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.discut.manga.components.domain.MangaCoverInfo
-import com.discut.manga.components.manga.MangaInfoBox
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.discut.manga.components.scaffold.AppBarAction
+import com.discut.manga.components.scaffold.AppBarActions
+import com.discut.manga.theme.padding
+import com.discut.manga.ui.history.component.HistoryHeader
+import com.discut.manga.ui.history.component.HistoryItem
+import com.discut.manga.ui.history.component.ListSettingsSheet
+import com.discut.manga.ui.reader.ReaderActivity
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun HistoryScreen() {
-    Row(
-        modifier = Modifier
-            .fillMaxSize(),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically  // 垂直居中
-    ) {
-        /*MangaInfoBox(
-            info = MangaCoverInfo(
-                coverUrl = "https://pro-api.mgsearcher.com/_next/image?url=https%3A%2F%2Fcover1.baozimh.org%2Fcover%2Ftx%2Fzuijiangneijuanjitong%2F27_17_20_325503b799a59e545f85633395ed7f13_1651051230260.webp&w=640&q=50",
-                title = "内卷系统"
-            )
-        )*/
+fun HistoryScreen(
+    vm: HistoryViewModel = hiltViewModel()
+) {
+    val state by vm.uiState.collectAsState()
+    val histories by state.histories.collectAsState()
+    val current = LocalContext.current
+    var showListSettingsModalBottomSheet by remember {
+        mutableStateOf(false)
     }
+    Scaffold(topBar = {
+        TopAppBar(
+            title = {
+                Text(
+                    text = "History",
+                )
+            },
+            actions = {
+                IconButton(onClick = { /*TODO*/ }) {
+                    Icon(imageVector = Icons.Outlined.Search, contentDescription = "Search")
+                }
+                AppBarActions(actions = listOf(
+                    AppBarAction.OverflowAction(
+                        title = "Clear all",
+                        onClick = {
+                            vm.sendEvent(HistoryEvent.ClearAll)
+                        }
+                    ),
+                    AppBarAction.OverflowAction(
+                        title = "List settings",
+                        onClick = {
+                            showListSettingsModalBottomSheet = true
+                        }
+                    )
+                ))
+            },
+            windowInsets = WindowInsets.captionBar,
+        )
+    }) { it ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = it.calculateTopPadding())
+        ) {
+            items(items = histories, key = { h -> h.key }) {
+                when (it) {
+                    is HistoryAction.Header -> {
+                        HistoryHeader(
+                            header = it.title,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .animateItemPlacement(
+                                    animationSpec = tween(
+                                        durationMillis = 500,
+                                    )
+                                )
+                        )
+                    }
+
+                    is HistoryAction.Item -> {
+                        HistoryItem(
+                            history = it.history,
+                            itemType = state.historyListLayout,
+                            paddingValues = PaddingValues(
+                                horizontal = MaterialTheme.padding.Normal,
+                                vertical = MaterialTheme.padding.Default
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .animateItemPlacement(
+                                    animationSpec = tween(
+                                        durationMillis = 500,
+                                    )
+                                ),
+                            onDelete = {
+                                vm.sendEvent(HistoryEvent.Remove(it.history))
+                            }
+                        ) {
+                            ReaderActivity.startActivity(
+                                current,
+                                it.history.mangaId,
+                                it.history.chapterId
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    ListSettingsSheet(
+        isShow = showListSettingsModalBottomSheet,
+        historyListLayout = state.historyListLayout,
+        onHistoryListLayoutChange = {
+            vm.sendEvent(HistoryEvent.ChangeListLayout(it))
+        },
+        onDismissRequest = {
+            showListSettingsModalBottomSheet = !showListSettingsModalBottomSheet
+        }
+    )
 }

@@ -3,7 +3,10 @@ package com.discut.manga.ui.reader
 import androidx.lifecycle.viewModelScope
 import com.discut.core.mvi.BaseViewModel
 import com.discut.manga.App
+import com.discut.manga.data.SnowFlakeUtil
 import com.discut.manga.data.shouldRead
+import com.discut.manga.domain.history.MangaChapterHistory
+import com.discut.manga.service.history.IHistoryProvider
 import com.discut.manga.service.source.ISourceManager
 import com.discut.manga.ui.reader.domain.CurrentChapters
 import com.discut.manga.ui.reader.domain.ReaderActivityEffect
@@ -25,6 +28,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ReaderViewModel @Inject constructor(
     private val sourceManager: ISourceManager,
+    private val historyProvider: IHistoryProvider
 ) :
     BaseViewModel<ReaderActivityState, ReaderActivityEvent, ReaderActivityEffect>() {
 
@@ -48,6 +52,22 @@ class ReaderViewModel @Inject constructor(
                             initState.exceptionOrNull() ?: IllegalStateException("Unknown error")
                         sendEffect(ReaderActivityEffect.InitChapterError(exception))
                     }
+                    pair.second.currentChapters?.apply {
+                        withIOContext {
+                            historyProvider.insert(
+                                MangaChapterHistory(
+                                    historyId = SnowFlakeUtil.generateSnowFlake(),
+                                    mangaId = event.mangaId,
+                                    chapterId = event.chapterId,
+                                    mangaTitle = pair.second.manga?.title ?: "",
+                                    chapterName = currReaderChapter.dbChapter.name,
+                                    thumbnailUrl = pair.second.manga?.thumbnailUrl,
+                                    readAt = System.currentTimeMillis(),
+                                )
+                            )
+                        }
+                    }
+
                     pair.second
                 }
             }
@@ -65,7 +85,8 @@ class ReaderViewModel @Inject constructor(
                         when (val chapterState = rc.state) {
                             is ReaderChapter.State.Loaded -> {
                                 val count =
-                                    chapterState.pages.filterIsInstance<ReaderPage.ChapterPage>().count()
+                                    chapterState.pages.filterIsInstance<ReaderPage.ChapterPage>()
+                                        .count()
                                 rc.dbChapter.apply {
                                     dbManager.chapterDao().update(
                                         this.copy(
