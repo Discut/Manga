@@ -1,11 +1,13 @@
 package com.discut.manga.components
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.captionBar
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
@@ -40,9 +42,9 @@ fun CustomModalBottomSheet(
             windowInsets = WindowInsets.captionBar,
             onDismissRequest = onDismissRequest,
         ) {
-            content(
-                bottomPadding
-            )
+            Column(modifier = Modifier.padding(bottomPadding)) {
+                content.invoke(this, bottomPadding)
+            }
         }
     }
 }
