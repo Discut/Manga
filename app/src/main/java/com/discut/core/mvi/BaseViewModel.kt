@@ -56,6 +56,10 @@ abstract class BaseViewModel<S : UiState, E : UiEvent, F : UiEffect> : ViewModel
         }
     }
 
+    fun sendEvent(eventBuild: () -> E) {
+        sendEvent(eventBuild())
+    }
+
     /**
      * 发送effect
      */

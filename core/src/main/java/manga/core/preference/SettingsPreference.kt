@@ -20,4 +20,18 @@ class SettingsPreference constructor(appPreference: SharedPreferences, flow: Flo
     fun getSecurityModeAsFlow(): Flow<Boolean> {
         return getValueAsFlow("enable_security_mode", false)
     }
+
+    fun setNoTranceMode(enable: Boolean) {
+        getEdit().putBoolean("enable_no_trance_mode", enable).apply()
+    }
+
+    fun getNoTranceModeAsFlow(enable: Boolean = false): Flow<Boolean> {
+        return getValueAsFlow("enable_no_trance_mode", enable)
+    }
+
+    fun getNoTranceMode(): Boolean {
+        return getValue("enable_no_trance_mode", false)
+    }
+
+
 }

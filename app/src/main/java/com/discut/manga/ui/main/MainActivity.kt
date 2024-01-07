@@ -12,7 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.discut.core.flowbus.observeEvent
-import com.discut.manga.navigation.NavigationEvent
+import com.discut.manga.event.NavigationEvent
 import com.discut.manga.navigation.NavigationRoute
 import com.discut.manga.navigation.composableWithAnimation
 import com.discut.manga.navigation.settingsGraph

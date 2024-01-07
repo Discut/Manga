@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.discut.manga.navigation.NavigationEvent
+import com.discut.manga.event.NavigationEvent
 import com.discut.manga.ui.source.SourceViewModel
 import com.discut.manga.ui.source.component.SourceHeader
 import com.discut.manga.ui.source.component.SourceItem

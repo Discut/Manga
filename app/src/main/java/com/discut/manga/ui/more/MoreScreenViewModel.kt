@@ -29,7 +29,8 @@ class MoreScreenViewModel @Inject constructor() :
 
     override fun initialState(): MoreScreenState {
         return MoreScreenState(
-            enableSecurityMode = settingsPreference.enableSecurityMode()
+            enableSecurityMode = settingsPreference.enableSecurityMode(),
+            enableNoTranceMode = settingsPreference.getNoTranceMode()
         )
     }
 
@@ -40,9 +41,15 @@ class MoreScreenViewModel @Inject constructor() :
         return when (event) {
             is MoreScreenEvent.SecurityModeChanged -> {
                 settingsPreference.setSecurityMode(event.enable)
-                sendEffect(MoreScreenEffect.SecurityModeChange(event.enable))
                 state.copy(
                     enableSecurityMode = event.enable
+                )
+            }
+
+            is MoreScreenEvent.NoTranceModeChanged -> {
+                settingsPreference.setNoTranceMode(event.enable)
+                state.copy(
+                    enableNoTranceMode = event.enable
                 )
             }
         }

@@ -9,6 +9,8 @@ data class MainState(val navBarItems: List<NavBarItem>) : UiState
 sealed interface MainEvent : UiEvent {
 
     data class ClickNavigationItem(val navigationItem: NavBarItem) : MainEvent
+
+    data object RefreshNavigationItems : MainEvent
 }
 
 sealed interface MainEffect : UiEffect {

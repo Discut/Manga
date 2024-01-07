@@ -3,7 +3,7 @@ package com.discut.manga.ui.settings.security
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,7 +26,9 @@ import com.discut.manga.ui.settings.security.domain.SecuritySettingsEvent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SecuritySettingsScreen() {
+fun SecuritySettingsScreen(
+    onBack: () -> Unit
+) {
     val scrollBehavior =
         TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
     val vm: SecuritySettingsViewModel = viewModel()
@@ -48,10 +50,10 @@ fun SecuritySettingsScreen() {
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { /* do something */ }) {
+                    IconButton(onClick = { onBack() }) {
                         Icon(
-                            imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "Localized description"
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back screen"
                         )
                     }
                 },

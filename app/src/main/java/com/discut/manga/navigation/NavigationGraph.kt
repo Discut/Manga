@@ -64,7 +64,9 @@ fun NavGraphBuilder.settingsGraph(navController: NavController) {
             SettingsScreen(navController)
         }
         composableWithAnimation(route = NavigationRoute.SettingsScreen.Security.route) {
-            SecuritySettingsScreen()
+            SecuritySettingsScreen {
+                navController.popBackStack()
+            }
         }
     }
 }

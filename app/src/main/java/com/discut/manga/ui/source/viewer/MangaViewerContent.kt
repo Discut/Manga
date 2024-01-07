@@ -12,7 +12,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.discut.domain.ListDisplayLayout
-import com.discut.manga.navigation.NavigationEvent
+import com.discut.manga.event.NavigationEvent
 import com.discut.manga.ui.common.LoadingScreen
 import com.discut.manga.ui.source.viewer.component.LooseGridLayout
 import com.discut.manga.util.postBy

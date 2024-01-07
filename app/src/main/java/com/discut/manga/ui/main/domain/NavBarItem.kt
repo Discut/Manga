@@ -7,5 +7,6 @@ data class NavBarItem(
     val title: String,
     val route: String,
     val icon: ImageVector,
+    val hide: Boolean = false,
     val screen: @Composable () -> Unit
 )

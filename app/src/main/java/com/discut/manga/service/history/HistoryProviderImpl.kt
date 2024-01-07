@@ -2,10 +2,13 @@ package com.discut.manga.service.history
 
 import com.discut.manga.data.SnowFlakeUtil
 import com.discut.manga.domain.history.MangaChapterHistory
+import com.discut.manga.util.get
 import discut.manga.data.MangaAppDatabase
 import discut.manga.data.history.History
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import manga.core.preference.PreferenceManager
+import manga.core.preference.SettingsPreference
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -14,6 +17,7 @@ class HistoryProviderImpl @Inject constructor() : IHistoryProvider {
     private val db = MangaAppDatabase.DB.historyDao()
     private val mangaDb = MangaAppDatabase.DB.mangaDao()
     private val chapterDb = MangaAppDatabase.DB.chapterDao()
+    private val settingsPreference = PreferenceManager.get<SettingsPreference>()
     override fun subscribeAll(): Flow<List<MangaChapterHistory>> =
         db.getAllAsFlow().map {
             it.map { history ->
@@ -32,6 +36,9 @@ class HistoryProviderImpl @Inject constructor() : IHistoryProvider {
 
 
     override fun insert(history: MangaChapterHistory) {
+        if (settingsPreference.getNoTranceMode()) {
+            return
+        }
         when (val dbHistory = db.getByMangaId(history.mangaId)) {
             null -> {
                 db.insert(

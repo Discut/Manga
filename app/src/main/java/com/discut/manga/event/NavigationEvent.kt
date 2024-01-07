@@ -1,4 +1,4 @@
-package com.discut.manga.navigation
+package com.discut.manga.event
 
 import com.discut.core.flowbus.BusEvent
 

@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
-import com.discut.manga.navigation.NavigationEvent
+import com.discut.manga.event.NavigationEvent
 import com.discut.manga.ui.bookshelf.component.BookshelfPage
 import com.discut.manga.util.postBy
 
