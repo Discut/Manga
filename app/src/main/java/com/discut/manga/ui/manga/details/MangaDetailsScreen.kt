@@ -1,7 +1,16 @@
 package com.discut.manga.ui.manga.details
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -14,6 +23,7 @@ import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -29,16 +39,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.discut.manga.components.CustomModalBottomSheet
 import com.discut.manga.components.SwipeDirection
+import com.discut.manga.components.domain.toMangaCoverInfo
 import com.discut.manga.components.indicator.AppLinearIndicator
+import com.discut.manga.components.manga.MangaCover
 import com.discut.manga.components.manga.MangaInfoBox
 import com.discut.manga.components.scaffold.AppBarActions
 import com.discut.manga.data.shouldRead
@@ -46,6 +61,7 @@ import com.discut.manga.theme.alpha
 import com.discut.manga.theme.padding
 import com.discut.manga.ui.common.LoadingScreen
 import com.discut.manga.ui.manga.details.component.AboutBookSheet
+import com.discut.manga.ui.manga.details.component.FavoriteButton
 import com.discut.manga.ui.manga.details.component.InfoBoxType
 import com.discut.manga.ui.manga.details.component.MoreInfoItem
 import com.discut.manga.ui.manga.details.component.ShortInfoBox
@@ -71,6 +87,17 @@ fun MangaDetailsScreen(
     var showModalBottomSheet by remember {
         mutableStateOf(false)
     }
+    /*    var isFavorite by remember {
+            mutableStateOf(false)
+        }*/
+    var isFavoriteOnAppbarAnimationStopped by remember {
+        mutableStateOf(true)
+    }
+    val isShowFavoriteOnAppbar by remember {
+        derivedStateOf {
+            state.manga?.favorite ?: false && isFavoriteOnAppbarAnimationStopped
+        }
+    }
     LaunchedEffect(key1 = mangaId) {
         if (state.loadState is MangaDetailsState.LoadState.Waiting) {
             vm.sendEvent(MangaDetailsEvent.Init(mangaId))
@@ -87,16 +114,34 @@ fun MangaDetailsScreen(
     val loadState = state.loadState as MangaDetailsState.LoadState.Loaded
     val details = loadState.details
     val chapterListState = rememberLazyListState()
+    val isShowReadFloatButton by remember {
+        derivedStateOf { chapterListState.firstVisibleItemIndex > 3 }
+    }
+    val isShowComplexTitle by remember {
+        derivedStateOf { chapterListState.firstVisibleItemIndex > 0 }
+    }
     Surface {
         Scaffold(
             topBar = {
                 TopAppBar(title = {
-                    Text(
-                        text = details.title.ifBlank { stringResource(id = R.string.unknown_manga_title) },
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        // modifier = Modifier.alpha(if (isActionMode) 1f else titleAlphaProvider()),
-                    )
+                    AnimatedVisibility(
+                        visible = isShowComplexTitle,
+                        enter = fadeIn() + slideInVertically(),
+                        exit = fadeOut() + slideOutVertically()
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            MangaCover.SQUARE(
+                                modifier = Modifier.size(28.dp),
+                                info = details.toMangaCoverInfo()
+                            )
+                            Spacer(modifier = Modifier.width(MaterialTheme.padding.Default))
+                            Text(
+                                text = details.title.ifBlank { stringResource(id = R.string.unknown_manga_title) },
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
+                    }
                 },
                     navigationIcon = {
                         IconButton(onClick = onBackPressed) {
@@ -107,11 +152,23 @@ fun MangaDetailsScreen(
                         }
                     },
                     actions = {
-                        LikeButton(favorite = details.favorite) {
-                            state.manga?.let {
-                                vm.sendEvent(MangaDetailsEvent.FavoriteManga(it))
+                        AnimatedVisibility(visible = isShowFavoriteOnAppbar) {
+                            IconButton(onClick = {
+                                state.manga?.let {
+                                    vm.sendEvent(MangaDetailsEvent.FavoriteManga(it))
+                                }
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Default.Favorite,
+                                    contentDescription = "favorite"
+                                )
                             }
                         }
+                        /*                        LikeButton(favorite = details.favorite) {
+                                                    state.manga?.let {
+                                                        vm.sendEvent(MangaDetailsEvent.FavoriteManga(it))
+                                                    }
+                                                }*/
                         AppBarActions {
                             toOverflowAction {
                                 title = "refresh"
@@ -123,23 +180,36 @@ fun MangaDetailsScreen(
                     })
             },
             floatingActionButton = {
-                ExtendedFloatingActionButton(
-                    text = {
-                        Text(
-                            text = "Read"
-                        )
-                    },
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Filled.PlayArrow,
-                            contentDescription = null
-                        )
-                    },
-                    onClick = {},
-                    expanded = chapterListState.isScrollingUp() || chapterListState.isScrolledToEnd(),
-                )
+                AnimatedVisibility(
+                    visible = isShowReadFloatButton,
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
+                    ExtendedFloatingActionButton(
+                        text = {
+                            Text(
+                                text = "Read"
+                            )
+                        },
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Filled.PlayArrow,
+                                contentDescription = null
+                            )
+                        },
+                        onClick = {},
+                        expanded = chapterListState.isScrollingUp() || chapterListState.isScrolledToEnd(),
+                    )
+                }
             }
         ) { pv ->
+            LaunchedEffect(chapterListState) {
+                snapshotFlow { chapterListState.firstVisibleItemIndex }
+                    .collect { index ->
+                        // 当滑动到了某一项时触发的逻辑
+                        println("滑动到了第 $index 项")
+                    }
+            }
             AppLinearIndicator(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -149,7 +219,7 @@ fun MangaDetailsScreen(
                 item {
                     MangaInfoBox(
                         modifier = Modifier
-                            .padding(horizontal = MaterialTheme.padding.ExtraLarge),
+                            .padding(horizontal = MaterialTheme.padding.Normal),
                         info = details,
                     )
                 }
@@ -179,15 +249,36 @@ fun MangaDetailsScreen(
                     HorizontalDivider(
                         modifier = Modifier
                             .padding(
-                                horizontal = MaterialTheme.padding.ExtraLarge,
+                                horizontal = MaterialTheme.padding.Normal,
                                 vertical = MaterialTheme.padding.Large
                             )
                     )
                 }
                 item {
+                    Row(modifier = Modifier.padding(horizontal = MaterialTheme.padding.Normal)) {
+                        FilledIconButton(
+                            modifier = Modifier.weight(3f),
+                            onClick = {
+                                isFavoriteOnAppbarAnimationStopped = false
+                            }) {
+                            Text(text = "开始阅读")
+                        }
+                        Spacer(modifier = Modifier.width(MaterialTheme.padding.Normal))
+                        FavoriteButton(
+                            modifier = Modifier.weight(1f),
+                            isFavorite = state.manga?.favorite ?: false,
+                            onClick = {
+                                state.manga?.let {
+                                    vm.sendEvent(MangaDetailsEvent.FavoriteManga(it))
+                                }
+                            },
+                            onAnimated = { isFavoriteOnAppbarAnimationStopped = true })
+                    }
+                }
+                item {
                     MoreInfoItem(
                         modifier = Modifier
-                            .padding(horizontal = MaterialTheme.padding.ExtraLarge)
+                            .padding(horizontal = MaterialTheme.padding.Normal)
                             .padding(bottom = MaterialTheme.padding.Medium),
                         title = "关于此漫画",
                         onClick = {
@@ -205,7 +296,7 @@ fun MangaDetailsScreen(
                 item {
                     MoreInfoItem(
                         modifier = Modifier
-                            .padding(horizontal = MaterialTheme.padding.ExtraLarge),
+                            .padding(horizontal = MaterialTheme.padding.Normal),
                         title = "章节",
                         icon = {
                             Icon(
@@ -236,8 +327,8 @@ fun MangaDetailsScreen(
                         SwipeableChapterItem(
                             modifier = Modifier
                                 .padding(
-                                    horizontal = MaterialTheme.padding.ExtraLarge,
-                                    vertical = MaterialTheme.padding.Normal
+                                    horizontal = MaterialTheme.padding.Normal,
+                                    vertical = MaterialTheme.padding.Medium
                                 )
                                 .alpha(alpha),
                             title = chapter.name,
@@ -266,21 +357,6 @@ fun MangaDetailsScreen(
                                 )
                             }
                         )
-                        /*                        AnimatedVisibility(
-                                                    visible = visibleProgress,
-                                                    exit = shrinkVertically()
-                                                ) {
-                                                    LinearProgressIndicator(
-                                                        progress = {
-                                                            chapter.getReadProgress()
-                                                        },
-                                                        modifier = Modifier
-                                                            .fillMaxWidth()
-                                                            .height(2.dp),
-                                                        color = MaterialTheme.colorScheme.primary
-                                                    )
-                                                }*/
-
                     }
                 }
 
@@ -307,6 +383,7 @@ fun MangaDetailsScreen(
 
 }
 
+@Deprecated("Use FavoriteButton", replaceWith = ReplaceWith("FavoriteButton"))
 @Composable
 internal fun LikeButton(
     favorite: Boolean,

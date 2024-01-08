@@ -85,6 +85,7 @@ internal fun TextWithIcon(
     text: String,
     icon: @Composable (modifier: Modifier) -> Unit
 ) {
+    text.trim().takeIf { it.isNotEmpty() } ?: return
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -98,6 +99,7 @@ internal fun TextWithIcon(
     }
 }
 
+@Deprecated("Use FavoriteButton", replaceWith = ReplaceWith("FavoriteButton"))
 @Composable
 internal fun LikeButton(
     favorite: Boolean,
