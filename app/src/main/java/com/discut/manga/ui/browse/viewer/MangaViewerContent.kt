@@ -1,4 +1,4 @@
-package com.discut.manga.ui.source.viewer
+package com.discut.manga.ui.browse.viewer
 
 import android.util.Log
 import androidx.compose.material3.SnackbarDuration
@@ -14,7 +14,7 @@ import androidx.paging.compose.LazyPagingItems
 import com.discut.domain.ListDisplayLayout
 import com.discut.manga.event.NavigationEvent
 import com.discut.manga.ui.common.LoadingScreen
-import com.discut.manga.ui.source.viewer.component.LooseGridLayout
+import com.discut.manga.ui.browse.viewer.component.LooseGridLayout
 import com.discut.manga.util.postBy
 import discut.manga.data.manga.Manga
 import kotlinx.coroutines.flow.StateFlow

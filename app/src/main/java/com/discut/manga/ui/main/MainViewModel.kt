@@ -15,7 +15,7 @@ import com.discut.manga.ui.main.domain.MainEvent
 import com.discut.manga.ui.main.domain.MainState
 import com.discut.manga.ui.main.domain.NavBarItem
 import com.discut.manga.ui.more.MoreScreen
-import com.discut.manga.ui.source.SourceScreen
+import com.discut.manga.ui.browse.SourceScreen
 import com.discut.manga.util.get
 import com.discut.manga.util.launchIO
 import dagger.hilt.android.lifecycle.HiltViewModel

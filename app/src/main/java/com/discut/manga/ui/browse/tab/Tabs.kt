@@ -1,4 +1,4 @@
-package com.discut.manga.ui.source.tab
+package com.discut.manga.ui.browse.tab
 
 val Tabs = listOf(
     MangaSourceTab,

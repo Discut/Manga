@@ -1,4 +1,4 @@
-package com.discut.manga.ui.source
+package com.discut.manga.ui.browse
 
 import com.discut.core.mvi.BaseViewModel
 import com.discut.manga.service.source.ISourceManager

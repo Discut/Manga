@@ -1,4 +1,4 @@
-package com.discut.manga.ui.source
+package com.discut.manga.ui.browse
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column

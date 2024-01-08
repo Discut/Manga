@@ -20,7 +20,7 @@ import com.discut.manga.ui.base.BaseActivity
 import com.discut.manga.ui.categories.CategoryScreen
 import com.discut.manga.ui.main.domain.ToRouteEvent
 import com.discut.manga.ui.manga.details.MangaDetailsScreen
-import com.discut.manga.ui.source.viewer.MangasViewer
+import com.discut.manga.ui.browse.viewer.MangasViewer
 import com.discut.manga.util.setComposeContent
 import com.discut.manga.util.toast
 import dagger.hilt.android.AndroidEntryPoint

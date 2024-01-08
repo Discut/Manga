@@ -1,4 +1,4 @@
-package com.discut.manga.ui.source.component
+package com.discut.manga.ui.browse.component
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme

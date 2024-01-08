@@ -1,4 +1,4 @@
-package com.discut.manga.ui.source.extensions
+package com.discut.manga.ui.browse.extensions
 
 import androidx.compose.ui.graphics.ImageBitmap
 import managa.source.Source

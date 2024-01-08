@@ -1,4 +1,4 @@
-package com.discut.manga.ui.source.tab
+package com.discut.manga.ui.browse.tab
 
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
@@ -6,9 +6,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.discut.manga.event.NavigationEvent
-import com.discut.manga.ui.source.SourceViewModel
-import com.discut.manga.ui.source.component.SourceHeader
-import com.discut.manga.ui.source.component.SourceItem
+import com.discut.manga.ui.browse.SourceViewModel
+import com.discut.manga.ui.browse.component.SourceHeader
+import com.discut.manga.ui.browse.component.SourceItem
 import com.discut.manga.util.dispatchBy
 
 @Composable

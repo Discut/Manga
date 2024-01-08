@@ -1,4 +1,4 @@
-package com.discut.manga.ui.source.component
+package com.discut.manga.ui.browse.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.aspectRatio
@@ -9,7 +9,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.discut.manga.R
 import com.discut.manga.service.source.isLocal
-import com.discut.manga.ui.source.extensions.icon
+import com.discut.manga.ui.browse.extensions.icon
 import managa.source.Source
 
 @Composable

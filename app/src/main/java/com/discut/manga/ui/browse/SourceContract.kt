@@ -1,10 +1,10 @@
-package com.discut.manga.ui.source
+package com.discut.manga.ui.browse
 
 import com.discut.core.mvi.contract.UiEffect
 import com.discut.core.mvi.contract.UiEvent
 import com.discut.core.mvi.contract.UiState
-import com.discut.manga.ui.source.tab.TabContent
-import com.discut.manga.ui.source.tab.Tabs
+import com.discut.manga.ui.browse.tab.TabContent
+import com.discut.manga.ui.browse.tab.Tabs
 import managa.source.Source
 
 data class SourceScreenState(

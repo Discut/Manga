@@ -1,4 +1,4 @@
-package com.discut.manga.ui.source.viewer.component
+package com.discut.manga.ui.browse.viewer.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues

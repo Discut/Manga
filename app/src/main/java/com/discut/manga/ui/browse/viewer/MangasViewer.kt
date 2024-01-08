@@ -1,4 +1,4 @@
-package com.discut.manga.ui.source.viewer
+package com.discut.manga.ui.browse.viewer
 
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -27,7 +27,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.discut.manga.components.indicator.AppLinearIndicator
 import com.discut.manga.theme.padding

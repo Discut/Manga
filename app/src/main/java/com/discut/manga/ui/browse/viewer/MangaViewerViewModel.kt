@@ -1,4 +1,4 @@
-package com.discut.manga.ui.source.viewer
+package com.discut.manga.ui.browse.viewer
 
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
