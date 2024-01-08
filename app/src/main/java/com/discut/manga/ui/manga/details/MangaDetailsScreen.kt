@@ -59,8 +59,10 @@ import com.discut.manga.components.scaffold.AppBarActions
 import com.discut.manga.data.shouldRead
 import com.discut.manga.theme.alpha
 import com.discut.manga.theme.padding
+import com.discut.manga.ui.categories.NewCategory
 import com.discut.manga.ui.common.LoadingScreen
 import com.discut.manga.ui.manga.details.component.AboutBookSheet
+import com.discut.manga.ui.manga.details.component.AddToFavoriteSheet
 import com.discut.manga.ui.manga.details.component.FavoriteButton
 import com.discut.manga.ui.manga.details.component.InfoBoxType
 import com.discut.manga.ui.manga.details.component.MoreInfoItem
@@ -85,6 +87,12 @@ fun MangaDetailsScreen(
     val state by vm.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     var showModalBottomSheet by remember {
+        mutableStateOf(false)
+    }
+    var isShowFavoriteSheet by remember {
+        mutableStateOf(false)
+    }
+    var isShowAddDialog by remember {
         mutableStateOf(false)
     }
     /*    var isFavorite by remember {
@@ -268,9 +276,10 @@ fun MangaDetailsScreen(
                             modifier = Modifier.weight(1f),
                             isFavorite = state.manga?.favorite ?: false,
                             onClick = {
-                                state.manga?.let {
+                                /*state.manga?.let {
                                     vm.sendEvent(MangaDetailsEvent.FavoriteManga(it))
-                                }
+                                }*/
+                                isShowFavoriteSheet = true
                             },
                             onAnimated = { isFavoriteOnAppbarAnimationStopped = true })
                     }
@@ -377,6 +386,24 @@ fun MangaDetailsScreen(
                 chips = details.tags
             )
         }
+        AddToFavoriteSheet(
+            categories = state.categories,
+            onDismissRequest = { isShowFavoriteSheet = false },
+            isShow = isShowFavoriteSheet
+        )
+        if (isShowAddDialog) {
+            NewCategory(
+                isFreeCategoryName = {
+                    !state.categories.any { c -> c.name == it }
+                },
+                onConfirm = {
+                    vm.sendEvent(MangaDetailsEvent.AddNewCategory(it))
+                    isShowAddDialog = false
+                }) {
+                isShowAddDialog = false
+            }
+        }
+
 
     }
 

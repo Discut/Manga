@@ -1,6 +1,7 @@
 package com.discut.manga.ui.manga.details
 
 import com.discut.core.mvi.BaseViewModel
+import com.discut.manga.data.SnowFlakeUtil
 import com.discut.manga.data.sortedByChapterNumber
 import com.discut.manga.service.chapter.ChapterSaver
 import com.discut.manga.service.chapter.IChapterProvider
@@ -10,6 +11,7 @@ import com.discut.manga.util.launchIO
 import com.discut.manga.util.withIOContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import discut.manga.data.MangaAppDatabase
+import discut.manga.data.category.Category
 import discut.manga.data.chapter.Chapter
 import discut.manga.data.manga.Manga
 import kotlinx.coroutines.async
@@ -37,7 +39,9 @@ class MangaDetailsViewModel @Inject constructor(
                 collectManga(event.mangaId)
                 collectChapters(event.mangaId)
                 sendEvent(MangaDetailsEvent.BootSync(event.mangaId))
-                state
+                state.copy(
+                    categories = fetchCategories()
+                )
             }
 
             is MangaDetailsEvent.BootSync -> {
@@ -111,8 +115,33 @@ class MangaDetailsViewModel @Inject constructor(
                     manga = event.manga
                 )
             }
+
+            is MangaDetailsEvent.AddNewCategory -> {
+                val order =
+                    state.categories.getOrNull(state.categories.lastIndex)?.order?.plus(1) ?: 0
+                val id = SnowFlakeUtil.generateSnowFlake()
+                withIOContext {
+                    state.copy(
+                        categories = db.categoryDao().run {
+                            insert(
+                                Category(
+                                    id = id,
+                                    name = event.category,
+                                    order = order
+                                )
+                            )
+                            fetchCategories()
+                        }
+                    )
+                }
+            }
         }
     }
+
+    private suspend fun fetchCategories(): List<Category> =
+        withIOContext {
+            db.categoryDao().getAll().sortedBy { it.order }
+        }
 
     private fun collectChapters(mangaId: Long) {
         launchIO {
