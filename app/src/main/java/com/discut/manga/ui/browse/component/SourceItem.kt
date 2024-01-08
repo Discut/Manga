@@ -33,8 +33,8 @@ fun SourceItem(
                 onLongClick = onLongClick
             )
             .padding(
-                horizontal = MaterialTheme.padding.Normal,
-                vertical = MaterialTheme.padding.Default
+                vertical = MaterialTheme.padding.Default,
+                horizontal = MaterialTheme.padding.Normal
             ),
         verticalAlignment = Alignment.CenterVertically
     ) {

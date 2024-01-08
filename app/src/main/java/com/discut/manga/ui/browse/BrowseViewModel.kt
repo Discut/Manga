@@ -8,11 +8,11 @@ import managa.source.Source
 import javax.inject.Inject
 
 @HiltViewModel
-class SourceViewModel @Inject constructor(
+class BrowseViewModel @Inject constructor(
     private val sourceManager: ISourceManager
 ) :
-    BaseViewModel<SourceScreenState, SourceScreenEvent, SourceScreenEffect>() {
-    override fun initialState(): SourceScreenState = SourceScreenState()
+    BaseViewModel<BrowseScreenState, BrowseScreenEvent, BrowseScreenEffect>() {
+    override fun initialState(): BrowseScreenState = BrowseScreenState()
 
     init {
         val sourceItems = mutableListOf<SourceItem>()
@@ -37,11 +37,11 @@ class SourceViewModel @Inject constructor(
     }
 
     override suspend fun handleEvent(
-        event: SourceScreenEvent,
-        state: SourceScreenState
-    ): SourceScreenState {
+        event: BrowseScreenEvent,
+        state: BrowseScreenState
+    ): BrowseScreenState {
         return when (event) {
-            is SourceScreenEvent.Init -> {
+            is BrowseScreenEvent.Init -> {
 
                 state
             }

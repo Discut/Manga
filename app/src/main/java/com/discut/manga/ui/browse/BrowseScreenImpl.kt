@@ -18,8 +18,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.discut.manga.util.launchUI
 
 @OptIn(ExperimentalFoundationApi::class)
+@Deprecated("Use BrowseScreenImpl2 instead")
 @Composable
-fun SourceScreenImpl(modifier: Modifier = Modifier, vm: SourceViewModel) {
+fun BrowseScreenImpl(modifier: Modifier = Modifier, vm: BrowseViewModel) {
     val scope = rememberCoroutineScope()
     val state by vm.uiState.collectAsStateWithLifecycle()
     val pagerState = rememberPagerState { state.tabs.size }
