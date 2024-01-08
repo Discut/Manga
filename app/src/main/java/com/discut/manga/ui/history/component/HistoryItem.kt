@@ -77,7 +77,7 @@ fun HistoryItem(
 
     when (itemType) {
         HistoryItemType.COMPACT -> HistoryCompactItem(
-            modifier = modifier.height(50.dp),
+            modifier = modifier.height(64.dp),
             history = history,
             paddingValues = paddingValues,
             dismissState = dismissState,

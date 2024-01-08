@@ -23,7 +23,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.discut.manga.components.scaffold.AppBarAction
 import com.discut.manga.components.scaffold.AppBarActions
 import com.discut.manga.components.scaffold.SearchAppToolbar
 import com.discut.manga.theme.padding
@@ -51,20 +50,20 @@ fun HistoryScreen(
                 )
             },
             actions = {
-                AppBarActions(actions = listOf(
-                    AppBarAction.OverflowAction(
-                        title = "Clear all",
+                AppBarActions {
+                    toOverflowAction {
+                        title = "Clear all"
                         onClick = {
                             vm.sendEvent(HistoryEvent.ClearAll)
                         }
-                    ),
-                    AppBarAction.OverflowAction(
-                        title = "List settings",
+                    }
+                    toOverflowAction {
+                        title = "List settings"
                         onClick = {
                             showListSettingsModalBottomSheet = true
                         }
-                    )
-                ))
+                    }
+                }
             },
             onChangeSearchKey = {
                 vm.sendEvent {

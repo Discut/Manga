@@ -23,19 +23,6 @@ fun BookshelfScreenImpl(
         return
     }
     val shelfManga = state.loadState.shelfManga
-    /*    Column {
-            TextPreferenceComponent(title = "进入Reader") {
-                ReaderActivity.startActivity(context, -3618642300592193536L, -3686196295002750976L)
-            }*/
-    /*        LazyColumn {
-                state..forEach {
-                    item {
-                        TextPreferenceComponent(title = it.title, subTitle = it.url) {
-                            NavigationEvent("mangaDetails/${it.id}").postBy(androidx.compose.runtime.rememberCoroutineScope)
-                        }
-                    }
-                }
-            }*/// }
     BookshelfPage(
         state = pagerState,
         getBooks = {
@@ -43,7 +30,6 @@ fun BookshelfScreenImpl(
         },
         onBookClick = {
             NavigationEvent("mangaDetails/${it.id}").postBy(rememberCoroutineScope)
-        })
-
-
+        }
+    )
 }

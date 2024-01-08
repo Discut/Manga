@@ -40,7 +40,6 @@ import com.discut.manga.components.CustomModalBottomSheet
 import com.discut.manga.components.SwipeDirection
 import com.discut.manga.components.indicator.AppLinearIndicator
 import com.discut.manga.components.manga.MangaInfoBox
-import com.discut.manga.components.scaffold.AppBarAction
 import com.discut.manga.components.scaffold.AppBarActions
 import com.discut.manga.data.shouldRead
 import com.discut.manga.theme.alpha
@@ -113,14 +112,14 @@ fun MangaDetailsScreen(
                                 vm.sendEvent(MangaDetailsEvent.FavoriteManga(it))
                             }
                         }
-                        AppBarActions(actions = listOf(
-                            AppBarAction.OverflowAction(
-                                title = "refresh",
+                        AppBarActions {
+                            toOverflowAction {
+                                title = "refresh"
                                 onClick = {
                                     vm.sendEvent(MangaDetailsEvent.BootSync(mangaId))
                                 }
-                            )
-                        ))
+                            }
+                        }
                     })
             },
             floatingActionButton = {
@@ -141,7 +140,11 @@ fun MangaDetailsScreen(
                 )
             }
         ) { pv ->
-            AppLinearIndicator(modifier = Modifier.fillMaxWidth().padding(pv), isVisible = state.isLoading)
+            AppLinearIndicator(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(pv), isVisible = state.isLoading
+            )
             LazyColumn(modifier = Modifier.padding(pv), state = chapterListState) {
                 item {
                     MangaInfoBox(
