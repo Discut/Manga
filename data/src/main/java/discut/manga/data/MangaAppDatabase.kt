@@ -8,13 +8,15 @@ import discut.manga.data.category.Category
 import discut.manga.data.category.CategoryDao
 import discut.manga.data.chapter.Chapter
 import discut.manga.data.chapter.ChapterDao
+import discut.manga.data.download.Download
+import discut.manga.data.download.DownloadDao
 import discut.manga.data.history.History
 import discut.manga.data.history.HistoryDao
 import discut.manga.data.manga.Manga
 import discut.manga.data.manga.MangaDao
 
 @Database(
-    entities = [Manga::class, Chapter::class, Category::class, History::class],
+    entities = [Manga::class, Chapter::class, Category::class, History::class, Download::class],
     version = 1,
     exportSchema = false
 )
@@ -26,6 +28,8 @@ abstract class MangaAppDatabase : RoomDatabase() {
     abstract fun categoryDao(): CategoryDao
 
     abstract fun historyDao(): HistoryDao
+
+    abstract fun downloadDao(): DownloadDao
 
     companion object {
         private var INSTANCE: MangaAppDatabase? = null

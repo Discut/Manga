@@ -82,6 +82,7 @@ dependencies {
     implementation(libs.reorderable)
     implementation(libs.constraintlayout)
     implementation(libs.swipe)
+    implementation(libs.workmanager)
 
     // for unlock app
     implementation(libs.biometric.ktx)

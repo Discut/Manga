@@ -29,6 +29,9 @@ fun Chapter.shouldUpdate(other: Chapter): Boolean {
 fun Collection<Chapter>.sortedByChapterNumber(): List<Chapter> =
     sortedBy { it.chapterNumber }
 
+fun Chapter.generateHashKey(): String =
+    "${name}${id}${url}".generateHashKey()
+
 fun Chapter.toSChapter(): SChapter =
     SChapter.create().let {
         it.url = this.url
