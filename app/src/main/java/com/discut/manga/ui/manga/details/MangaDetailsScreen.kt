@@ -32,12 +32,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -49,6 +51,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.discut.core.flowbus.FlowBus
 import com.discut.manga.components.CustomModalBottomSheet
 import com.discut.manga.components.SwipeDirection
 import com.discut.manga.components.domain.toMangaCoverInfo
@@ -57,10 +60,12 @@ import com.discut.manga.components.manga.MangaCover
 import com.discut.manga.components.manga.MangaInfoBox
 import com.discut.manga.components.scaffold.AppBarActions
 import com.discut.manga.data.shouldRead
+import com.discut.manga.navigation.NavigationRoute
 import com.discut.manga.theme.alpha
 import com.discut.manga.theme.padding
 import com.discut.manga.ui.categories.NewCategory
 import com.discut.manga.ui.common.LoadingScreen
+import com.discut.manga.ui.main.domain.ToRouteEvent
 import com.discut.manga.ui.manga.details.component.AboutBookSheet
 import com.discut.manga.ui.manga.details.component.AddToFavoriteSheet
 import com.discut.manga.ui.manga.details.component.FavoriteButton
@@ -75,6 +80,7 @@ import com.discut.manga.util.isScrollingUp
 import com.discut.manga.util.toDate
 import discut.manga.common.res.R
 import discut.manga.data.chapter.Chapter
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -85,27 +91,6 @@ fun MangaDetailsScreen(
     onBackPressed: () -> Unit,
 ) {
     val state by vm.uiState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
-    var showModalBottomSheet by remember {
-        mutableStateOf(false)
-    }
-    var isShowFavoriteSheet by remember {
-        mutableStateOf(false)
-    }
-    var isShowAddDialog by remember {
-        mutableStateOf(false)
-    }
-    /*    var isFavorite by remember {
-            mutableStateOf(false)
-        }*/
-    var isFavoriteOnAppbarAnimationStopped by remember {
-        mutableStateOf(true)
-    }
-    val isShowFavoriteOnAppbar by remember {
-        derivedStateOf {
-            state.manga?.favorite ?: false && isFavoriteOnAppbarAnimationStopped
-        }
-    }
     LaunchedEffect(key1 = mangaId) {
         if (state.loadState is MangaDetailsState.LoadState.Waiting) {
             vm.sendEvent(MangaDetailsEvent.Init(mangaId))
@@ -118,7 +103,27 @@ fun MangaDetailsScreen(
         LoadingScreen()
         return
     }
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val addToFavoriteSheetState = rememberModalBottomSheetState()
 
+    var isShowModalBottomSheet by remember {
+        mutableStateOf(false)
+    }
+    var isShowFavoriteSheet by remember {
+        mutableStateOf(false)
+    }
+    var isShowAddDialog by remember {
+        mutableStateOf(false)
+    }
+    var isFavoriteOnAppbarAnimationStopped by remember {
+        mutableStateOf(true)
+    }
+    val isShowFavoriteOnAppbar by remember {
+        derivedStateOf {
+            state.manga?.favorite ?: false && isFavoriteOnAppbarAnimationStopped
+        }
+    }
     val loadState = state.loadState as MangaDetailsState.LoadState.Loaded
     val details = loadState.details
     val chapterListState = rememberLazyListState()
@@ -127,6 +132,14 @@ fun MangaDetailsScreen(
     }
     val isShowComplexTitle by remember {
         derivedStateOf { chapterListState.firstVisibleItemIndex > 0 }
+    }
+
+    val collapseAddToFavoriteSheet = {
+        scope.launch { addToFavoriteSheetState.hide() }.invokeOnCompletion {
+            if (!addToFavoriteSheetState.isVisible) {
+                isShowFavoriteSheet = false
+            }
+        }
     }
     Surface {
         Scaffold(
@@ -163,7 +176,13 @@ fun MangaDetailsScreen(
                         AnimatedVisibility(visible = isShowFavoriteOnAppbar) {
                             IconButton(onClick = {
                                 state.manga?.let {
-                                    vm.sendEvent(MangaDetailsEvent.FavoriteManga(it))
+                                    vm.sendEvent {
+                                        MangaDetailsEvent.FavoriteManga(
+                                            it.copy(
+                                                category = null
+                                            )
+                                        )
+                                    }
                                 }
                             }) {
                                 Icon(
@@ -172,11 +191,6 @@ fun MangaDetailsScreen(
                                 )
                             }
                         }
-                        /*                        LikeButton(favorite = details.favorite) {
-                                                    state.manga?.let {
-                                                        vm.sendEvent(MangaDetailsEvent.FavoriteManga(it))
-                                                    }
-                                                }*/
                         AppBarActions {
                             toOverflowAction {
                                 title = "refresh"
@@ -276,9 +290,6 @@ fun MangaDetailsScreen(
                             modifier = Modifier.weight(1f),
                             isFavorite = state.manga?.favorite ?: false,
                             onClick = {
-                                /*state.manga?.let {
-                                    vm.sendEvent(MangaDetailsEvent.FavoriteManga(it))
-                                }*/
                                 isShowFavoriteSheet = true
                             },
                             onAnimated = { isFavoriteOnAppbarAnimationStopped = true })
@@ -291,7 +302,7 @@ fun MangaDetailsScreen(
                             .padding(bottom = MaterialTheme.padding.Medium),
                         title = "关于此漫画",
                         onClick = {
-                            showModalBottomSheet = true
+                            isShowModalBottomSheet = true
                         }) {
                         Text(
                             text = details.description,
@@ -315,7 +326,7 @@ fun MangaDetailsScreen(
                             )
                         })
                 }
-                state.chapters.forEachIndexed { index, c ->
+                state.chapters.forEachIndexed { _, c ->
                     item {
                         val chapter by vm.collectionChapterInfo(c)
                             .collectAsStateWithLifecycle(initialValue = c)
@@ -373,9 +384,10 @@ fun MangaDetailsScreen(
             }
         }
         CustomModalBottomSheet(
-            isShow = showModalBottomSheet,
+            sheetState = addToFavoriteSheetState,
+            isShow = isShowModalBottomSheet,
             onDismissRequest = {
-                showModalBottomSheet = !showModalBottomSheet
+                isShowModalBottomSheet = !isShowModalBottomSheet
             }
         ) {
             AboutBookSheet(
@@ -386,11 +398,33 @@ fun MangaDetailsScreen(
                 chips = details.tags
             )
         }
-        AddToFavoriteSheet(
-            categories = state.categories,
-            onDismissRequest = { isShowFavoriteSheet = false },
-            isShow = isShowFavoriteSheet
-        )
+        if (isShowFavoriteSheet) {
+            AddToFavoriteSheet(
+                categories = state.categories,
+                sheetState = addToFavoriteSheetState,
+                onAddClick = { isShowAddDialog = true },
+                onConfirm = { id ->
+                    state.manga?.let {
+                        vm.sendEvent {
+                            MangaDetailsEvent.FavoriteManga(
+                                it.copy(
+                                    category = id
+                                )
+                            )
+                        }
+                    }
+                    collapseAddToFavoriteSheet()
+                },
+                onEditClick = {
+                    FlowBus.with<ToRouteEvent>()
+                        .post(scope, ToRouteEvent(NavigationRoute.CategoryScreen.route, popup = false))
+                    collapseAddToFavoriteSheet()
+                },
+                onDismissRequest = {
+                    isShowFavoriteSheet = false
+                }
+            )
+        }
         if (isShowAddDialog) {
             NewCategory(
                 isFreeCategoryName = {

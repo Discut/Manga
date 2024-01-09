@@ -17,10 +17,10 @@ import com.discut.manga.navigation.NavigationRoute
 import com.discut.manga.navigation.composableWithAnimation
 import com.discut.manga.navigation.settingsGraph
 import com.discut.manga.ui.base.BaseActivity
+import com.discut.manga.ui.browse.viewer.MangasViewer
 import com.discut.manga.ui.categories.CategoryScreen
 import com.discut.manga.ui.main.domain.ToRouteEvent
 import com.discut.manga.ui.manga.details.MangaDetailsScreen
-import com.discut.manga.ui.browse.viewer.MangasViewer
 import com.discut.manga.util.setComposeContent
 import com.discut.manga.util.toast
 import dagger.hilt.android.AndroidEntryPoint
@@ -36,6 +36,7 @@ class MainActivity : BaseActivity() {
             val navController = rememberNavController()
             LocalLifecycleOwner.current.observeEvent<ToRouteEvent> {
                 navController.navigate(it.route) {
+                    if (!it.popup) return@navigate
                     popUpTo(navController.graph.findStartDestination().id) {
                         saveState = true
                     }
