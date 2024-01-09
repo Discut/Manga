@@ -35,6 +35,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -92,15 +93,11 @@ fun MangaDetailsScreen(
     onBackPressed: () -> Unit,
 ) {
     val state by vm.uiState.collectAsStateWithLifecycle()
+    val manga by state.manga.collectAsState()
     LaunchedEffect(key1 = mangaId) {
-        if (state.loadState is MangaDetailsState.LoadState.Waiting) {
-            vm.sendEvent(MangaDetailsEvent.Init(mangaId))
-        }
+        vm.sendEvent(MangaDetailsEvent.Init(mangaId))
     }
-    if (state.loadState is MangaDetailsState.LoadState.Error) {
-        return
-    }
-    if (state.loadState !is MangaDetailsState.LoadState.Loaded) {
+    if (manga == null) {
         LoadingScreen()
         return
     }
@@ -126,11 +123,10 @@ fun MangaDetailsScreen(
     }
     val isShowFavoriteOnAppbar by remember {
         derivedStateOf {
-            state.manga?.favorite ?: false && isFavoriteAnimationStopped
+            manga?.favorite ?: false && isFavoriteAnimationStopped
         }
     }
-    val loadState = state.loadState as MangaDetailsState.LoadState.Loaded
-    val details = loadState.details
+    val details = manga!!.toMangaDetails()
     val chapterListState = rememberLazyListState()
     val isShowReadFloatButton by remember {
         derivedStateOf { chapterListState.firstVisibleItemIndex > 3 }
@@ -138,6 +134,7 @@ fun MangaDetailsScreen(
     val isShowComplexTitle by remember {
         derivedStateOf { chapterListState.firstVisibleItemIndex > 0 }
     }
+    val chapters by state.chapters.collectAsState()
 
     val collapseAddToFavoriteSheet = {
         scope.launch { addToFavoriteSheetState.hide() }.invokeOnCompletion {
@@ -181,7 +178,7 @@ fun MangaDetailsScreen(
                     actions = {
                         AnimatedVisibility(visible = isShowFavoriteOnAppbar) {
                             IconButton(onClick = {
-                                state.manga?.let {
+                                manga?.let {
                                     vm.sendEvent {
                                         MangaDetailsEvent.FavoriteManga(
                                             it.copy(
@@ -262,7 +259,7 @@ fun MangaDetailsScreen(
                                     contentDescription = ""
                                 )
                             },
-                            InfoBoxType.Title(state.chapters.size.toString(), "章"),
+                            InfoBoxType.Title(chapters.size.toString(), "章"),
                             InfoBoxType.Icon("Preview") {
                                 Icon(
                                     modifier = it,
@@ -291,13 +288,13 @@ fun MangaDetailsScreen(
                         ) {
                             when (history) {
                                 null -> Text(text = "开始阅读")
-                                else -> Text(text ="继续 ${history!!.chapterName}")
+                                else -> Text(text = "继续 ${history!!.chapterName}")
                             }
                         }
                         Spacer(modifier = Modifier.width(MaterialTheme.padding.Normal))
                         FavoriteButton(
                             modifier = Modifier.weight(1f),
-                            isFavorite = state.manga?.favorite ?: false,
+                            isFavorite = manga?.favorite ?: false,
                             onClick = {
                                 isShowFavoriteSheet = true
                             },
@@ -335,7 +332,7 @@ fun MangaDetailsScreen(
                             )
                         })
                 }
-                state.chapters.forEachIndexed { _, c ->
+                chapters.forEachIndexed { _, c ->
                     item {
                         val chapter by vm.collectionChapterInfo(c)
                             .collectAsStateWithLifecycle(initialValue = c)
@@ -413,7 +410,7 @@ fun MangaDetailsScreen(
                 sheetState = addToFavoriteSheetState,
                 onAddClick = { isShowAddDialog = true },
                 onConfirm = { id ->
-                    state.manga?.let {
+                    manga?.let {
                         vm.sendEvent {
                             MangaDetailsEvent.FavoriteManga(
                                 it.copy(

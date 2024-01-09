@@ -21,6 +21,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
@@ -41,11 +42,18 @@ class MangaDetailsViewModel @Inject constructor(
     ): MangaDetailsState {
         return when (event) {
             is MangaDetailsEvent.Init -> {
-                collectManga(event.mangaId)
-                collectChapters(event.mangaId)
                 sendEvent(MangaDetailsEvent.BootSync(event.mangaId))
                 state.copy(
-                    categories = fetchCategories()
+                    manga = mangaProvider.subscribe(event.mangaId).distinctUntilChanged()
+                        .stateIn(CoroutineScope(Dispatchers.IO)),
+                    categories = fetchCategories(),
+                    chapters = chapterProvider.subscribe(event.mangaId)
+                        .onEach { it.customFilter() }
+                        .stateIn(CoroutineScope(Dispatchers.IO)),
+                    currentHistory = historyProvider.subscribe(event.mangaId)
+                        .distinctUntilChanged().stateIn(
+                            CoroutineScope(Dispatchers.IO)
+                        )
                 )
             }
 
@@ -75,21 +83,19 @@ class MangaDetailsViewModel @Inject constructor(
             }
 
             is MangaDetailsEvent.StartToRead -> {
-                if (state.manga == null) {
-                    return state
-                }
+                val manga = state.manga.value ?: return state
                 launchIO {
-                    when (val history = historyProvider.getLatest(state.manga.id)) {
+                    when (val history = historyProvider.getLatest(manga.id)) {
                         null -> sendEffect(
                             MangaDetailsEffect.JumpToRead(
-                                state.manga.id,
+                                manga.id,
                                 getFirstChapter().id
                             )
                         )
 
                         else -> sendEffect(
                             MangaDetailsEffect.JumpToRead(
-                                state.manga.id,
+                                manga.id,
                                 history.chapterId
                             )
                         )
@@ -120,23 +126,6 @@ class MangaDetailsViewModel @Inject constructor(
                 state
             }
 
-            is MangaDetailsEvent.ChaptersUpdated -> {
-                state.copy(
-                    chapters = event.chapters.sortedByChapterNumber().asReversed()
-                )
-            }
-
-            is MangaDetailsEvent.MangaUpdated -> {
-                state.copy(
-                    loadState = MangaDetailsState.LoadState.Loaded(event.manga.toMangaDetails()),
-                    manga = event.manga,
-                    currentHistory = historyProvider.subscribe(event.manga.id)
-                        .distinctUntilChanged().stateIn(
-                            CoroutineScope(Dispatchers.IO)
-                        )
-                )
-            }
-
             is MangaDetailsEvent.AddNewCategory -> {
                 val order =
                     state.categories.getOrNull(state.categories.lastIndex)?.order?.plus(1) ?: 0
@@ -159,30 +148,18 @@ class MangaDetailsViewModel @Inject constructor(
         }
     }
 
+    private fun List<Chapter>.customFilter(): List<Chapter> {
+        return sortedByChapterNumber().asReversed()
+    }
+
     private fun getFirstChapter(): Chapter {
-        return uiState.value.chapters.last()
+        return uiState.value.chapters.value.last()
     }
 
     private suspend fun fetchCategories(): List<Category> =
         withIOContext {
             db.categoryDao().getAll().sortedBy { it.order }
         }
-
-    private fun collectChapters(mangaId: Long) {
-        launchIO {
-            chapterProvider.subscribe(mangaId).collect {
-                sendEvent(MangaDetailsEvent.ChaptersUpdated(it))
-            }
-        }
-    }
-
-    private suspend fun collectManga(mangaId: Long) {
-        launchIO {
-            mangaProvider.subscribe(mangaId).distinctUntilChanged().collect {
-                sendEvent(MangaDetailsEvent.MangaUpdated(it))
-            }
-        }
-    }
 
     private suspend fun getManga(mangaId: Long): Manga {
         return withIOContext {

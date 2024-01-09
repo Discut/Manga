@@ -11,20 +11,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 data class MangaDetailsState(
-    internal val loadState: LoadState = LoadState.Waiting,
     internal val isLoading: Boolean = false,
-    internal val manga: Manga? = null,
+    internal val manga: StateFlow<Manga?> = MutableStateFlow(null),
     internal val categories: List<Category> = emptyList(),
-    internal val chapters: List<Chapter> = emptyList(),
+    internal val chapters: StateFlow<List<Chapter>> = MutableStateFlow(emptyList()),
     internal val currentHistory: StateFlow<MangaChapterHistory?> = MutableStateFlow(null)
-) : UiState {
-    sealed class LoadState {
-        data object Waiting : LoadState()
-        data class Loaded(val details: MangaDetails) : LoadState()
-        data class Error(val error: Throwable) : LoadState()
-        data object Loading : LoadState()
-    }
-}
+) : UiState
 
 sealed interface MangaDetailsEvent : UiEvent {
 
@@ -33,10 +25,6 @@ sealed interface MangaDetailsEvent : UiEvent {
     data class BootSync(val mangaId: Long) : MangaDetailsEvent
 
     data object Synced : MangaDetailsEvent
-
-    data class ChaptersUpdated(val chapters: List<Chapter>) : MangaDetailsEvent
-
-    data class MangaUpdated(val manga: Manga) : MangaDetailsEvent
 
     data class ReadChapter(val chapter: Chapter) : MangaDetailsEvent
 
