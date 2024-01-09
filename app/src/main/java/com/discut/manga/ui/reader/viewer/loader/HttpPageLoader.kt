@@ -24,7 +24,7 @@ class HttpPageLoader(
     private val pagesCache: PagesCache = PagesCache.instance
 ) : IPageLoader {
     override suspend fun buildPages(): List<ReaderPage> {
-        val pagesHashKey = "${chapter.id}${chapter.url}".generateHashKey()
+        val pagesHashKey = chapter.generateHashKey()
         val pages = if (pagesCache.isExist(pagesHashKey)) {
             Json.decodeFromString(pagesCache.get(pagesHashKey)!!)
         } else {
