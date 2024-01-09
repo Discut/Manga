@@ -52,6 +52,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.discut.core.flowbus.FlowBus
+import com.discut.core.mvi.CollectSideEffect
 import com.discut.manga.components.CustomModalBottomSheet
 import com.discut.manga.components.SwipeDirection
 import com.discut.manga.components.domain.toMangaCoverInfo
@@ -116,12 +117,16 @@ fun MangaDetailsScreen(
     var isShowAddDialog by remember {
         mutableStateOf(false)
     }
-    var isFavoriteOnAppbarAnimationStopped by remember {
+
+    /**
+     * 收藏按钮动画是否停止
+     */
+    var isFavoriteAnimationStopped by remember {
         mutableStateOf(true)
     }
     val isShowFavoriteOnAppbar by remember {
         derivedStateOf {
-            state.manga?.favorite ?: false && isFavoriteOnAppbarAnimationStopped
+            state.manga?.favorite ?: false && isFavoriteAnimationStopped
         }
     }
     val loadState = state.loadState as MangaDetailsState.LoadState.Loaded
@@ -141,6 +146,7 @@ fun MangaDetailsScreen(
             }
         }
     }
+    handleEffect(vm = vm)
     Surface {
         Scaffold(
             topBar = {
@@ -277,13 +283,16 @@ fun MangaDetailsScreen(
                     )
                 }
                 item {
+                    val history by state.currentHistory.collectAsStateWithLifecycle()
                     Row(modifier = Modifier.padding(horizontal = MaterialTheme.padding.Normal)) {
                         FilledIconButton(
                             modifier = Modifier.weight(3f),
-                            onClick = {
-                                isFavoriteOnAppbarAnimationStopped = false
-                            }) {
-                            Text(text = "开始阅读")
+                            onClick = { vm.sendEvent(MangaDetailsEvent.StartToRead) }
+                        ) {
+                            when (history) {
+                                null -> Text(text = "开始阅读")
+                                else -> Text(text ="继续 ${history!!.chapterName}")
+                            }
                         }
                         Spacer(modifier = Modifier.width(MaterialTheme.padding.Normal))
                         FavoriteButton(
@@ -292,7 +301,7 @@ fun MangaDetailsScreen(
                             onClick = {
                                 isShowFavoriteSheet = true
                             },
-                            onAnimated = { isFavoriteOnAppbarAnimationStopped = true })
+                            onAnimated = { isFavoriteAnimationStopped = true })
                     }
                 }
                 item {
@@ -413,11 +422,15 @@ fun MangaDetailsScreen(
                             )
                         }
                     }
+                    isFavoriteAnimationStopped = false
                     collapseAddToFavoriteSheet()
                 },
                 onEditClick = {
                     FlowBus.with<ToRouteEvent>()
-                        .post(scope, ToRouteEvent(NavigationRoute.CategoryScreen.route, popup = false))
+                        .post(
+                            scope,
+                            ToRouteEvent(NavigationRoute.CategoryScreen.route, popup = false)
+                        )
                     collapseAddToFavoriteSheet()
                 },
                 onDismissRequest = {
@@ -442,6 +455,22 @@ fun MangaDetailsScreen(
     }
 
 
+}
+
+@Composable
+private fun handleEffect(vm: MangaDetailsViewModel) {
+    val context = LocalContext.current
+    vm.CollectSideEffect {
+        when (it) {
+            is MangaDetailsEffect.JumpToRead -> {
+                ReaderActivity.startActivity(
+                    context,
+                    it.mangaId,
+                    it.chapterId
+                )
+            }
+        }
+    }
 }
 
 @Deprecated("Use FavoriteButton", replaceWith = ReplaceWith("FavoriteButton"))

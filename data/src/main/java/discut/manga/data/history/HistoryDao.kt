@@ -21,5 +21,10 @@ interface HistoryDao : BaseDao<History> {
     @Query(
         "SELECT * FROM history WHERE mangaId = :mangaId"
     )
+    fun getByIdAsFlow(mangaId: Long): Flow<History?>
+
+    @Query(
+        "SELECT * FROM history WHERE mangaId = :mangaId"
+    )
     fun getByMangaId(mangaId: Long): History?
 }

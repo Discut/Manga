@@ -5,6 +5,7 @@ import com.discut.manga.data.SnowFlakeUtil
 import com.discut.manga.data.sortedByChapterNumber
 import com.discut.manga.service.chapter.ChapterSaver
 import com.discut.manga.service.chapter.IChapterProvider
+import com.discut.manga.service.history.IHistoryProvider
 import com.discut.manga.service.manga.IMangaProvider
 import com.discut.manga.service.manga.MangaSaver
 import com.discut.manga.util.launchIO
@@ -14,10 +15,13 @@ import discut.manga.data.MangaAppDatabase
 import discut.manga.data.category.Category
 import discut.manga.data.chapter.Chapter
 import discut.manga.data.manga.Manga
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,6 +29,7 @@ class MangaDetailsViewModel @Inject constructor(
     private val db: MangaAppDatabase,
     private val chapterProvider: IChapterProvider,
     private val mangaProvider: IMangaProvider,
+    private val historyProvider: IHistoryProvider,
     private val chapterSaver: ChapterSaver,
     private val mangaSaver: MangaSaver
 ) : BaseViewModel<MangaDetailsState, MangaDetailsEvent, MangaDetailsEffect>() {
@@ -69,6 +74,30 @@ class MangaDetailsViewModel @Inject constructor(
                 state
             }
 
+            is MangaDetailsEvent.StartToRead -> {
+                if (state.manga == null) {
+                    return state
+                }
+                launchIO {
+                    when (val history = historyProvider.getLatest(state.manga.id)) {
+                        null -> sendEffect(
+                            MangaDetailsEffect.JumpToRead(
+                                state.manga.id,
+                                getFirstChapter().id
+                            )
+                        )
+
+                        else -> sendEffect(
+                            MangaDetailsEffect.JumpToRead(
+                                state.manga.id,
+                                history.chapterId
+                            )
+                        )
+                    }
+                }
+                state
+            }
+
             is MangaDetailsEvent.UnreadChapter -> {
                 launchIO {
                     db.chapterDao().update(
@@ -100,7 +129,11 @@ class MangaDetailsViewModel @Inject constructor(
             is MangaDetailsEvent.MangaUpdated -> {
                 state.copy(
                     loadState = MangaDetailsState.LoadState.Loaded(event.manga.toMangaDetails()),
-                    manga = event.manga
+                    manga = event.manga,
+                    currentHistory = historyProvider.subscribe(event.manga.id)
+                        .distinctUntilChanged().stateIn(
+                            CoroutineScope(Dispatchers.IO)
+                        )
                 )
             }
 
@@ -124,6 +157,10 @@ class MangaDetailsViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun getFirstChapter(): Chapter {
+        return uiState.value.chapters.last()
     }
 
     private suspend fun fetchCategories(): List<Category> =

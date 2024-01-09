@@ -76,4 +76,38 @@ class HistoryProviderImpl @Inject constructor() : IHistoryProvider {
         return histories.size
     }
 
+    override fun getLatest(mangaId: Long): MangaChapterHistory? {
+        db.getByMangaId(mangaId)?.let {
+            val manga = mangaDb.getById(it.mangaId)
+            return MangaChapterHistory(
+                historyId = it.id,
+                mangaId = it.mangaId,
+                chapterId = it.chapterId,
+                mangaTitle = manga?.title ?: "",
+                chapterName = chapterDb.getById(it.chapterId)?.name ?: "",
+                thumbnailUrl = manga?.thumbnailUrl,
+                readAt = it.readAt
+            )
+        }
+        return null
+    }
+
+    override fun subscribe(mangaId: Long): Flow<MangaChapterHistory?> {
+        return db.getByIdAsFlow(mangaId).map {
+            if (it == null) {
+                return@map null
+            }
+            val manga = mangaDb.getById(it.mangaId)
+            MangaChapterHistory(
+                historyId = it.id,
+                mangaId = it.mangaId,
+                chapterId = it.chapterId,
+                mangaTitle = manga?.title ?: "",
+                chapterName = chapterDb.getById(it.chapterId)?.name ?: "",
+                thumbnailUrl = manga?.thumbnailUrl,
+                readAt = it.readAt
+            )
+        }
+    }
+
 }

@@ -3,16 +3,20 @@ package com.discut.manga.ui.manga.details
 import com.discut.core.mvi.contract.UiEffect
 import com.discut.core.mvi.contract.UiEvent
 import com.discut.core.mvi.contract.UiState
+import com.discut.manga.domain.history.MangaChapterHistory
 import discut.manga.data.category.Category
 import discut.manga.data.chapter.Chapter
 import discut.manga.data.manga.Manga
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 data class MangaDetailsState(
     internal val loadState: LoadState = LoadState.Waiting,
     internal val isLoading: Boolean = false,
     internal val manga: Manga? = null,
     internal val categories: List<Category> = emptyList(),
-    internal val chapters: List<Chapter> = emptyList()
+    internal val chapters: List<Chapter> = emptyList(),
+    internal val currentHistory: StateFlow<MangaChapterHistory?> = MutableStateFlow(null)
 ) : UiState {
     sealed class LoadState {
         data object Waiting : LoadState()
@@ -36,6 +40,8 @@ sealed interface MangaDetailsEvent : UiEvent {
 
     data class ReadChapter(val chapter: Chapter) : MangaDetailsEvent
 
+    data object StartToRead : MangaDetailsEvent
+
     data class UnreadChapter(val chapter: Chapter) : MangaDetailsEvent
 
     data class FavoriteManga(val manga: Manga) : MangaDetailsEvent
@@ -45,7 +51,7 @@ sealed interface MangaDetailsEvent : UiEvent {
 }
 
 sealed interface MangaDetailsEffect : UiEffect {
-    data class SecurityModeChange(val enable: Boolean) : MangaDetailsEffect
+    data class JumpToRead(val mangaId: Long, val chapterId: Long) : MangaDetailsEffect
 
 }
 

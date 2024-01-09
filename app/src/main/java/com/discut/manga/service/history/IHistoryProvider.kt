@@ -6,8 +6,12 @@ import kotlinx.coroutines.flow.Flow
 interface IHistoryProvider {
     fun subscribeAll(): Flow<List<MangaChapterHistory>>
 
+    fun subscribe(mangaId: Long): Flow<MangaChapterHistory?>
+
     fun insert(history: MangaChapterHistory)
 
     fun removeAll(histories: List<MangaChapterHistory>): Int
+
+    fun getLatest(mangaId: Long): MangaChapterHistory?
 
 }
