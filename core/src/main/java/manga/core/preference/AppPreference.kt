@@ -39,4 +39,11 @@ open class AppPreference constructor(
         return appPreference.edit()
     }
 
+    protected fun edit(block: SharedPreferences.Editor.() -> Unit) {
+        appPreference.edit().apply {
+            block()
+            apply()
+        }
+    }
+
 }

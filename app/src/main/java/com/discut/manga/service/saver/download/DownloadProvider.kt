@@ -4,7 +4,6 @@ import android.content.Context
 import com.discut.manga.data.generateHashKey
 import com.discut.manga.data.toSChapter
 import com.discut.manga.service.cache.PagesCache
-import com.discut.manga.service.saver.SaverService
 import com.discut.manga.service.saver.download.model.DownloadScope
 import com.discut.manga.service.saver.download.model.Downloader
 import com.discut.manga.service.source.SourceManager
@@ -77,7 +76,6 @@ class DownloadProvider @Inject constructor(
      * Tells the downloader to begin downloads.
      */
     fun startDownloads() {
-        SaverService.start(context)
     }
 
     /**
