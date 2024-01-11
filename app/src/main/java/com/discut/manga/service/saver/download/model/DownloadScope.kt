@@ -290,6 +290,13 @@ class DownloadScope {
         }
     }
 
+    fun cancel(downloader: Downloader){
+        downloader.status = Downloader.DownloadState.InQueue
+        _queueState.update { downloaderList ->
+            downloaderList.filter { it.download.id != downloader.download.id }
+        }
+    }
+
     fun pause(downloader: Downloader) {
         downloader.status = Downloader.DownloadState.InQueue
     }

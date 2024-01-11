@@ -13,6 +13,7 @@ import com.discut.manga.service.saver.download.model.DownloadScope
 import com.discut.manga.service.saver.download.model.DownloadWorker
 import com.discut.manga.service.saver.download.model.Downloader
 import com.discut.manga.service.source.SourceManager
+import com.discut.manga.util.get
 import com.discut.manga.util.launchIO
 import com.discut.manga.util.withIOContext
 import dagger.hilt.EntryPoints
@@ -32,6 +33,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import managa.source.HttpSource
+import manga.core.preference.DownloadPreference
+import manga.core.preference.PreferenceManager
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -44,6 +47,7 @@ class DownloadProvider @Inject constructor(
     private val downloadDb = MangaAppDatabase.DB.downloadDao()
     private val mangaDb = MangaAppDatabase.DB.mangaDao()
     private val chapterDb = MangaAppDatabase.DB.chapterDao()
+    private val downloadPreference = PreferenceManager.get<DownloadPreference>()
 
     private val _queue: MutableStateFlow<MutableList<DownloadScope>> =
         MutableStateFlow(mutableListOf())
@@ -168,6 +172,22 @@ class DownloadProvider @Inject constructor(
 
     fun launchDownloadScope(key: String): Boolean =
         queue.value.find { it.scopeTag == key }?.bootDownloadMainJob() ?: false
+
+
+    /**
+     * 取消下载
+     */
+    fun cancelDownload(downloader: Downloader) {
+        downloadDb.getByMangaIdAndChapterId(downloader.manga.id, downloader.chapter.id)
+            ?.let { download ->
+                queue.value.find { it.source.id == downloader.source.id }?.let {
+                    it.cancel(downloader)
+                    downloadDb.delete(downloader.download)
+                    DownloadFileSystem(downloadPreference.getDownloadDirectory(App.instance))
+                }
+
+            }
+    }
 
 
     /**

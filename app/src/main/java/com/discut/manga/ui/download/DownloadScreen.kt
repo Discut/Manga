@@ -29,6 +29,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDismissState
@@ -149,64 +150,65 @@ fun DownloadScreen(
                             LaunchedEffect(key1 = progress) {
                                 progressText = "${it.downloadedImages}/${it.pages?.size}"
                             }
-                            BasePreferenceComponent(
-                                modifier = Modifier.background(color = MaterialTheme.colorScheme.surface),
-                                title = it.chapter.name,
-                                iconWidget = {
-                                    Icon(
-                                        modifier = Modifier.padding(MaterialTheme.padding.Normal),
-                                        imageVector = Icons.Outlined.Menu,
-                                        contentDescription = "Drag"
-                                    )
-                                },
-                                endWidget = {
-                                    var expanded by remember { mutableStateOf(false) }
-                                    IconButton(
-                                        onClick = { expanded = !expanded },
-                                    ) {
+                            Surface{
+                                BasePreferenceComponent(
+                                    title = it.chapter.name,
+                                    iconWidget = {
                                         Icon(
-                                            imageVector = Icons.Outlined.MoreVert,
-                                            contentDescription = "More",
+                                            modifier = Modifier.padding(MaterialTheme.padding.Normal),
+                                            imageVector = Icons.Outlined.Menu,
+                                            contentDescription = "Drag"
                                         )
-                                    }
-                                    DropdownMenu(
-                                        expanded = expanded,
-                                        onDismissRequest = { expanded = false },
-                                    ) {
-                                        DropdownMenuItem(
-                                            text = { Text(text = "Stop") },
-                                            onClick = { /*TODO*/ })
-                                        DropdownMenuItem(
-                                            text = { Text(text = "Cancel") },
-                                            onClick = { /*TODO*/ })
-                                    }
-                                },
-                                subWidget = {
-                                    Row(
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        modifier = Modifier.fillMaxWidth()
-                                    ) {
-                                        Text(
-                                            text = it.manga.title,
-                                            maxLines = 1,
-                                            style = MaterialTheme.typography.bodySmall,
-                                            modifier = Modifier.alpha(MaterialTheme.alpha.Normal)
-                                        )
+                                    },
+                                    endWidget = {
+                                        var expanded by remember { mutableStateOf(false) }
+                                        IconButton(
+                                            onClick = { expanded = !expanded },
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Outlined.MoreVert,
+                                                contentDescription = "More",
+                                            )
+                                        }
+                                        DropdownMenu(
+                                            expanded = expanded,
+                                            onDismissRequest = { expanded = false },
+                                        ) {
+                                            DropdownMenuItem(
+                                                text = { Text(text = "Stop") },
+                                                onClick = { /*TODO*/ })
+                                            DropdownMenuItem(
+                                                text = { Text(text = "Cancel") },
+                                                onClick = { /*TODO*/ })
+                                        }
+                                    },
+                                    subWidget = {
+                                        Row(
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            modifier = Modifier.fillMaxWidth()
+                                        ) {
+                                            Text(
+                                                text = it.manga.title,
+                                                maxLines = 1,
+                                                style = MaterialTheme.typography.bodySmall,
+                                                modifier = Modifier.alpha(MaterialTheme.alpha.Normal)
+                                            )
 
-                                        Text(
-                                            text = progressText,
-                                            maxLines = 1,
-                                            style = MaterialTheme.typography.bodySmall,
-                                            modifier = Modifier.alpha(MaterialTheme.alpha.Normal)
-                                        )
+                                            Text(
+                                                text = progressText,
+                                                maxLines = 1,
+                                                style = MaterialTheme.typography.bodySmall,
+                                                modifier = Modifier.alpha(MaterialTheme.alpha.Normal)
+                                            )
+                                        }
+                                        LinearProgressIndicator(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(3.dp),
+                                            progress = { progress.toFloat() / 100 })
                                     }
-                                    LinearProgressIndicator(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(3.dp),
-                                        progress = { progress.toFloat() / 100 })
-                                }
-                            )
+                                )
+                            }
                         }
                     }
                 }

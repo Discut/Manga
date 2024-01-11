@@ -20,12 +20,28 @@ class DownloadFileSystem(
         tempPageFile.writeBytes(pageInputStream.readBytes()).let {
             pageInputStream.close()
         }
-        if (ImageUtil.isImage(""){tempPageFile.inputStream()}.not()) {
+        if (ImageUtil.isImage("") { tempPageFile.inputStream() }.not()) {
             tempPageFile.delete()
             page.status = Page.State.ERROR
             return
         }
-        tempPageFile.renameTo(File("$chapterDir/${page.number}.${ImageUtil.findImageType(tempPageFile.inputStream())!!.extension}"))
+        tempPageFile.renameTo(
+            File(
+                "$chapterDir/${page.number}.${
+                    ImageUtil.findImageType(
+                        tempPageFile.inputStream()
+                    )!!.extension
+                }"
+            )
+        )
         page.status = Page.State.READY
+    }
+
+    fun deleteChapter(downloader: Downloader): Boolean {
+        val chapterDir = getChapterDir(downloader)
+        if (File(chapterDir).exists()) {
+            return File(chapterDir).deleteRecursively()
+        }
+        return false
     }
 }
