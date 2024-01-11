@@ -13,6 +13,11 @@ interface DownloadDao : BaseDao<Download> {
     fun getAll(): List<Download>
 
     @Query(
+        "SELECT * FROM download WHERE mangaId = :mangaId"
+    )
+    fun getAllByMangaId(mangaId: Long): List<Download>
+
+    @Query(
         "SELECT * FROM download"
     )
     fun getAllAsFlow(): Flow<List<Download>>
