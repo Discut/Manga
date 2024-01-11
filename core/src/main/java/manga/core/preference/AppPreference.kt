@@ -31,6 +31,10 @@ open class AppPreference constructor(
             .conflate()
     }
 
+    protected fun isExists(key: String): Boolean {
+        return appPreference.contains(key)
+    }
+
     protected fun getStringSet(key: String, defaultValue: Set<String>): Set<String> {
         return appPreference.getStringSet(key, defaultValue)!!
     }
