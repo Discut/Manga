@@ -11,6 +11,26 @@ class DownloadStateConverter {
 
     @TypeConverter
     fun intToState(code: Int): DownloadState {
-        return DownloadState.values().first { it.code == code }
+        return DownloadState.entries.first { it.code == code }
+    }
+
+    @TypeConverter
+    fun objectToString(arr: List<Long>): String {
+        val builder = StringBuilder()
+        arr.forEach {
+            builder.append(it).append(",")
+        }
+        return builder.toString()
+    }
+
+    @TypeConverter
+    fun stringToObject(str: String): List<Long> {
+        return str.split(",").mapNotNull {
+            try {
+                it.toLong()
+            } catch (e: Exception) {
+                null
+            }
+        }
     }
 }

@@ -13,8 +13,9 @@ data class Download(
     val id: Long,
     val mangaId: Long,
     val chapterId: Long,
+    val order: Double,
     val status: DownloadState,
-    val currentPage: Int,
-    val totalPage: Int,
+    val queue: List<Long>,
+    val downloaded: List<Long>,
     val addAt: Long,
 )
