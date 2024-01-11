@@ -1,45 +1,42 @@
 package com.discut.manga.service.saver.download.model
 
-import android.content.Context
-import android.content.pm.ServiceInfo
 import android.util.Log
-import androidx.core.app.NotificationCompat
-import androidx.work.CoroutineWorker
-import androidx.work.ForegroundInfo
-import androidx.work.WorkerParameters
+import com.discut.manga.App
 import com.discut.manga.data.toSChapter
-import com.discut.manga.ui.util.NetworkState
-import com.discut.manga.ui.util.activeNetworkState
-import com.discut.manga.ui.util.networkStateFlow
+import com.discut.manga.service.saver.download.DownloadFileSystem
+import com.discut.manga.service.saver.download.DownloadProvider
+import com.discut.manga.service.saver.download.instance
+import com.discut.manga.util.get
 import com.discut.manga.util.launchIO
+import com.discut.manga.util.withIOContext
+import discut.manga.data.download.DownloadState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.combineTransform
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.transformLatest
+import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.flatMapMerge
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.supervisorScope
 import managa.source.HttpSource
+import managa.source.domain.Page
+import managa.source.extensions.toInputStream
 import manga.core.preference.DownloadPreference
+import manga.core.preference.PreferenceManager
 
-class DownloadScope(
-    context: Context, workerParams: WorkerParameters,
-    private val downloadPreference: DownloadPreference,
-) :
-    CoroutineWorker(context, workerParams) {
+
+/**
+ * in fact, it only contains one Source
+ */
+class DownloadScope {
+
+    private val downloadPreference = PreferenceManager.get<DownloadPreference>()
 
     lateinit var source: HttpSource
 
@@ -48,80 +45,28 @@ class DownloadScope(
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    private var downloadJob: Job? = null
+    private var downloadMainJob: Job? = null
 
-    private val activeDownloaderJobs: MutableMap<Downloader, Job> = mutableMapOf()
+    private val _activeDownloaderJobsFlow: MutableStateFlow<Map<Downloader, Job>> =
+        MutableStateFlow(emptyMap())
+    private val activeDownloaderJobs
+        get() = _activeDownloaderJobsFlow.value
 
-    val isRunning get() = downloadJob?.isActive ?: false
+    private val downloadProvider = DownloadProvider.instance
+
+    val isRunning get() = downloadMainJob?.isActive ?: false
     val queueState get() = _queueState.asStateFlow()
 
+    val scopeTag
+        get() = "${source.id}-${source.name}"
 
     companion object {
         const val CHANNEL_ID = 100
         const val CHANNEL_NAME = "com.discut.manga.service.saver.download.model.DownloadScope"
 
-        const val MAX_DOWNLOADS = 3
-    }
+        const val MAX_DOWNLOADS = 1
 
-
-    override suspend fun getForegroundInfo(): ForegroundInfo {
-        val notification = NotificationCompat.Builder(applicationContext, CHANNEL_NAME).apply {
-            setContentTitle("Download")
-            setSmallIcon(android.R.drawable.stat_sys_download)
-        }.build()
-        return ForegroundInfo(
-            CHANNEL_ID,
-            notification,
-            ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC,
-        )
-    }
-
-    override suspend fun doWork(): Result {
-        var checkNetworkState = checkNetworkState(
-            applicationContext.activeNetworkState(),
-            downloadPreference.isWifiOnly()
-        )
-        var active = checkNetworkState && bootDownloadJob()
-        if (active.not()) {
-            return Result.failure()
-        }
-
-        try {
-            setForeground(getForegroundInfo())
-            delay(500)
-        } catch (e: IllegalStateException) {
-            Log.e("DownloadScope", e.message.toString())
-            return Result.failure()
-        }
-        coroutineScope {
-            combineTransform(
-                applicationContext.networkStateFlow(),
-                downloadPreference.getIsWifiOnlyAsFlow(),
-                transform = { a, b -> emit(checkNetworkState(a, b)) },
-            )
-                .onEach { checkNetworkState = it }
-                .launchIn(this)
-        }
-        // Keep the worker running when needed
-        while (active) {
-            active = !isStopped /*&& downloadManager.isRunning*/ && checkNetworkState
-        }
-        return Result.success()
-    }
-
-    private fun checkNetworkState(state: NetworkState, requireWifi: Boolean): Boolean {
-        return if (state.isOnline) {
-            val noWifi = requireWifi && !state.isWifi
-            if (noWifi) {
-                downloadManager.downloaderStop(
-                    applicationContext.getString(R.string.download_notifier_text_only_wifi),
-                )
-            }
-            !noWifi
-        } else {
-            downloadManager.downloaderStop(applicationContext.getString(R.string.download_notifier_no_network))
-            false
-        }
+        const val TAG = "DownloadScope"
     }
 
     fun add(downloader: Downloader) {
@@ -130,100 +75,238 @@ class DownloadScope(
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private fun bootDownloadJob(): Boolean {
+    fun bootDownloadMainJob(): Boolean {
         if (isRunning || _queueState.value.isEmpty()) {
             return false
         }
-        downloadJob = scope.launchIO {
-            val activeDownloadsFlow = queueState.transformLatest { queue ->
-                while (true) {
-                    delay(500)
-                    val activeDownloads = queue.asSequence()
-                        .filterAndSortNeedDownload()
-                        .toList()//.take(MAX_DOWNLOADS) // Concurrently download from 3 different sources
-                    if (activeDownloaderJobs.size < MAX_DOWNLOADS) {
-                        emit(activeDownloads)
-                    }
-
-                    if (activeDownloads.isEmpty()) break
-                    // Suspend until a download enters the ERROR state
-                    val activeDownloadsErroredFlow =
-                        combine(activeDownloads.map(Downloader::statusFlow)) { states ->
-                            states.filterIsInstance<Downloader.DownloadState.Error>().isEmpty()
-                                .not()
-                        }.filter { it }
-                    activeDownloadsErroredFlow.first()
-                }
-            }.distinctUntilChanged()
-
-            // Use supervisorScope to cancel child jobs when the downloader job is cancelled
+        downloadMainJob = scope.launchIO {
             supervisorScope {
-                activeDownloadsFlow.collectLatest { activeDownloads ->
-                    activeDownloaderJobs.forEach { (downloader, job) ->
-                        if (downloader.status == Downloader.DownloadState.Downloaded) {
-                            job.cancel()
-                            activeDownloaderJobs.remove(downloader)
+                _activeDownloaderJobsFlow.collect {
+                    Log.i("DownloadScope", "activeDownloaderJobsFlow size is ${it.size}")
+                    if (it.size >= MAX_DOWNLOADS) return@collect
+                    synchronized(activeDownloaderJobs) {
+                        try {
+                            val downloader =
+                                queueState.value.sortedBy { downloader -> downloader.download.order }
+                                    .first { download -> download.status == Downloader.DownloadState.Waiting }
+                            Log.i("DownloadScope", "${downloader.getTag()}: Start to download")
+                            _activeDownloaderJobsFlow.update { downloaderMap ->
+                                downloaderMap + (downloader to launchDownloaderJob(downloader))
+                            }
+                        } catch (e: Exception) {
+                            Log.i("DownloadScope", "Queue is empty")
+                            stop()
                         }
-                    }
-                    if (activeDownloaderJobs.size >= MAX_DOWNLOADS) return@collectLatest
-                    activeDownloads.forEach { download ->
-                        activeDownloaderJobs[download] = launchDownloaderJob(download)
                     }
                 }
             }
         }
-        return false
+        return true
     }
 
     private fun CoroutineScope.launchDownloaderJob(downloader: Downloader): Job = launchIO {
         try {
-            if (downloader.status == Downloader.DownloadState.Downloaded) {
+            if (!downloader.canDownload()) {
                 throw IllegalStateException("${downloader.getTag()}: status is ${downloader.status}, can't download again.")
             }
-            var pages = if (downloader.pages == null || downloader.pages?.isEmpty() == true) {
-                source.getPageList(downloader.chapter.toSChapter())
-            } else {
-                downloader.pages!!
-            }.sortedBy { it.index }
-            if (pages.isEmpty()) {
-                throw IllegalStateException("${downloader.getTag()}: pages is empty.")
-            }
-            pages.forEachIndexed { index, page ->
-                if (index < downloader.download.currentPage) return@forEachIndexed
+            handleDownloaderState(downloader)
+            handleDownloaderProgress(downloader)
 
-                source.getImage(page)?.let {
+            downloader.status = Downloader.DownloadState.Downloading
 
+            executeDownload(downloader)
+        } catch (e: Throwable) {
+            downloader.status =
+                Downloader.DownloadState.Error(e, "${downloader.getTag()}: ${e.message}")
+        }
+    }
+
+    private fun CoroutineScope.handleDownloaderState(downloader: Downloader) =
+        launchIO {
+            downloader.statusFlow.collect {
+                when (it) {
+                    is Downloader.DownloadState.Error ->
+                        _activeDownloaderJobsFlow.tryCancelJob(downloader)
+
+                    Downloader.DownloadState.Downloaded, Downloader.DownloadState.InQueue ->
+                        _activeDownloaderJobsFlow.tryCancelJob(downloader)
+
+                    Downloader.DownloadState.Downloading -> {
+                        Log.i("DownloadScope", "${downloader.getTag()}: Downloading")
+                    }
+
+
+                    Downloader.DownloadState.Waiting -> {
+                        Log.i("DownloadScope", "${downloader.getTag()}: Waiting")
+                    }
                 }
             }
-
-
-        } catch (e: Throwable) {
-            if (e is CancellationException) throw e
-            logcat(LogPriority.ERROR, e)
-            notifier.onError(e.message)
-            stop()
         }
+
+    private fun CoroutineScope.handleDownloaderProgress(downloader: Downloader) =
+        launchIO {
+            downloader.progressFlow.collect {
+                //Log.i("DownloadScope", "${downloader.getTag()}: progress is $it")
+            }
+        }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private suspend fun executeDownload(downloader: Downloader) {
+        val pages = if (downloader.pages == null || downloader.pages?.isEmpty() == true) {
+            source.getPageList(downloader.chapter.toSChapter())
+        } else {
+            downloader.pages!!
+        }.sortedBy { it.index }
+
+        if (pages.isEmpty()) {
+            throw IllegalStateException("${downloader.getTag()}: pages is empty.")
+        }
+
+        pages.asFlow()
+            .flatMapMerge(concurrency = 2) {
+                flow {
+                    when (it.status) {
+                        Page.State.DOWNLOAD_IMAGE, Page.State.READY -> emit(it)
+                        Page.State.QUEUE, Page.State.LOAD_PAGE, Page.State.ERROR -> {
+                            // delay(1000)// TODO
+                            if (it.imageUrl.isNullOrEmpty()) {
+                                it.status = Page.State.LOAD_PAGE
+                                try {
+                                    it.imageUrl = source.getImageUrl(it)
+                                } catch (e: Exception) {
+                                    it.status = Page.State.ERROR
+                                }
+                            }
+                            withIOContext { downloadImage(downloader, it) }
+                        }
+                    }
+                    emit(it)
+                }.flowOn(Dispatchers.IO)
+            }
+            .buffer()
+            .collect { it ->
+                // 每次下载完成一个图片后在数据库保存信息
+                // 数据库升级请保持线程安全，该下载是异步多线程的
+                if (it.status == Page.State.READY) {
+                    val newQueue = downloader.download.queue.let { queue ->
+                        if (queue.contains(it.index.toLong())) {
+                            queue.toMutableList().apply {
+                                remove(it.index.toLong())
+                            }
+                        } else {
+                            queue
+                        }
+                    }
+                    val newDownloaded = downloader.download.downloaded.let { downloaded ->
+                        if (!downloaded.contains(it.index.toLong())) {
+                            downloaded.toMutableList().apply {
+                                add(it.index.toLong())
+                            }
+                        } else {
+                            downloaded
+                        }
+                    }
+                    val status = if (newQueue.isNotEmpty()) {
+                        downloader.download.status
+                    } else {
+                        DownloadState.Completed
+                    }
+                    downloader.download = downloader.download.copy(
+                        status = status,
+                        queue = newQueue,
+                        downloaded = newDownloaded
+                    )
+                    downloadProvider.updateDownload(
+                        downloader.download
+                    )
+                    if (status == DownloadState.Completed) {
+                        downloader.status = Downloader.DownloadState.Downloaded
+                    }
+                    //_activeDownloaderJobsFlow.rinseMap()
+                }
+            }
+    }
+
+    private suspend fun downloadImage(downloader: Downloader, page: Page) {
+        page.status = Page.State.DOWNLOAD_IMAGE
+        val image = downloader.source.getImage(page).toInputStream()
+        DownloadFileSystem(downloadPreference.getDownloadDirectory(App.instance)).apply {
+            savePage(downloader, page, image)
+        }
+    }
+
+    private fun MutableMap<Downloader, Job>.tryCancelJob(downloader: Downloader) {
+        this[downloader]?.cancel()
+        this.remove(downloader)
+    }
+
+    private fun MutableStateFlow<Map<Downloader, Job>>.tryCancelJob(downloader: Downloader) {
+        this.value[downloader]?.cancel()
+        update {
+            val map = value.toMutableMap().apply {
+                remove(downloader)
+            }
+            map
+        }
+    }
+
+    private fun MutableStateFlow<Map<Downloader, Job>>.rinseMap() {
+        update {
+            it.filter { entry -> entry.key.status != Downloader.DownloadState.Downloaded }
+        }
+    }
+
+
+    fun startAll() {
+        val downloaderList =
+            queueState.value.filter { it.status != Downloader.DownloadState.Downloaded }.onEach {
+                if (it.status == Downloader.DownloadState.InQueue) {
+                    it.status = Downloader.DownloadState.Waiting
+                }
+            }
+        _queueState.update {
+            downloaderList
+        }
+
+    }
+
+    fun stop() {
+        pauseAll()
+        downloadMainJob?.cancel()
+        downloadMainJob = null
+    }
+
+    fun pauseAll() {
+        activeDownloaderJobs.forEach { (_, job) ->
+            job.cancel()
+        }
+        _activeDownloaderJobsFlow.update { emptyMap() }
+        _queueState.update { it ->
+            it.filter { it.status == Downloader.DownloadState.Downloading || it.status == Downloader.DownloadState.Waiting }
+                .onEach {
+                    it.status = Downloader.DownloadState.InQueue
+                }
+            it
+        }
+    }
+
+    fun pause(downloader: Downloader) {
+        downloader.status = Downloader.DownloadState.InQueue
+    }
+
+    fun pause(downloadId: Long) {
+        _queueState.value.find { it.download.id == downloadId }?.apply(::pause)
     }
 
     fun Downloader.getTag() = "${manga.title}->${chapter.name}(${source.name}id:${source.id})"
 
-    fun startAll() {
-
-    }
-
-    fun stopAll() {
-
-    }
-
-    fun stop(downloader: Downloader) {
-
-    }
-
     private fun Sequence<Downloader>.filterAndSortNeedDownload(): Sequence<Downloader> =
         filter {
             when (it.status) {
-                Downloader.DownloadState.Waiting, Downloader.DownloadState.Downloading -> true
+                Downloader.DownloadState.Waiting,
+                Downloader.DownloadState.Downloading,
+                Downloader.DownloadState.InQueue -> true
+
                 else -> false
             }
         }.sortedWith { l, r ->

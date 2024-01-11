@@ -17,7 +17,7 @@ import managa.source.domain.Page
 
 data class Downloader(
     val source: HttpSource,
-    val download: Download,
+    var download: Download,
     val manga: Manga,
     val chapter: Chapter,
     var pages: List<Page>? = null
