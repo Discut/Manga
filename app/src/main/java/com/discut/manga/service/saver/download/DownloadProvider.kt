@@ -29,9 +29,10 @@ import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
-import manga.source.HttpSource
+import manga.core.base.BaseManager
 import manga.core.preference.DownloadPreference
 import manga.core.preference.PreferenceManager
+import manga.source.HttpSource
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -40,11 +41,11 @@ class DownloadProvider @Inject constructor(
     @ApplicationContext private val context: Context,
     private val sourceManager: SourceManager,
     private val pagesGetterFactory: PagesGetter.Factory
-) {
-    private val downloadDb = MangaAppDatabase.DB.downloadDao()
-    private val mangaDb = MangaAppDatabase.DB.mangaDao()
-    private val chapterDb = MangaAppDatabase.DB.chapterDao()
-    private val downloadPreference = PreferenceManager.get<DownloadPreference>()
+) : BaseManager {
+    private val downloadDb by lazy { MangaAppDatabase.DB.downloadDao() }
+    private val mangaDb by lazy { MangaAppDatabase.DB.mangaDao() }
+    private val chapterDb by lazy { MangaAppDatabase.DB.chapterDao() }
+    private val downloadPreference by lazy { PreferenceManager.get<DownloadPreference>() }
 
     private val _queue: MutableStateFlow<MutableList<DownloadScope>> =
         MutableStateFlow(mutableListOf())
@@ -56,32 +57,6 @@ class DownloadProvider @Inject constructor(
 
     private val eventFlow: MutableStateFlow<DownloadEvent?> =
         MutableStateFlow(null)
-
-    init {
-        scope.launchIO {
-            rinseDb()
-            downloadDb.getAll()/*.filter { it.status != DownloadState.Completed }*/.forEach { it ->
-                val manga = mangaDb.getById(it.mangaId)
-                val chapter = chapterDb.getById(it.chapterId)
-                    ?: throw IllegalArgumentException("Chapter ${it.chapterId} not found")
-                val source = sourceManager.get(manga!!.source) as? HttpSource
-                    ?: throw IllegalArgumentException("Source ${manga.source} not found")
-                val scope = getDownloadScope(source)
-
-                val downloader = Downloader(
-                    source = source,
-                    download = it,
-                    manga = manga,
-                    chapter = chapter,
-                    pages = pagesGetterFactory.create(source).getPages(chapter)
-
-                )
-                scope.add(downloader)
-            }
-        }
-        tryLaunchAllDownloadScope()
-        observer()
-    }
 
     private suspend fun buildDownloader(mangaId: Long, chapterId: Long): Downloader =
         withIOContext {
@@ -140,8 +115,6 @@ class DownloadProvider @Inject constructor(
                                 DownloadWorker.stopScope(context, it)
                             }
                         }
-
-                        else -> {}
                     }
                 }
         }
@@ -192,7 +165,7 @@ class DownloadProvider @Inject constructor(
     }
 
     suspend fun updateQueueOrder(/*downloader: Downloader*/) {
-        queue.value.forEach{
+        queue.value.forEach {
             it.updateOrder()
         }
         //queue.value.find { it.source.id == downloader.source.id }?.updateOrder()
@@ -284,6 +257,32 @@ class DownloadProvider @Inject constructor(
 
     companion object {
         const val TAG = "DownloadProvider"
+    }
+
+    override fun initManager() {
+        scope.launchIO {
+            rinseDb()
+            downloadDb.getAll()/*.filter { it.status != DownloadState.Completed }*/.forEach { it ->
+                val manga = mangaDb.getById(it.mangaId)
+                val chapter = chapterDb.getById(it.chapterId)
+                    ?: throw IllegalArgumentException("Chapter ${it.chapterId} not found")
+                val source = sourceManager.get(manga!!.source) as? HttpSource
+                    ?: throw IllegalArgumentException("Source ${manga.source} not found")
+                val scope = getDownloadScope(source)
+
+                val downloader = Downloader(
+                    source = source,
+                    download = it,
+                    manga = manga,
+                    chapter = chapter,
+                    pages = pagesGetterFactory.create(source).getPages(chapter)
+
+                )
+                scope.add(downloader)
+            }
+        }
+        tryLaunchAllDownloadScope()
+        observer()
     }
 
 }

@@ -2,6 +2,7 @@ package com.discut.manga
 
 import android.app.Application
 import com.discut.core.handle.GlobalExceptionHandler
+import com.discut.manga.service.saver.download.DownloadProvider
 import com.discut.manga.service.source.SourceManager
 import dagger.hilt.android.HiltAndroidApp
 import discut.manga.data.MangaAppDatabase
@@ -22,6 +23,9 @@ class App : Application() {
     @Inject
     lateinit var sourceManager: SourceManager
 
+    @Inject
+    lateinit var downloadProvider: DownloadProvider
+
     override fun onCreate() {
         super.onCreate()
         // save application instance
@@ -32,6 +36,7 @@ class App : Application() {
         sourceManager.initManager()
         MangaAppDatabase.init(this)
         GlobalExceptionHandler.init(this)
+        downloadProvider.initManager()
         // init end
     }
 }
