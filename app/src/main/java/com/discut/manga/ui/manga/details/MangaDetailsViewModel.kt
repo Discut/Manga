@@ -8,6 +8,7 @@ import com.discut.manga.service.chapter.IChapterProvider
 import com.discut.manga.service.history.IHistoryProvider
 import com.discut.manga.service.manga.IMangaProvider
 import com.discut.manga.service.manga.MangaSaver
+import com.discut.manga.service.saver.download.DownloadProvider
 import com.discut.manga.util.launchIO
 import com.discut.manga.util.withIOContext
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,6 +29,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MangaDetailsViewModel @Inject constructor(
     private val db: MangaAppDatabase,
+    private val downloadProvider: DownloadProvider,
     private val chapterProvider: IChapterProvider,
     private val mangaProvider: IMangaProvider,
     private val historyProvider: IHistoryProvider,
@@ -144,6 +146,11 @@ class MangaDetailsViewModel @Inject constructor(
                         }
                     )
                 }
+            }
+
+            is MangaDetailsEvent.DownloadChapter -> {
+                downloadProvider.addDownload(event.manga.id, event.chapter.id)
+                state
             }
         }
     }

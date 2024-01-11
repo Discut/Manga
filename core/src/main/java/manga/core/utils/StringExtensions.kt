@@ -1,8 +1,11 @@
 package manga.core.utils
 
+import android.content.Context
+import android.content.res.Configuration
 import androidx.core.text.parseAsHtml
 import net.greypanther.natsort.CaseInsensitiveSimpleNaturalComparator
 import java.nio.charset.StandardCharsets
+import java.util.Locale
 import kotlin.math.floor
 
 /**
@@ -66,4 +69,13 @@ fun String.takeBytes(n: Int): String {
  */
 fun String.htmlDecode(): String {
     return this.parseAsHtml().toString()
+}
+
+/**
+ * get string from context
+ */
+fun Context.getStringFromLocal(id: Int, locale: Locale): String {
+    val configuration = Configuration(resources.configuration)
+    configuration.setLocale(locale)
+    return createConfigurationContext(configuration).resources.getString(id)
 }

@@ -19,6 +19,7 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Preview
+import androidx.compose.material.icons.outlined.Downloading
 import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -61,6 +62,7 @@ import com.discut.manga.components.indicator.AppLinearIndicator
 import com.discut.manga.components.manga.MangaCover
 import com.discut.manga.components.manga.MangaInfoBox
 import com.discut.manga.components.scaffold.AppBarActions
+import com.discut.manga.data.manga.isLocal
 import com.discut.manga.data.shouldRead
 import com.discut.manga.navigation.NavigationRoute
 import com.discut.manga.theme.alpha
@@ -361,6 +363,22 @@ fun MangaDetailsScreen(
                             subtitle = chapter.getSubtitle(),
                             leftAction = SwipeableActionCollection.Read {},
                             visibleProgress = visibleProgress,
+
+                            rightContent = {
+                                if (manga?.isLocal() == true) {
+                                    return@SwipeableChapterItem
+                                }
+                                IconButton(onClick = {
+                                    vm.sendEvent {
+                                        MangaDetailsEvent.DownloadChapter(manga!!, chapter)
+                                    }
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.Downloading,
+                                        contentDescription = "download"
+                                    )
+                                }
+                            },
 
                             onSwipe = {
                                 if (it == SwipeDirection.R) {

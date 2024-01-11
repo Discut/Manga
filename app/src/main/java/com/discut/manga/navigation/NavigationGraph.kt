@@ -49,6 +49,8 @@ sealed class NavigationRoute(
 
     data object CategoryScreen : NavigationRoute("category")
 
+    data object DownloadScreen : NavigationRoute("download")
+
     data object SettingsScreen : NavigationRoute("settings") {
         data object Security : NavigationRoute("security")
         data object SettingsMain : NavigationRoute("settingsMain")

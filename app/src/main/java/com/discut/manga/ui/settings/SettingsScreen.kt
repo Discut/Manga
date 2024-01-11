@@ -3,8 +3,9 @@ package com.discut.manga.ui.settings
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Security
+import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -38,7 +39,7 @@ fun SettingsScreen(navController: NavController) {
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
-                            imageVector = Icons.Filled.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Localized description"
                         )
                     }
@@ -67,6 +68,12 @@ private fun SettingsScreenContent(
             subTitle = "app锁定、隐藏预览图",
             icon = Icons.Default.Security,
             onPreferenceClick = onSecuritySettingsClick
+        )
+        TextPreferenceComponent(
+            title = "下载",
+            subTitle = "自动下载、下载路径",
+            icon = Icons.Outlined.Download,
+            onPreferenceClick = {}
         )
     }
 }

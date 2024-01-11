@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.discut.manga.components.CustomModalBottomSheet
 import com.discut.manga.event.NavigationEvent
+import com.discut.manga.navigation.NavigationRoute
 import com.discut.manga.ui.browse.source.SourceStoreSheet
 import com.discut.manga.util.dispatchBy
 
@@ -57,6 +58,10 @@ internal fun BrowseScreen(
             sources = sources,
             onSourceClick = { sourceId ->
                 NavigationEvent("mangasViewer/$sourceId").dispatchBy(scope)
+            },
+            onDownloadClock = {
+                NavigationEvent(NavigationRoute.DownloadScreen.route).dispatchBy(scope)
+
             })
     }
     CustomModalBottomSheet(

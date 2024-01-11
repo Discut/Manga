@@ -40,11 +40,11 @@ open class Page(
         }
 
     enum class State {
-        QUEUE,
-        LOAD_PAGE,
-        DOWNLOAD_IMAGE,
-        READY,
-        ERROR,
+        QUEUE,// queue
+        LOAD_PAGE,// loading page info
+        DOWNLOAD_IMAGE,// downloading image
+        READY, // image downloaded
+        ERROR,// error
     }
 
     override fun update(bytesRead: Long, contentLength: Long, done: Boolean) {

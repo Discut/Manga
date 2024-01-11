@@ -34,14 +34,15 @@ import managa.source.Source
 internal fun <S : Source> BrowseScreen2Impl(
     modifier: Modifier = Modifier,
     sources: List<S>,
-    onSourceClick: (Long) -> Unit
+    onSourceClick: (Long) -> Unit,
+    onDownloadClock: () -> Unit
 ) {
     Column(modifier = modifier.fillMaxSize()) {
         BrowserActionButtons(
             modifier = Modifier
                 .padding(horizontal = MaterialTheme.padding.Normal),
             onLocalSourceClock = { onSourceClick(LocalSource.ID) },
-            onDownloadClock = {}
+            onDownloadClock = onDownloadClock
         )
         Text(
             text = "Source",

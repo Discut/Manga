@@ -36,6 +36,8 @@ sealed interface MangaDetailsEvent : UiEvent {
 
     data class AddNewCategory(val category: String) : MangaDetailsEvent
 
+    data class DownloadChapter(val manga: Manga, val chapter: Chapter) : MangaDetailsEvent
+
 }
 
 sealed interface MangaDetailsEffect : UiEffect {

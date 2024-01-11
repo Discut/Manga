@@ -19,6 +19,7 @@ import com.discut.manga.navigation.settingsGraph
 import com.discut.manga.ui.base.BaseActivity
 import com.discut.manga.ui.browse.viewer.MangasViewer
 import com.discut.manga.ui.categories.CategoryScreen
+import com.discut.manga.ui.download.DownloadScreen
 import com.discut.manga.ui.main.domain.ToRouteEvent
 import com.discut.manga.ui.manga.details.MangaDetailsScreen
 import com.discut.manga.util.setComposeContent
@@ -79,6 +80,9 @@ class MainActivity : BaseActivity() {
                 }
                 composableWithAnimation(NavigationRoute.CategoryScreen.route) {
                     CategoryScreen(navController)
+                }
+                composableWithAnimation(NavigationRoute.DownloadScreen.route) {
+                    DownloadScreen()
                 }
                 settingsGraph(navController)
             }
