@@ -8,6 +8,9 @@ plugins {
 
 }
 
+val SUPPORTED_ABIS = setOf("armeabi-v7a", "arm64-v8a"/*, "x86", "x86_64"*/)
+
+
 android {
     namespace = "com.discut.manga"
     compileSdk = 34
@@ -20,11 +23,29 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        ndk {
+            abiFilters += SUPPORTED_ABIS
+        }
+        splits {
+            abi {
+                isEnable = true
+                reset()
+                include(*SUPPORTED_ABIS.toTypedArray())
+                isUniversalApk = true
+            }
+        }
     }
 
     buildTypes {
+        debug {
+            versionNameSuffix = "-debug"
+            applicationIdSuffix = ".debug"
+            isPseudoLocalesEnabled = true
+        }
         release {
-            isMinifyEnabled = false
+            isShrinkResources = true
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -110,12 +131,15 @@ dependencies {
     }
 
     // Image Loading
-    implementation(libs.subsamplingscaleimageview){
+    implementation(libs.subsamplingscaleimageview) {
         exclude(module = "image-decoder")
     }
     implementation(libs.image.decoder)
     implementation(platform(libs.coil.bom))
     implementation(libs.bundles.coil)
+
+    //animate icon
+    implementation(libs.lottie)
 
     // Room
     // To use Kotlin annotation processing tool (kapt)
