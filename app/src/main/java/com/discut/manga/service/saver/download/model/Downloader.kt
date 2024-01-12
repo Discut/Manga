@@ -12,8 +12,8 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
-import managa.source.HttpSource
-import managa.source.domain.Page
+import manga.source.HttpSource
+import manga.source.domain.Page
 
 data class Downloader(
     val source: HttpSource,

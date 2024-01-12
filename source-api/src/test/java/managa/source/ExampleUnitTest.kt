@@ -1,4 +1,4 @@
-package managa.source
+package manga.source
 
 import org.junit.Test
 

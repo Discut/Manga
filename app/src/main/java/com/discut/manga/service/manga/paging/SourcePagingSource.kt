@@ -4,9 +4,9 @@ import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.discut.manga.util.withIOContext
-import managa.source.Source
-import managa.source.domain.SManga
-import managa.source.domain.SMangas
+import manga.source.Source
+import manga.source.domain.SManga
+import manga.source.domain.SMangas
 
 /**
  * from tachiyomi.data.source

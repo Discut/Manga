@@ -1,6 +1,6 @@
 package com.discut.manga.service.source
 
-import managa.source.Source
+import manga.source.Source
 
 interface ISourceManager {
     fun get(sourceKey: Long): Source?

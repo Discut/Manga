@@ -33,6 +33,11 @@ class DownloadViewModel @Inject constructor(
                 )
             }
 
+            is DownloadEvent.Cancel -> {
+                downloadProvider.cancelDownload(event.download)
+                state
+            }
+
             else -> null
         }
     }

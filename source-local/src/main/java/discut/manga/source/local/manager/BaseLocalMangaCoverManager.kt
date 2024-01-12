@@ -1,6 +1,6 @@
 package discut.manga.source.local.manager
 
-import managa.source.domain.SManga
+import manga.source.domain.SManga
 import java.io.File
 import java.io.InputStream
 

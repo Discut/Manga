@@ -4,7 +4,7 @@ import com.discut.manga.data.manga.toManga
 import com.discut.manga.util.withIOContext
 import discut.manga.data.MangaAppDatabase
 import discut.manga.data.manga.Manga
-import managa.source.domain.SManga
+import manga.source.domain.SManga
 import javax.inject.Inject
 import javax.inject.Singleton
 

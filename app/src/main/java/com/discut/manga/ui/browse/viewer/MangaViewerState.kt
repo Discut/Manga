@@ -7,7 +7,7 @@ import com.discut.core.mvi.contract.UiState
 import discut.manga.data.manga.Manga
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
-import managa.source.domain.FilterList
+import manga.source.domain.FilterList
 
 data class MangaViewerState(
     val isLoading: Boolean = true,

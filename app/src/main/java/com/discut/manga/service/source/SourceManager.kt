@@ -4,9 +4,9 @@ import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import discut.manga.source.local.LocalSource
 import kotlinx.coroutines.flow.MutableStateFlow
-import managa.source.Source
-import managa.source.online.BH3
-import managa.source.online.Baimangu
+import manga.source.Source
+import manga.source.online.BH3
+import manga.source.online.Baimangu
 import manga.core.base.BaseManager
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject

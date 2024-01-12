@@ -1,7 +1,15 @@
 package com.discut.manga.data
 
+import com.discut.manga.service.saver.download.DownloadProvider
+import com.discut.manga.service.saver.download.instance
 import discut.manga.data.chapter.Chapter
-import managa.source.domain.SChapter
+import discut.manga.data.download.DownloadState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import manga.source.domain.SChapter
 import kotlin.math.absoluteValue
 
 fun Chapter.shouldRead(): Boolean {
@@ -42,3 +50,14 @@ fun Chapter.toSChapter(): SChapter =
         it
     }
 
+val Chapter.isDownloaded: Boolean
+    get() = DownloadProvider.instance.isDownloaded(id, mangaId)
+
+val Chapter.downloadState: DownloadState
+    get() = DownloadProvider.instance.getDownloadState(mangaId = mangaId, chapterId = id)
+
+suspend fun Chapter.getDownloadStateFlow(downloadProvider: DownloadProvider = DownloadProvider.instance): StateFlow<DownloadState> {
+    return downloadProvider.subscribe(mangaId = mangaId, chapterId = id).map {
+        it?.status?: DownloadState.NotInQueue
+    }.stateIn(CoroutineScope(Dispatchers.IO))
+}

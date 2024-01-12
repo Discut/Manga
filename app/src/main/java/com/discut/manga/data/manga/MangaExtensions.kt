@@ -6,8 +6,8 @@ import com.discut.manga.service.GlobalModuleEntrypoint
 import dagger.hilt.EntryPoints
 import discut.manga.data.manga.Manga
 import discut.manga.source.local.LocalSource
-import managa.source.Source
-import managa.source.domain.SManga
+import manga.source.Source
+import manga.source.domain.SManga
 
 fun Manga.getSource(): Source? {
     val instance = EntryPoints.get(App.instance, GlobalModuleEntrypoint::class.java).getSourceManagerInstance()

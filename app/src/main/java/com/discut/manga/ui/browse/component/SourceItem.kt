@@ -15,7 +15,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.style.TextOverflow
 import com.discut.manga.theme.alpha
 import com.discut.manga.theme.padding
-import managa.source.Source
+import manga.source.Source
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

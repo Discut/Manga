@@ -1,7 +1,7 @@
 package discut.manga.source.local.manager
 
 import discut.manga.source.local.metadata.IMetadataParser
-import managa.source.domain.SManga
+import manga.source.domain.SManga
 import java.io.InputStream
 import javax.xml.parsers.DocumentBuilderFactory
 
