@@ -8,9 +8,8 @@ import discut.manga.data.chapter.Chapter
 import discut.manga.data.manga.Manga
 import discut.manga.source.local.LocalSource
 import discut.manga.source.local.SupportFormat
-import managa.source.HttpSource
-import managa.source.Source
-import managa.source.domain.SChapter
+import manga.source.HttpSource
+import manga.source.Source
 
 class ChapterLoader(
     private val context: Context,

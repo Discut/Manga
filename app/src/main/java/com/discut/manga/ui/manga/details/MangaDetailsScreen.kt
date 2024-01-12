@@ -19,15 +19,18 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Preview
+import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Downloading
 import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.twotone.CropRotate
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -35,7 +38,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -47,6 +52,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -70,6 +76,7 @@ import com.discut.manga.theme.padding
 import com.discut.manga.ui.categories.NewCategory
 import com.discut.manga.ui.common.LoadingScreen
 import com.discut.manga.ui.main.domain.ToRouteEvent
+import com.discut.manga.ui.manga.ChapterScope
 import com.discut.manga.ui.manga.details.component.AboutBookSheet
 import com.discut.manga.ui.manga.details.component.AddToFavoriteSheet
 import com.discut.manga.ui.manga.details.component.FavoriteButton
@@ -84,6 +91,8 @@ import com.discut.manga.util.isScrollingUp
 import com.discut.manga.util.toDate
 import discut.manga.common.res.R
 import discut.manga.data.chapter.Chapter
+import discut.manga.data.download.DownloadState
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -334,7 +343,7 @@ fun MangaDetailsScreen(
                             )
                         })
                 }
-                chapters.forEachIndexed { _, c ->
+                chapters.map { it.chapter }.forEachIndexed { index, c ->
                     item {
                         val chapter by vm.collectionChapterInfo(c)
                             .collectAsStateWithLifecycle(initialValue = c)
@@ -368,16 +377,19 @@ fun MangaDetailsScreen(
                                 if (manga?.isLocal() == true) {
                                     return@SwipeableChapterItem
                                 }
-                                IconButton(onClick = {
-                                    vm.sendEvent {
-                                        MangaDetailsEvent.DownloadChapter(manga!!, chapter)
+                                DownloadIcon(chapters[index],
+                                    onDownloadClick = {
+                                        vm.sendEvent {
+                                            MangaDetailsEvent.DownloadChapter(manga!!, chapter)
+                                        }
+                                    },
+                                    onProgressingClick = {
+
+                                    },
+                                    onDownloadedClick = {
+
                                     }
-                                }) {
-                                    Icon(
-                                        imageVector = Icons.Outlined.Downloading,
-                                        contentDescription = "download"
-                                    )
-                                }
+                                )
                             },
 
                             onSwipe = {
@@ -483,6 +495,50 @@ private fun handleEffect(vm: MangaDetailsViewModel) {
                     it.mangaId,
                     it.chapterId
                 )
+            }
+        }
+    }
+}
+
+@Composable
+private fun DownloadIcon(
+    chapterScope: ChapterScope,
+    onDownloadClick: () -> Unit,
+    onProgressingClick: () -> Unit,
+    onDownloadedClick: () -> Unit
+) {
+    val downloadState by chapterScope.downloadState.collectAsStateWithLifecycle()
+    CompositionLocalProvider(
+        LocalContentColor provides Color.Black.copy(
+            alpha = MaterialTheme.alpha.Lowest
+        )
+    ) {
+        when (downloadState) {
+            DownloadState.NotInQueue -> {
+                IconButton(onClick = onDownloadClick) {
+                    Icon(
+                        imageVector = Icons.Outlined.Downloading,
+                        contentDescription = "download"
+                    )
+                }
+            }
+
+            DownloadState.Waiting, DownloadState.Downloading, DownloadState.InQueue -> {
+                IconButton(onClick = onProgressingClick) {
+                    Icon(
+                        imageVector = Icons.TwoTone.CropRotate,
+                        contentDescription = "downloading"
+                    )
+                }
+            }
+
+            DownloadState.Completed -> {
+                IconButton(onClick = onDownloadedClick) {
+                    Icon(
+                        imageVector = Icons.Outlined.CheckCircle,
+                        contentDescription = "downloaded"
+                    )
+                }
             }
         }
     }

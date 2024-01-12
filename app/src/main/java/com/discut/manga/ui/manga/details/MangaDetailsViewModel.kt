@@ -9,12 +9,14 @@ import com.discut.manga.service.history.IHistoryProvider
 import com.discut.manga.service.manga.IMangaProvider
 import com.discut.manga.service.manga.MangaSaver
 import com.discut.manga.service.saver.download.DownloadProvider
+import com.discut.manga.ui.manga.ChapterScope
 import com.discut.manga.util.launchIO
 import com.discut.manga.util.withIOContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import discut.manga.data.MangaAppDatabase
 import discut.manga.data.category.Category
 import discut.manga.data.chapter.Chapter
+import discut.manga.data.download.DownloadState
 import discut.manga.data.manga.Manga
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,6 +24,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
@@ -51,6 +54,21 @@ class MangaDetailsViewModel @Inject constructor(
                     categories = fetchCategories(),
                     chapters = chapterProvider.subscribe(event.mangaId)
                         .onEach { it.customFilter() }
+                        .map { chapters ->
+                            chapters.map { chapter ->
+                                ChapterScope(
+                                    chapter = chapter,
+                                    downloadState = downloadProvider.subscribe(
+                                        chapter.mangaId,
+                                        chapter.id
+                                    ).map {
+                                        it?.status ?: DownloadState.NotInQueue
+                                    }.stateIn(
+                                        CoroutineScope(Dispatchers.IO)
+                                    )
+                                )
+                            }
+                        }
                         .stateIn(CoroutineScope(Dispatchers.IO)),
                     currentHistory = historyProvider.subscribe(event.mangaId)
                         .distinctUntilChanged().stateIn(
@@ -160,7 +178,7 @@ class MangaDetailsViewModel @Inject constructor(
     }
 
     private fun getFirstChapter(): Chapter {
-        return uiState.value.chapters.value.last()
+        return uiState.value.chapters.value.last().chapter
     }
 
     private suspend fun fetchCategories(): List<Category> =

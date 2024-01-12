@@ -5,7 +5,7 @@ import com.discut.core.mvi.contract.UiEvent
 import com.discut.core.mvi.contract.UiState
 import com.discut.manga.ui.browse.tab.TabContent
 import com.discut.manga.ui.browse.tab.Tabs
-import managa.source.Source
+import manga.source.Source
 
 data class BrowseScreenState(
     val isLoading: Boolean = false,

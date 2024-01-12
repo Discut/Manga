@@ -3,11 +3,9 @@ package com.discut.manga.service.saver.download
 import android.content.Context
 import com.discut.manga.App
 import com.discut.manga.data.SnowFlakeUtil
-import com.discut.manga.data.generateHashKey
 import com.discut.manga.data.manga.isLocal
-import com.discut.manga.data.toSChapter
 import com.discut.manga.service.GlobalModuleEntrypoint
-import com.discut.manga.service.cache.PagesCache
+import com.discut.manga.service.chapter.page.PagesGetter
 import com.discut.manga.service.saver.download.model.DownloadEvent
 import com.discut.manga.service.saver.download.model.DownloadScope
 import com.discut.manga.service.saver.download.model.DownloadWorker
@@ -24,15 +22,14 @@ import discut.manga.data.download.DownloadState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import managa.source.HttpSource
+import manga.source.HttpSource
 import manga.core.preference.DownloadPreference
 import manga.core.preference.PreferenceManager
 import javax.inject.Inject
@@ -42,7 +39,7 @@ import javax.inject.Singleton
 class DownloadProvider @Inject constructor(
     @ApplicationContext private val context: Context,
     private val sourceManager: SourceManager,
-    private val pagesCache: PagesCache
+    private val pagesGetterFactory: PagesGetter.Factory
 ) {
     private val downloadDb = MangaAppDatabase.DB.downloadDao()
     private val mangaDb = MangaAppDatabase.DB.mangaDao()
@@ -63,7 +60,7 @@ class DownloadProvider @Inject constructor(
     init {
         scope.launchIO {
             rinseDb()
-            downloadDb.getAll().filter { it.status != DownloadState.Completed }.forEach { it ->
+            downloadDb.getAll()/*.filter { it.status != DownloadState.Completed }*/.forEach { it ->
                 val manga = mangaDb.getById(it.mangaId)
                 val chapter = chapterDb.getById(it.chapterId)
                     ?: throw IllegalArgumentException("Chapter ${it.chapterId} not found")
@@ -76,13 +73,7 @@ class DownloadProvider @Inject constructor(
                     download = it,
                     manga = manga,
                     chapter = chapter,
-                    pages = if (pagesCache.isExist(chapter.generateHashKey())) {
-                        Json.decodeFromString(chapter.generateHashKey())
-                    } else {
-                        source.getPageList(chapter.toSChapter()).apply {
-                            pagesCache.put(chapter.generateHashKey(), Json.encodeToString(this))
-                        }
-                    }
+                    pages = pagesGetterFactory.create(source).getPages(chapter)
 
                 )
                 scope.add(downloader)
@@ -99,15 +90,7 @@ class DownloadProvider @Inject constructor(
                 ?: throw IllegalArgumentException("Chapter $chapterId not found")
             val source = sourceManager.get(manga!!.source) as? HttpSource
                 ?: throw IllegalArgumentException("Source ${manga.source} not found")
-            val pages = if (pagesCache.isExist(chapter.generateHashKey())) {
-                pagesCache.get(chapter.generateHashKey()).let {
-                    Json.decodeFromString(it!!)
-                }
-            } else {
-                source.getPageList(chapter.toSChapter()).apply {
-                    pagesCache.put(chapter.generateHashKey(), Json.encodeToString(this))
-                }
-            }
+            val pages = pagesGetterFactory.create(source).getPages(chapter)
             if (pages.isEmpty()) {
                 throw IllegalArgumentException("Pages not found")
             }
@@ -177,42 +160,41 @@ class DownloadProvider @Inject constructor(
     /**
      * 取消下载
      */
-    fun cancelDownload(downloader: Downloader) {
-        downloadDb.getByMangaIdAndChapterId(downloader.manga.id, downloader.chapter.id)
-            ?.let { download ->
-                queue.value.find { it.source.id == downloader.source.id }?.let {
-                    it.cancel(downloader)
-                    downloadDb.delete(downloader.download)
-                    DownloadFileSystem(downloadPreference.getDownloadDirectory(App.instance))
+    suspend fun cancelDownload(downloader: Downloader) {
+        withIOContext {
+            downloadDb.getByMangaIdAndChapterId(downloader.manga.id, downloader.chapter.id)
+                ?.let {
+                    queue.value.find { it.source.id == downloader.source.id }?.let {
+                        it.cancel(downloader)
+                        downloadDb.delete(downloader.download)
+                        DownloadFileSystem(downloadPreference.getDownloadDirectory(App.instance))
+                    }
+
                 }
-
-            }
+        }
     }
 
-
-    /**
-     * Tells the downloader to begin downloads.
-     */
-    fun startDownloads() {
+    fun pauseDownload(downloader: Downloader) {
+        if (downloader.status != Downloader.DownloadState.Downloading) {
+            return
+        }
+        queue.value.find { it.source.id == downloader.source.id }?.pause(downloader)
     }
 
-    /**
-     * Tells the downloader to pause downloads.
-     */
     fun pauseDownloads() {
         queue.value.onEach {
             it.pauseAll()
         }
     }
 
-    /**
-     * Empties the download queue.
-     */
-    fun clearQueue() {
-        queue.value.onEach {
-            it.pauseAll()
+    fun startDownload(downloader: Downloader) {
+
+    }
+
+    fun updateQueuePriority(downloader: Downloader, priority: Int) {
+        queue.value.find { it.source.id == downloader.source.id }?.let {
+            it.updatePriority(downloader, priority)
         }
-        clearDb()
     }
 
     suspend fun addDownload(mangaId: Long, chapterId: Long) {
@@ -274,19 +256,30 @@ class DownloadProvider @Inject constructor(
         it.map { it.queueState }
     }
 
-    fun updateDownload(download: Download) {
-        downloadDb.update(download)
-    }
-
-    fun deleteDownload(download: Download) {
-        downloadDb.delete(download)
+    fun updateOrInsertDownload(download: Download) {
+        if (downloadDb.getById(download.id) == null)
+            downloadDb.insert(download)
+        else
+            downloadDb.update(download)
     }
 
     fun getDownloadState(mangaId: Long, chapterId: Long): DownloadState {
-        val download = downloadDb.getByMangaIdAndChapterId(mangaId, chapterId)
-            ?: return DownloadState.NotInQueue
-        return download.status
+        queue.value.forEach { downloadScope ->
+            downloadScope.queueState.value.find { it.manga.id == mangaId && it.chapter.id == chapterId }
+                ?.let { return it.download.status }
+        }
+        return DownloadState.NotInQueue
     }
+
+    fun isDownloaded(id: Long, mangaId: Long): Boolean {
+        val download = downloadDb.getByMangaIdAndChapterId(mangaId, id) ?: return false
+        return download.status == DownloadState.Completed
+    }
+
+    fun subscribe(mangaId: Long, chapterId: Long): Flow<Download?> {
+        return downloadDb.getByMangaIdAndChapterIdAsFlow(mangaId, chapterId)
+    }
+
 
     companion object {
         const val TAG = "DownloadProvider"

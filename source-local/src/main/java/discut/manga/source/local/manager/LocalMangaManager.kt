@@ -3,9 +3,9 @@ package discut.manga.source.local.manager
 import android.content.Context
 import discut.manga.source.local.SupportFormat
 import discut.manga.source.local.disk.LocalSourceFileSystem
-import managa.source.domain.SChapter
-import managa.source.domain.SManga
-import managa.source.domain.utils.ChapterRecognition
+import manga.source.domain.SChapter
+import manga.source.domain.SManga
+import manga.source.domain.utils.ChapterRecognition
 import manga.core.utils.ImageUtil
 import manga.core.utils.compareToCaseInsensitiveNaturalOrder
 import java.io.File

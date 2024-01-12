@@ -4,7 +4,7 @@ import com.discut.core.mvi.BaseViewModel
 import com.discut.manga.service.source.ISourceManager
 import com.discut.manga.service.source.isLocal
 import dagger.hilt.android.lifecycle.HiltViewModel
-import managa.source.Source
+import manga.source.Source
 import javax.inject.Inject
 
 @HiltViewModel

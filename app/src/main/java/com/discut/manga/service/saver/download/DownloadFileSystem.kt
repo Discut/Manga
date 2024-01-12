@@ -1,7 +1,7 @@
 package com.discut.manga.service.saver.download
 
 import com.discut.manga.service.saver.download.model.Downloader
-import managa.source.domain.Page
+import manga.source.domain.Page
 import manga.core.utils.ImageUtil
 import java.io.File
 import java.io.InputStream

@@ -15,6 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,9 +25,9 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.supervisorScope
-import managa.source.HttpSource
-import managa.source.domain.Page
-import managa.source.extensions.toInputStream
+import manga.source.HttpSource
+import manga.source.domain.Page
+import manga.source.extensions.toInputStream
 import manga.core.preference.DownloadPreference
 import manga.core.preference.PreferenceManager
 
@@ -168,7 +169,7 @@ class DownloadScope {
                     when (it.status) {
                         Page.State.DOWNLOAD_IMAGE, Page.State.READY -> emit(it)
                         Page.State.QUEUE, Page.State.LOAD_PAGE, Page.State.ERROR -> {
-                            // delay(1000)// TODO
+                            delay(downloadPreference.getDownloadInterval().toLong())
                             if (it.imageUrl.isNullOrEmpty()) {
                                 it.status = Page.State.LOAD_PAGE
                                 try {
@@ -216,7 +217,7 @@ class DownloadScope {
                         queue = newQueue,
                         downloaded = newDownloaded
                     )
-                    downloadProvider.updateDownload(
+                    downloadProvider.updateOrInsertDownload(
                         downloader.download
                     )
                     if (status == DownloadState.Completed) {
@@ -290,7 +291,7 @@ class DownloadScope {
         }
     }
 
-    fun cancel(downloader: Downloader){
+    fun cancel(downloader: Downloader) {
         downloader.status = Downloader.DownloadState.InQueue
         _queueState.update { downloaderList ->
             downloaderList.filter { it.download.id != downloader.download.id }

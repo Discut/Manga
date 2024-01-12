@@ -10,10 +10,21 @@ import java.io.File
 import java.util.Locale
 
 
-class DownloadPreference constructor(appPreference: SharedPreferences, flow: Flow<String?>) :
+class DownloadPreference(appPreference: SharedPreferences, flow: Flow<String?>) :
     AppPreference(appPreference, flow) {
     companion object {
         const val DOWNLOAD_DIRECTORY = "storage/emulated/0/Download/Manga"
+    }
+
+    fun getDownloadInterval(): Int {
+        return getValue("download_interval", 0)
+    }
+
+
+    fun setDownloadInterval(interval: Int) {
+        edit {
+            putInt("download_interval", interval)
+        }
     }
 
     fun getDownloadDirectory(context: Context): String {
