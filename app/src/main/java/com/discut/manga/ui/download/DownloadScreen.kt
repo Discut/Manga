@@ -35,10 +35,10 @@ import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.rememberReorderableLazyListState
 import org.burnoutcrew.reorderable.reorderable
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun DownloadScreen(
-    vm: DownloadViewModel = hiltViewModel()
+    vm: DownloadViewModel = hiltViewModel(),
+    onBack: () -> Unit
 ) {
     val state by vm.uiState.collectAsState()
     Scaffold(
@@ -54,6 +54,7 @@ fun DownloadScreen(
                     AppBarActions {
                         toOverflowAction {
                             title = "Cancel All"
+                            onClick = onBack
                         }
                     }
                 }

@@ -20,6 +20,10 @@ class DownloadPreference(appPreference: SharedPreferences, flow: Flow<String?>) 
         return getValue("download_interval", 0)
     }
 
+    fun getDownloadIntervalAsFlow(): Flow<Int> {
+        return getValueAsFlow("download_interval", 0)
+    }
+
 
     fun setDownloadInterval(interval: Int) {
         edit {
@@ -27,21 +31,25 @@ class DownloadPreference(appPreference: SharedPreferences, flow: Flow<String?>) 
         }
     }
 
+    fun getDefaultDownloadDirectory(context: Context): String {
+        val baseLocationFolder =
+            "${
+                context.getStringFromLocal(
+                    R.string.app_name,
+                    Locale.ENGLISH
+                )
+            }${File.separator}download"
+        val first =
+            DiskUtils.getExternalStorages(context)
+                .map { File(it.absolutePath, baseLocationFolder) }
+                .first()
+        return first.absolutePath ?: DOWNLOAD_DIRECTORY
+    }
+
     fun getDownloadDirectory(context: Context): String {
         if (isExists("download_directory").not()) {
-            val baseLocationFolder =
-                "${
-                    context.getStringFromLocal(
-                        R.string.app_name,
-                        Locale.ENGLISH
-                    )
-                }${File.separator}download"
-            val first =
-                DiskUtils.getExternalStorages(context)
-                    .map { File(it.absolutePath, baseLocationFolder) }
-                    .first()
             edit {
-                putString("download_directory", first.absolutePath)
+                putString("download_directory", getDefaultDownloadDirectory(context))
             }
         }
         return getValue(

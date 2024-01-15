@@ -82,7 +82,9 @@ class MainActivity : BaseActivity() {
                     CategoryScreen(navController)
                 }
                 composableWithAnimation(NavigationRoute.DownloadScreen.route) {
-                    DownloadScreen()
+                    DownloadScreen {
+                        navController.popBackStack()
+                    }
                 }
                 settingsGraph(navController)
             }
