@@ -134,9 +134,10 @@ fun DownloadItem(
                 )
             }
         }) {
-        val progress by downloader.progressFlow.collectAsStateWithLifecycle(initialValue = 0)
+        val innerProgress by downloader.progressFlow.collectAsStateWithLifecycle(initialValue = 0)
+        val progress by animateFloatAsState(targetValue = innerProgress / 100f, label = "")
         var progressText by remember { mutableStateOf("") }
-        LaunchedEffect(key1 = progress) {
+        LaunchedEffect(key1 = innerProgress) {
             progressText = "${downloader.downloadedImages}/${downloader.pages?.size}"
         }
         Surface {
@@ -196,7 +197,7 @@ fun DownloadItem(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(3.dp),
-                        progress = { progress.toFloat() / 100 })
+                        progress = { progress })
                 }
             )
         }

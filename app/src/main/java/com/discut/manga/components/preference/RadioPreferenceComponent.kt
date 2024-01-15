@@ -14,6 +14,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,7 +34,7 @@ fun <K> RadioPreferenceComponent(
     title: String,
     subTitle: String? = null,
     icon: ImageVector? = null,
-    adapter: RadioPreferenceAdapter<K>,
+    state: RadioPreferenceState<K>,
     iconTint: Color = MaterialTheme.colorScheme.primary,
     endWidget: @Composable ((PaddingValues) -> Unit)? = null,
     onPreferenceClick: (() -> Unit)? = null,
@@ -62,10 +63,10 @@ fun <K> RadioPreferenceComponent(
                     // val state = rememberLazyListState()
                     LazyColumn {
                         item {
-                            for (i in 0..<adapter.keys().size) {
-                                val key = adapter.keys()[i]
-                                val label = adapter.getOption(key)
-                                val isSelected = adapter.isSelected(key)
+                            for (i in 0..<state.keys().size) {
+                                val key = state.keys()[i]
+                                val label = state.getOption(key)
+                                val isSelected = state.isSelected(key)
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
                                     modifier = Modifier
@@ -75,7 +76,7 @@ fun <K> RadioPreferenceComponent(
                                             selected = isSelected,
                                             onClick = {
                                                 if (!isSelected) {
-                                                    adapter.onSelected(key, i)
+                                                    state.onSelected(key, i)
                                                     isDialogShow = false
                                                 }
                                             },
@@ -107,6 +108,52 @@ fun <K> RadioPreferenceComponent(
     }
 }
 
+interface RadioPreferenceState<K> {
+    fun getOption(key: K): String
+
+    fun keys(): List<K>
+
+    fun isSelected(key: K): Boolean
+
+    fun onSelected(key: K, index: Int)
+}
+
+@Composable
+fun <K> rememberRadioPreferenceState(
+    data: Map<K, String>,
+    default: K? = null,
+    onSelected: (K, Int) -> Unit
+): RadioPreferenceState<K> = remember {
+    RadioPreferenceStateImpl(
+        map = data,
+        default = default,
+        outerOnSelected = onSelected
+    )
+}
+
+@Stable
+private class RadioPreferenceStateImpl<K>(
+    val map: Map<K, String> = emptyMap(),
+    val default: K? = null,
+    val outerOnSelected: (K, Int) -> Unit
+) : RadioPreferenceState<K> {
+
+    private var selected: K? = default
+    override fun getOption(key: K): String =
+        map[key] ?: ""
+
+    override fun keys(): List<K> = map.keys.toList()
+
+    override fun onSelected(key: K, index: Int) {
+        selected = key
+        this.outerOnSelected(key, index)
+    }
+
+    override fun isSelected(key: K): Boolean = key == selected
+
+}
+
+@Deprecated("Use rememberRadioPreferenceState instead")
 interface RadioPreferenceAdapter<K> {
     fun getOption(key: K): String
 
@@ -117,6 +164,7 @@ interface RadioPreferenceAdapter<K> {
     fun onSelected(key: K, index: Int)
 }
 
+
 @Preview(
     showBackground = true,
     name = "Light"
@@ -126,12 +174,17 @@ private fun RadioPreferenceComponentPreview() {
     var subTitle by remember {
         mutableStateOf("")
     }
+    val state = rememberRadioPreferenceState(
+        data = mapOf("A" to "A", "B" to "B", "C" to "C"),
+        onSelected = { _, _ -> }
+    )
     MangaTheme {
         Column {
             RadioPreferenceComponent<String>(
                 title = "RadioPreferenceComponent",
                 subTitle = subTitle,
-                adapter = object : RadioPreferenceAdapter<String> {
+                state = state
+                /*adapter = object : RadioPreferenceAdapter<String> {
                     val map = mapOf(
                         "A" to "A",
                         "B" to "B",
@@ -153,7 +206,7 @@ private fun RadioPreferenceComponentPreview() {
                     override fun isSelected(key: String): Boolean {
                         return subTitle == getOption(key)
                     }
-                }
+                }*/
             )
         }
     }

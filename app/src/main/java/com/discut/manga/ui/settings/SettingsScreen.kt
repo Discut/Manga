@@ -20,6 +20,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.navigation.NavController
 import com.discut.manga.components.preference.TextPreferenceComponent
+import com.discut.manga.navigation.NavigationRoute
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,6 +54,7 @@ fun SettingsScreen(navController: NavController) {
                 .padding(innerPadding)
                 .nestedScroll(scrollBehavior.nestedScrollConnection),
             onSecuritySettingsClick = { navController.navigate("security") },
+            onDownloadSettingsClick = { navController.navigate(NavigationRoute.SettingsScreen.Download.route) }
         )
     }
 }
@@ -61,6 +63,7 @@ fun SettingsScreen(navController: NavController) {
 private fun SettingsScreenContent(
     modifier: Modifier = Modifier,
     onSecuritySettingsClick: () -> Unit,
+    onDownloadSettingsClick: () -> Unit
 ) {
     Column(modifier = modifier) {
         TextPreferenceComponent(
@@ -73,7 +76,7 @@ private fun SettingsScreenContent(
             title = "下载",
             subTitle = "自动下载、下载路径",
             icon = Icons.Outlined.Download,
-            onPreferenceClick = {}
+            onPreferenceClick = onDownloadSettingsClick
         )
     }
 }
