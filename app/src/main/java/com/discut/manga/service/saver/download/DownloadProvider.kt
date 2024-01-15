@@ -191,10 +191,11 @@ class DownloadProvider @Inject constructor(
 
     }
 
-    fun updateQueuePriority(downloader: Downloader, priority: Int) {
-        queue.value.find { it.source.id == downloader.source.id }?.let {
-            it.updatePriority(downloader, priority)
+    suspend fun updateQueueOrder(/*downloader: Downloader*/) {
+        queue.value.forEach{
+            it.updateOrder()
         }
+        //queue.value.find { it.source.id == downloader.source.id }?.updateOrder()
     }
 
     suspend fun addDownload(mangaId: Long, chapterId: Long) {

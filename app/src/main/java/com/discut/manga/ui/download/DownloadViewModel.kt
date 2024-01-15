@@ -38,6 +38,11 @@ class DownloadViewModel @Inject constructor(
                 state
             }
 
+            is DownloadEvent.UpdateDownloadList -> {
+                downloadProvider.updateQueueOrder()
+                state
+            }
+
             else -> null
         }
     }

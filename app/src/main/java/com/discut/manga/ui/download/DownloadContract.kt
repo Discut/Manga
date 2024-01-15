@@ -14,6 +14,8 @@ data class DownloadState(
 sealed interface DownloadEvent : UiEvent {
     data object Init : DownloadEvent
     data class Cancel(val download: Downloader) : DownloadEvent
+
+    data object UpdateDownloadList : DownloadEvent
 }
 
 sealed interface DownloadEffect : UiEffect
