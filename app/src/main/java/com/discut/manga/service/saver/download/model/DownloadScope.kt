@@ -324,4 +324,47 @@ class DownloadScope {
                 1
             }
         }
+
+    suspend fun updateOrder() {
+        // update order
+        val sorted = queueState.value.sortedBy { it.download.order }
+        var isContinue = false
+        sorted.forEachIndexed { index, downloader ->
+            if (downloader.download.id != queueState.value[index].download.id) {
+                isContinue = true
+            }
+        }
+        if (!isContinue) {
+            return
+        }
+        _queueState.update {
+            sorted
+        }
+        val needStopDownloader: MutableMap<Downloader, Job> = mutableMapOf()
+        // update downloading status
+        activeDownloaderJobs.keys.forEach {
+            val index = queueState.value.indexOf(it)
+            if (index in 0..MAX_DOWNLOADS) {
+                return@forEach
+            }
+            it.status = Downloader.DownloadState.Waiting
+            needStopDownloader[it] = activeDownloaderJobs[it]!!
+        }
+        _activeDownloaderJobsFlow.update { it ->
+            it.toMutableMap().apply {
+                needStopDownloader.keys.forEach {
+                    remove(it)
+                }
+            }
+        }
+        withIOContext {
+            queueState.value.forEach {
+/*            // update order from double to int
+            it.download = it.download.copy(order = queueState.value.indexOf(it).toDouble())*/
+                // update db
+                downloadProvider.updateOrInsertDownload(it.download)
+            }
+        }
+
+    }
 }

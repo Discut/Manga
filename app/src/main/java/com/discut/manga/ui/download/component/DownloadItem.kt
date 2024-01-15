@@ -47,11 +47,14 @@ import com.discut.manga.service.saver.download.model.Downloader
 import com.discut.manga.theme.alpha
 import com.discut.manga.theme.padding
 import com.discut.manga.util.toPx
+import org.burnoutcrew.reorderable.ReorderableLazyListState
+import org.burnoutcrew.reorderable.detectReorder
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DownloadItem(
     modifier: Modifier = Modifier,
+    state: ReorderableLazyListState,
     downloader: Downloader,
     onCancel: () -> Unit
 ) {
@@ -141,7 +144,9 @@ fun DownloadItem(
                 title = downloader.chapter.name,
                 iconWidget = {
                     Icon(
-                        modifier = Modifier.padding(MaterialTheme.padding.Normal),
+                        modifier = Modifier
+                            .detectReorder(state)
+                            .padding(MaterialTheme.padding.Normal),
                         imageVector = Icons.Outlined.Menu,
                         contentDescription = "Drag"
                     )
