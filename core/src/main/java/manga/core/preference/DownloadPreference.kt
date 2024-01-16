@@ -70,6 +70,10 @@ class DownloadPreference(appPreference: SharedPreferences, flow: Flow<String?>) 
     fun getIsWifiOnlyAsFlow(): Flow<Boolean> =
         getValueAsFlow("enable_wifi_only", false)
 
+    fun getIsWifiOnly(): Boolean {
+        return getValue("enable_wifi_only", false)
+    }
+
 
     fun setWifiOnly(enable: Boolean) {
         edit {
