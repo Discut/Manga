@@ -1,16 +1,19 @@
 package com.discut.manga.ui.settings.download
 
 import android.content.Context
+import androidx.compose.runtime.MutableState
 import androidx.lifecycle.viewModelScope
 import com.discut.core.mvi.BaseViewModel
 import com.discut.manga.App
 import com.discut.manga.util.get
 import com.discut.manga.util.launchIO
+import com.discut.manga.util.launchUI
 import com.discut.manga.util.withIOContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.launchIn
@@ -28,20 +31,26 @@ class DownloadSettingsViewModel @Inject constructor(
 
     private val downloadPreference = PreferenceManager.get<DownloadPreference>()
     override fun initialState(): DownloadSettingsState = DownloadSettingsState(
-        downloadInterval = downloadPreference.getDownloadInterval()
+        downloadInterval = MutableStateFlow(downloadPreference.getDownloadInterval()),
+        wifiOnly = MutableStateFlow(downloadPreference.getIsWifiOnly())
     )
 
     init {
         sendEvent(DownloadSettingsEvent.Init)
-        downloadPreference.getDownloadIntervalAsFlow()
-            .distinctUntilChanged()
-            .onEach {
-                sendState {
-                    copy(
-                        downloadInterval = it
-                    )
-                }
-            }.launchIn(viewModelScope)
+
+        viewModelScope.launchIO {
+            val wifiOnlyFlow = downloadPreference.getIsWifiOnlyAsFlow().distinctUntilChanged()
+                .stateIn(CoroutineScope(Dispatchers.IO))
+            val downloadInterval =
+                downloadPreference.getDownloadIntervalAsFlow().distinctUntilChanged()
+                    .stateIn(CoroutineScope(Dispatchers.IO))
+            sendState {
+                copy(
+                    wifiOnly = wifiOnlyFlow,
+                    downloadInterval = downloadInterval
+                )
+            }
+        }
     }
 
     override suspend fun handleEvent(
@@ -70,14 +79,16 @@ class DownloadSettingsViewModel @Inject constructor(
                 )
             }
 
-            is DownloadSettingsEvent.DownloadDirChanged -> TODO()
+            is DownloadSettingsEvent.DownloadDirChanged -> {
+                downloadPreference.setDownloadDirectory(event.dir)
+                state
+            }
+
             is DownloadSettingsEvent.DownloadIntervalChanged -> {
                 downloadPreference.setDownloadInterval(
                     event.interval
                 )
-                state.copy(
-                    downloadInterval = event.interval
-                )
+                state
             }
 
             is DownloadSettingsEvent.WifiOnlyChanged -> {

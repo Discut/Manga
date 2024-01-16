@@ -46,7 +46,7 @@ fun DownloadSettingsScreen(
     vm: DownloadSettingsViewModel = hiltViewModel(),
     onBack: () -> Unit
 ) {
-    val state by vm.uiState.collectAsState()
+    val state by vm.uiState.collectAsStateWithLifecycle()
     val scrollBehavior =
         TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
     Scaffold(
@@ -77,12 +77,15 @@ fun DownloadSettingsScreen(
             wifiOnly = state.wifiOnly.collectAsStateWithLifecycle().value,
             downloadDirs = state.downloadDirMap,
             downloadDefaultDirKey = state.downloadDirDefault,
-            downloadInterval = state.downloadInterval,
+            downloadInterval = state.downloadInterval.collectAsStateWithLifecycle().value,
             onWifiOnlyPreferenceClick = { value ->
                 vm.sendEvent(DownloadSettingsEvent.WifiOnlyChanged(value))
             },
             onDownloadIntervalChanged = { value ->
                 vm.sendEvent(DownloadSettingsEvent.DownloadIntervalChanged(value))
+            },
+            onDownloadDirChanged = { value ->
+                vm.sendEvent(DownloadSettingsEvent.DownloadDirChanged(value))
             }
         )
     }
@@ -98,7 +101,8 @@ private fun Content(
     downloadInterval: Int = 0,
 
     onWifiOnlyPreferenceClick: (Boolean) -> Unit,
-    onDownloadIntervalChanged: (Int) -> Unit
+    onDownloadIntervalChanged: (Int) -> Unit,
+    onDownloadDirChanged: (String) -> Unit
 ) {
     val context = LocalContext.current
     var selectedDir by remember { mutableStateOf(downloadDirs[downloadDefaultDirKey]) }
@@ -108,6 +112,9 @@ private fun Content(
         if (result.resultCode == Activity.RESULT_OK) {
             val data: Intent? = result.data
             selectedDir = getRealPathFromURI(context = context, uri = data?.data!!)
+            selectedDir?.let {
+                onDownloadDirChanged(selectedDir!!)
+            }
         }
     }
     val downloadDirState = rememberRadioPreferenceState(data = downloadDirs,
@@ -118,6 +125,9 @@ private fun Content(
                 launcher.launch(intent)
             } else {
                 selectedDir = downloadDirs[k] ?: ""
+                if (!selectedDir.isNullOrBlank()) {
+                    onDownloadDirChanged(selectedDir!!)
+                }
             }
         })
     val downloadIntervalState = rememberRadioPreferenceState(

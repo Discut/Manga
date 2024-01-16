@@ -7,11 +7,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 data class DownloadSettingsState(
-    val wifiOnly: StateFlow<Boolean> = MutableStateFlow(true),
+    val wifiOnly: StateFlow<Boolean>,
     val downloadDir: StateFlow<String> = MutableStateFlow(""),
     val downloadDirDefault: String = "",
     val downloadDirMap: Map<String, String> = emptyMap(),
-    val downloadInterval: Int = 0
+    val downloadInterval: StateFlow<Int>
 ) : UiState
 
 
