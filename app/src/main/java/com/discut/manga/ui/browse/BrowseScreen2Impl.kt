@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import com.discut.manga.theme.padding
 import com.discut.manga.ui.browse.component.SourceItem
 import discut.manga.source.local.LocalSource
-import managa.source.Source
+import manga.source.Source
 
 @Composable
 internal fun <S : Source> BrowseScreen2Impl(

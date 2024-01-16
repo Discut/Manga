@@ -51,9 +51,9 @@ internal fun MangaViewerContent(
         }
     }
 
-    Log.d("MangaViewerContent", "mangaList.itemCount = ${mangaList.itemCount}")
+/*    Log.d("MangaViewerContent", "mangaList.itemCount = ${mangaList.itemCount}")
     Log.d("MangaViewerContent", "mangaList.loadState.refresh = ${mangaList.loadState.refresh}")
-    Log.d("MangaViewerContent", "mangaList.loadState.append = ${mangaList.loadState.append}")
+    Log.d("MangaViewerContent", "mangaList.loadState.append = ${mangaList.loadState.append}")*/
 
     if (mangaList.itemCount == 0 && mangaList.loadState.refresh is LoadState.Loading) {
         LoadingScreen(

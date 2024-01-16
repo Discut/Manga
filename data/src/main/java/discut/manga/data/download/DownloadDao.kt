@@ -13,6 +13,11 @@ interface DownloadDao : BaseDao<Download> {
     fun getAll(): List<Download>
 
     @Query(
+        "SELECT * FROM download WHERE id = :id"
+    )
+    fun getById(id: Long): Download?
+
+    @Query(
         "SELECT * FROM download WHERE mangaId = :mangaId"
     )
     fun getAllByMangaId(mangaId: Long): List<Download>
@@ -32,4 +37,13 @@ interface DownloadDao : BaseDao<Download> {
     )
     fun getByMangaIdAndChapterId(mangaId: Long): List<Download>
 
+    @Query(
+        "SELECT * FROM download WHERE mangaId = :mangaId AND chapterId = :chapterId"
+    )
+    fun getByMangaIdAndChapterIdAsFlow(mangaId: Long, chapterId: Long): Flow<Download?>
+
+    @Query(
+        "UPDATE download SET `order` = :order WHERE id = :id"
+    )
+    fun updateOrder(id: Long, order: Double)
 }

@@ -21,7 +21,9 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
+import com.discut.manga.ui.download.DownloadScreen
 import com.discut.manga.ui.settings.SettingsScreen
+import com.discut.manga.ui.settings.download.DownloadSettingsScreen
 import com.discut.manga.ui.settings.security.SecuritySettingsScreen
 
 sealed class NavigationRoute(
@@ -53,6 +55,8 @@ sealed class NavigationRoute(
 
     data object SettingsScreen : NavigationRoute("settings") {
         data object Security : NavigationRoute("security")
+
+        data object Download : NavigationRoute("downloadSettings")
         data object SettingsMain : NavigationRoute("settingsMain")
     }
 }
@@ -67,6 +71,11 @@ fun NavGraphBuilder.settingsGraph(navController: NavController) {
         }
         composableWithAnimation(route = NavigationRoute.SettingsScreen.Security.route) {
             SecuritySettingsScreen {
+                navController.popBackStack()
+            }
+        }
+        composableWithAnimation(route = NavigationRoute.SettingsScreen.Download.route) {
+            DownloadSettingsScreen {
                 navController.popBackStack()
             }
         }

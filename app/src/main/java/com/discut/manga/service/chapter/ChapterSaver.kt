@@ -12,7 +12,7 @@ import discut.manga.data.chapter.Chapter
 import discut.manga.data.chapter.ChapterDao
 import discut.manga.data.manga.MangaDao
 import kotlinx.coroutines.flow.first
-import managa.source.domain.utils.ChapterRecognition
+import manga.source.domain.utils.ChapterRecognition
 import java.time.ZonedDateTime
 import java.util.Date
 import java.util.TreeSet

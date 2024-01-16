@@ -4,6 +4,7 @@ import com.discut.core.mvi.contract.UiEffect
 import com.discut.core.mvi.contract.UiEvent
 import com.discut.core.mvi.contract.UiState
 import com.discut.manga.domain.history.MangaChapterHistory
+import com.discut.manga.ui.manga.ChapterScope
 import discut.manga.data.category.Category
 import discut.manga.data.chapter.Chapter
 import discut.manga.data.manga.Manga
@@ -14,7 +15,7 @@ data class MangaDetailsState(
     internal val isLoading: Boolean = false,
     internal val manga: StateFlow<Manga?> = MutableStateFlow(null),
     internal val categories: List<Category> = emptyList(),
-    internal val chapters: StateFlow<List<Chapter>> = MutableStateFlow(emptyList()),
+    internal val chapters: StateFlow<List<ChapterScope>> = MutableStateFlow(emptyList()),
     internal val currentHistory: StateFlow<MangaChapterHistory?> = MutableStateFlow(null)
 ) : UiState
 
@@ -38,10 +39,14 @@ sealed interface MangaDetailsEvent : UiEvent {
 
     data class DownloadChapter(val manga: Manga, val chapter: Chapter) : MangaDetailsEvent
 
+    data class DeleteChapter(val manga: Manga, val chapter: Chapter) : MangaDetailsEvent
+
 }
 
 sealed interface MangaDetailsEffect : UiEffect {
     data class JumpToRead(val mangaId: Long, val chapterId: Long) : MangaDetailsEffect
+
+    data class NetworkError(val error: Throwable, val msg: String) : MangaDetailsEffect
 
 }
 

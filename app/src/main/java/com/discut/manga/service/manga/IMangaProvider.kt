@@ -4,8 +4,8 @@ import androidx.paging.PagingSource
 import com.discut.manga.data.manga.UpdateManga
 import discut.manga.data.manga.Manga
 import kotlinx.coroutines.flow.Flow
-import managa.source.domain.FilterList
-import managa.source.domain.SManga
+import manga.source.domain.FilterList
+import manga.source.domain.SManga
 import java.time.ZonedDateTime
 
 

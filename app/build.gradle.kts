@@ -8,6 +8,9 @@ plugins {
 
 }
 
+val SUPPORTED_ABIS = setOf("armeabi-v7a", "arm64-v8a"/*, "x86", "x86_64"*/)
+
+
 android {
     namespace = "com.discut.manga"
     compileSdk = 34
@@ -20,11 +23,29 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        ndk {
+            abiFilters += SUPPORTED_ABIS
+        }
+        splits {
+            abi {
+                isEnable = true
+                reset()
+                include(*SUPPORTED_ABIS.toTypedArray())
+                isUniversalApk = true
+            }
+        }
     }
 
     buildTypes {
+        debug {
+            versionNameSuffix = "-debug"
+            applicationIdSuffix = ".debug"
+            isPseudoLocalesEnabled = true
+        }
         release {
-            isMinifyEnabled = false
+            isShrinkResources = true
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -51,6 +72,7 @@ dependencies {
     implementation(project(mapOf("path" to ":common-res")))
     val roomVersion = "2.5.1"
     val composeBom = platform("androidx.compose:compose-bom:2023.01.00")
+    //val composeBom = platform("dev.chrisbanes.compose:compose-bom:2024.01.00-alpha01")
 
     implementation(project(mapOf("path" to ":data")))
     implementation(project(mapOf("path" to ":source-local")))
@@ -110,12 +132,15 @@ dependencies {
     }
 
     // Image Loading
-    implementation(libs.subsamplingscaleimageview){
+    implementation(libs.subsamplingscaleimageview) {
         exclude(module = "image-decoder")
     }
     implementation(libs.image.decoder)
     implementation(platform(libs.coil.bom))
     implementation(libs.bundles.coil)
+
+    //animate icon
+    implementation(libs.lottie)
 
     // Room
     // To use Kotlin annotation processing tool (kapt)

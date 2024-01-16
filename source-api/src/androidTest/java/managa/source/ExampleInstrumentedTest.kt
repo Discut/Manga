@@ -1,4 +1,4 @@
-package managa.source
+package manga.source
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

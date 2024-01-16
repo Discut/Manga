@@ -10,12 +10,10 @@ import com.discut.manga.ui.reader.viewer.domain.ReaderPage
 import discut.manga.data.chapter.Chapter
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import managa.source.HttpSource
-import managa.source.domain.Page
-import managa.source.extensions.toInputStream
+import manga.source.HttpSource
+import manga.source.extensions.toInputStream
 
 class HttpPageLoader(
     private val chapter: Chapter,

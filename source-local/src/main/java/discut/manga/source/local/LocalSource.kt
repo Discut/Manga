@@ -5,11 +5,11 @@ import discut.manga.source.local.disk.LocalSourceFileSystem
 import discut.manga.source.local.manager.LocalMangaManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import managa.source.Source
-import managa.source.domain.FilterList
-import managa.source.domain.SChapter
-import managa.source.domain.SManga
-import managa.source.domain.SMangas
+import manga.source.Source
+import manga.source.domain.FilterList
+import manga.source.domain.SChapter
+import manga.source.domain.SManga
+import manga.source.domain.SMangas
 
 class LocalSource(
     private val context: Context,

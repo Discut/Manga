@@ -7,8 +7,8 @@ import com.discut.manga.service.source.ISourceManager
 import discut.manga.data.MangaAppDatabase
 import discut.manga.data.manga.Manga
 import kotlinx.coroutines.flow.Flow
-import managa.source.domain.FilterList
-import managa.source.domain.SManga
+import manga.source.domain.FilterList
+import manga.source.domain.SManga
 import java.time.ZonedDateTime
 import javax.inject.Inject
 import javax.inject.Singleton

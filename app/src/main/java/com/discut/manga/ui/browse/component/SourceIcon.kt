@@ -10,7 +10,7 @@ import androidx.compose.ui.unit.dp
 import com.discut.manga.R
 import com.discut.manga.service.source.isLocal
 import com.discut.manga.ui.browse.extensions.icon
-import managa.source.Source
+import manga.source.Source
 
 @Composable
 fun SourceIcon(

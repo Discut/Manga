@@ -1,65 +1,45 @@
 package com.discut.manga.ui.download
 
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import android.util.Log
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.outlined.Menu
-import androidx.compose.material.icons.outlined.MoreVert
-import androidx.compose.material3.DismissDirection
-import androidx.compose.material3.DismissValue
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.discut.manga.components.preference.BasePreferenceComponent
 import com.discut.manga.components.scaffold.AppBarActions
 import com.discut.manga.components.scaffold.SearchAppToolbar
 import com.discut.manga.theme.alpha
 import com.discut.manga.theme.padding
-import com.discut.manga.util.toPx
+import com.discut.manga.ui.download.component.DownloadItem
+import org.burnoutcrew.reorderable.ReorderableItem
+import org.burnoutcrew.reorderable.rememberReorderableLazyListState
+import org.burnoutcrew.reorderable.reorderable
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun DownloadScreen(
-    vm: DownloadViewModel = hiltViewModel()
+    vm: DownloadViewModel = hiltViewModel(),
+    onBack: () -> Unit
 ) {
     val state by vm.uiState.collectAsState()
+    var queryKey by remember { mutableStateOf("") }
     Scaffold(
         topBar = {
             SearchAppToolbar(
@@ -72,139 +52,132 @@ fun DownloadScreen(
                 actions = {
                     AppBarActions {
                         toOverflowAction {
+                            title = "Start All"
+                            onClick = {
+                                vm.sendEvent {
+                                    DownloadEvent.StartAllDownloads
+                                }
+                            }
+                        }
+                        toOverflowAction {
+                            title = "Pause All"
+                            onClick = {
+                                vm.sendEvent {
+                                    DownloadEvent.PauseAllDownloads
+                                }
+                            }
+                        }
+                        toOverflowAction {
                             title = "Cancel All"
+                            onClick = {
+                                vm.sendEvent {
+                                    DownloadEvent.CancelAllDownloads
+                                }
+                            }
                         }
                     }
-                }
+                },
+                defaultSearchKey = queryKey,
+                onChangeSearchKey = {
+                    queryKey = it
+                },
+                onBack = onBack
             )
         }
     ) { paddingValues ->
         val downloads by state.downloads.collectAsStateWithLifecycle()
+        LaunchedEffect(key1 = downloads) {
+            Log.d("DownloadScreen", downloads.toString())
+        }
         Column(modifier = Modifier.padding(paddingValues)) {
-            downloads.forEach { it ->
-                val downloaderList by it.collectAsStateWithLifecycle()
-                if (downloaderList.isEmpty()) {
+            downloads.forEach { (source, downloads) ->
+                if (downloads.isEmpty()) {
                     return@forEach
                 }
+                val sortedList = downloads.sortedBy { it.download.order }
                 Text(
-                    text = downloaderList.first().source.name,
+                    text = source.name,
                     modifier = Modifier
                         .padding(horizontal = MaterialTheme.padding.Normal)
                         .alpha(MaterialTheme.alpha.Normal)
                 )
-                LazyColumn {
-                    items(items = downloaderList, key = { it.download.id }) {
-                        val positionalThreshold = 80.dp.toPx()
-                        val dismissState = rememberDismissState(
-                            positionalThreshold = {
-                                positionalThreshold
-                            },
-                            confirmValueChange = {
-                                it != DismissValue.DismissedToStart
-                            }
+                var unrealDownloaderList by remember { mutableStateOf(sortedList) }
+                LaunchedEffect(key1 = downloads) {
+                    unrealDownloaderList = sortedList
+                }
+                val reorderableState = rememberReorderableLazyListState(
+                    onMove = { from, to ->
+                        unrealDownloaderList = unrealDownloaderList.toMutableList().apply {
+                            add(to.index, removeAt(from.index))
+                        }
+                        Log.i(
+                            "DownloadScreen", "before ${
+                                unrealDownloaderList.map {
+                                    "${it.chapter.name}:${it.download.order}  "
+                                }
+                            }"
                         )
-                        SwipeToDismissBox(modifier = Modifier.animateItemPlacement(),
-                            state = dismissState,
-                            directions = setOf(DismissDirection.StartToEnd),
-                            backgroundContent = {
-                                val direction =
-                                    dismissState.dismissDirection ?: return@SwipeToDismissBox
-                                val color by animateColorAsState(
-                                    when (dismissState.targetValue) {
-                                        DismissValue.Default -> Color.LightGray
-                                        DismissValue.DismissedToEnd -> Color.Red
-                                        DismissValue.DismissedToStart -> Color.Red
-                                    },
-                                    label = "swipe color"
-                                )
-                                val alignment = when (direction) {
-                                    DismissDirection.StartToEnd -> Alignment.CenterStart
-                                    DismissDirection.EndToStart -> Alignment.CenterEnd
-                                }
-                                val icon = when (direction) {
-                                    DismissDirection.StartToEnd -> Icons.Default.Delete
-                                    DismissDirection.EndToStart -> Icons.Default.Done
-                                }
-                                val scale by animateFloatAsState(
-                                    if (dismissState.targetValue == DismissValue.Default) 0.75f else 1f,
-                                    label = "swipe scale"
-                                )
 
-                                Box(
-                                    Modifier
-                                        .fillMaxSize()
-                                        .background(color)
-                                        .padding(horizontal = 20.dp),
-                                    contentAlignment = alignment
-                                ) {
-                                    Icon(
-                                        icon,
-                                        contentDescription = "Localized description",
-                                        modifier = Modifier.scale(scale)
-                                    )
+                        unrealDownloaderList.forEachIndexed { index, it ->
+                            it.download = it.download.copy(order = index.toDouble())
+                        }
+                        Log.i("DownloadScreen", unrealDownloaderList.map {
+                            "${it.chapter.name}:${it.download.order}  "
+                        }.toString())
+                    },
+                    onDragEnd = { _, _ ->
+                        vm.sendEvent {
+                            DownloadEvent.UpdateDownloadList(
+                                source,
+                                unrealDownloaderList.associate {
+                                    it.download.id to it.download.order
                                 }
-                            }) {
-                            val progress by it.progressFlow.collectAsStateWithLifecycle(initialValue = 0)
-                            var progressText by remember { mutableStateOf("") }
-                            LaunchedEffect(key1 = progress) {
-                                progressText = "${it.downloadedImages}/${it.pages?.size}"
-                            }
-                            BasePreferenceComponent(
-                                modifier = Modifier.background(color = MaterialTheme.colorScheme.surface),
-                                title = it.chapter.name,
-                                iconWidget = {
-                                    Icon(
-                                        modifier = Modifier.padding(MaterialTheme.padding.Normal),
-                                        imageVector = Icons.Outlined.Menu,
-                                        contentDescription = "Drag"
-                                    )
-                                },
-                                endWidget = {
-                                    var expanded by remember { mutableStateOf(false) }
-                                    IconButton(
-                                        onClick = { expanded = !expanded },
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Outlined.MoreVert,
-                                            contentDescription = "More",
-                                        )
-                                    }
-                                    DropdownMenu(
-                                        expanded = expanded,
-                                        onDismissRequest = { expanded = false },
-                                    ) {
-                                        DropdownMenuItem(
-                                            text = { Text(text = "Stop") },
-                                            onClick = { /*TODO*/ })
-                                        DropdownMenuItem(
-                                            text = { Text(text = "Cancel") },
-                                            onClick = { /*TODO*/ })
+                            )
+                        }
+                    })
+                val data by derivedStateOf {
+                    unrealDownloaderList
+                        .filter {
+                            it.chapter.name.contains(queryKey) || it.manga.title.contains(
+                                queryKey
+                            )
+                        }.toMutableStateList()
+                }
+                LazyColumn(
+                    state = reorderableState.listState,
+                    modifier = Modifier.reorderable(reorderableState),
+                ) {
+                    items(items = data, key = { it.download.id }) {
+                        ReorderableItem(
+                            reorderableState = reorderableState,
+                            key = it.download.id,
+                        ) { isDragging ->
+                            val elevation by
+                            animateDpAsState(if (isDragging) 4.dp else 0.dp, label = "")
+                            DownloadItem(
+                                modifier = Modifier
+                                    .shadow(elevation),
+                                downloader = it,
+                                state = reorderableState,
+                                onCancel = {
+                                    vm.sendEvent {
+                                        DownloadEvent.Cancel(it)
                                     }
                                 },
-                                subWidget = {
-                                    Row(
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        modifier = Modifier.fillMaxWidth()
-                                    ) {
-                                        Text(
-                                            text = it.manga.title,
-                                            maxLines = 1,
-                                            style = MaterialTheme.typography.bodySmall,
-                                            modifier = Modifier.alpha(MaterialTheme.alpha.Normal)
-                                        )
-
-                                        Text(
-                                            text = progressText,
-                                            maxLines = 1,
-                                            style = MaterialTheme.typography.bodySmall,
-                                            modifier = Modifier.alpha(MaterialTheme.alpha.Normal)
-                                        )
+                                onStart = {
+                                    vm.sendEvent {
+                                        DownloadEvent.Start(it)
                                     }
-                                    LinearProgressIndicator(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(3.dp),
-                                        progress = { progress.toFloat() / 100 })
+                                },
+                                onPause = {
+                                    vm.sendEvent {
+                                        DownloadEvent.Pause(it)
+                                    }
+                                },
+                                onRetry = {
+                                    vm.sendEvent {
+                                        DownloadEvent.Retry(it)
+                                    }
                                 }
                             )
                         }
