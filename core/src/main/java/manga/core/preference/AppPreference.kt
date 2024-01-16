@@ -5,8 +5,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 
-open class AppPreference constructor(
+open class AppPreference(
     private val appPreference: SharedPreferences,
     private val keysFlow: Flow<String?>
 ) {
@@ -25,8 +26,9 @@ open class AppPreference constructor(
 
     protected fun <T> getValueAsFlow(key: String, defaultValue: T): Flow<T> {
         return keysFlow.filter {
-            key == it
+            key == it || it == null
         }
+            .onStart { emit(key) }
             .map { getValue(key, defaultValue) }
             .conflate()
     }
