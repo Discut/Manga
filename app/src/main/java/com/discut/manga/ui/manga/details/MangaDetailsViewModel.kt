@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
+import manga.core.network.interceptor.NetworkException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -167,7 +168,16 @@ class MangaDetailsViewModel @Inject constructor(
             }
 
             is MangaDetailsEvent.DownloadChapter -> {
-                downloadProvider.addDownload(event.manga.id, event.chapter.id)
+                try {
+                    downloadProvider.addDownload(event.manga.id, event.chapter.id)
+                } catch (e: NetworkException) {
+                    sendEffect(
+                        MangaDetailsEffect.NetworkError(
+                            e,
+                            "Unable to download chapter, please check your network connection and try again"
+                        )
+                    )
+                }
                 state
             }
         }
