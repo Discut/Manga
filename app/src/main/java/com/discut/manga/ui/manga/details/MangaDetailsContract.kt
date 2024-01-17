@@ -44,5 +44,7 @@ sealed interface MangaDetailsEvent : UiEvent {
 sealed interface MangaDetailsEffect : UiEffect {
     data class JumpToRead(val mangaId: Long, val chapterId: Long) : MangaDetailsEffect
 
+    data class NetworkError(val error: Throwable, val msg: String) : MangaDetailsEffect
+
 }
 
