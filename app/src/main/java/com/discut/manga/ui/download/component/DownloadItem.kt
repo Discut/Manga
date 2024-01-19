@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material3.DismissDirection
@@ -41,12 +42,12 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.discut.manga.components.preference.BasePreferenceComponent
 import com.discut.manga.service.saver.download.model.Downloader
 import com.discut.manga.theme.alpha
 import com.discut.manga.theme.padding
 import com.discut.manga.util.toPx
+import discut.manga.data.download.DownloadState
 import org.burnoutcrew.reorderable.ReorderableLazyListState
 import org.burnoutcrew.reorderable.detectReorder
 
@@ -56,7 +57,10 @@ fun DownloadItem(
     modifier: Modifier = Modifier,
     state: ReorderableLazyListState,
     downloader: Downloader,
-    onCancel: () -> Unit
+    onCancel: () -> Unit,
+    onPause: () -> Unit,
+    onStart: () -> Unit,
+    onRetry: () -> Unit
 ) {
     val positionalThreshold = 80.dp.toPx()
     val dismissState = rememberDismissState(
@@ -134,12 +138,6 @@ fun DownloadItem(
                 )
             }
         }) {
-        val innerProgress by downloader.progressFlow.collectAsStateWithLifecycle(initialValue = 0)
-        val progress by animateFloatAsState(targetValue = innerProgress / 100f, label = "")
-        var progressText by remember { mutableStateOf("") }
-        LaunchedEffect(key1 = innerProgress) {
-            progressText = "${downloader.downloadedImages}/${downloader.pages?.size}"
-        }
         Surface {
             BasePreferenceComponent(
                 title = downloader.chapter.name,
@@ -154,23 +152,71 @@ fun DownloadItem(
                 },
                 endWidget = {
                     var expanded by remember { mutableStateOf(false) }
-                    IconButton(
-                        onClick = { expanded = !expanded },
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.MoreVert,
-                            contentDescription = "More",
-                        )
-                        DropdownMenu(
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false },
-                        ) {
-                            DropdownMenuItem(
-                                text = { Text(text = "Stop") },
-                                onClick = { /*TODO*/ })
-                            DropdownMenuItem(
-                                text = { Text(text = "Cancel") },
-                                onClick = { /*TODO*/ })
+                    when (downloader.status) {
+                        is Downloader.DownloadState.Error -> {
+                            IconButton(
+                                onClick = { },
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.ErrorOutline,
+                                    contentDescription = "Error",
+                                    tint = Color.Red
+                                )
+                            }
+                        }
+
+                        else -> {
+                            IconButton(
+                                onClick = { expanded = !expanded },
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.MoreVert,
+                                    contentDescription = "More",
+                                )
+
+                                DropdownMenu(
+                                    expanded = expanded,
+                                    onDismissRequest = { expanded = false },
+                                ) {
+                                    when (downloader.download.status) {
+                                        DownloadState.NotInQueue, DownloadState.Completed, DownloadState.Error -> {
+
+
+                                        }
+
+                                        DownloadState.Waiting, DownloadState.Downloading -> {
+                                            DropdownMenuItem(
+                                                text = { Text(text = "Pause") },
+                                                onClick = {
+                                                    onPause()
+                                                    expanded = false
+                                                }
+                                            )
+                                        }
+
+                                        DownloadState.InQueue -> {
+                                            DropdownMenuItem(
+                                                text = { Text(text = "Start") },
+                                                onClick = {
+                                                    onStart()
+                                                    expanded = false
+                                                }
+                                            )
+                                        }
+                                    }
+                                    DropdownMenuItem(text = { Text(text = "Retry") }, onClick = {
+                                        onRetry()
+                                        expanded = false
+                                    })
+                                    /*DropdownMenuItem(
+                                        text = { Text(text = "Cancel") },
+                                        onClick = {
+                                            onCancel()
+                                            expanded = false
+                                        }
+                                    )*/
+                                }
+                            }
                         }
                     }
                 },
@@ -187,17 +233,47 @@ fun DownloadItem(
                         )
 
                         Text(
-                            text = progressText,
+                            text = "${downloader.download.downloaded.size}/${downloader.pages?.size}",
                             maxLines = 1,
                             style = MaterialTheme.typography.bodySmall,
                             modifier = Modifier.alpha(MaterialTheme.alpha.Normal)
                         )
                     }
-                    LinearProgressIndicator(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(3.dp),
-                        progress = { progress })
+                    when (downloader.status) {
+                        Downloader.DownloadState.Downloaded -> {}
+                        Downloader.DownloadState.Downloading -> {
+                            LinearProgressIndicator(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(3.dp),
+                                progress = { downloader.download.downloaded.size.toFloat() / downloader.pages!!.size })
+                        }
+
+                        is Downloader.DownloadState.Error -> {
+                            Text(
+                                text = (downloader.status as Downloader.DownloadState.Error).msg,
+                                modifier = Modifier.fillMaxWidth(),
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+
+                        Downloader.DownloadState.InQueue -> {
+                            Text(
+                                text = "In Queue", modifier = Modifier.fillMaxWidth(),
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+
+                        Downloader.DownloadState.Waiting -> {
+                            LinearProgressIndicator(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(3.dp)
+                            )
+                        }
+                    }
+
+
                 }
             )
         }

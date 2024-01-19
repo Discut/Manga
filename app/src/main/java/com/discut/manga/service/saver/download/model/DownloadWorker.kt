@@ -75,12 +75,16 @@ class DownloadWorker(
 
     override suspend fun doWork(): Result {
         val scopeKey = inputData.getString(SCOPE_KEY) ?: return Result.failure()
+        Log.d("DownloadWorker", "Worker is running ,scopeKey is $scopeKey")
         var checkNetworkState = checkNetworkState(
             applicationContext.activeNetworkState(),
             downloadPreference.isWifiOnly(),
             scopeKey
         )
+        Log.d("DownloadWorker", "checkNetworkState is $checkNetworkState")
+        Log.d("DownloadWorker", "try launch download scope")
         var active = checkNetworkState && downloadProvider.launchDownloadScope(scopeKey)
+        Log.d("DownloadWorker", "active is $active")
         if (active.not()) {
             return Result.failure()
         }
@@ -131,7 +135,7 @@ class DownloadWorker(
 
         fun stopScope(context: Context, downloadScope: DownloadScope) {
             val workerTag = getWorkerTag(downloadScope.scopeTag)
-            downloadScope.pauseAll()
+            downloadScope.stop()
             WorkManager.getInstance(context)
                 .cancelUniqueWork(workerTag)
         }

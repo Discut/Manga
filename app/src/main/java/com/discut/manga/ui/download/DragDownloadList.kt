@@ -10,6 +10,6 @@ fun DownloadScreen(
     modifier: Modifier = Modifier,
     state: ReorderableLazyListState,
     list: SnapshotStateList<String>,
-    ) {
+) {
 
 }

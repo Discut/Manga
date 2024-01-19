@@ -41,4 +41,9 @@ interface DownloadDao : BaseDao<Download> {
         "SELECT * FROM download WHERE mangaId = :mangaId AND chapterId = :chapterId"
     )
     fun getByMangaIdAndChapterIdAsFlow(mangaId: Long, chapterId: Long): Flow<Download?>
+
+    @Query(
+        "UPDATE download SET `order` = :order WHERE id = :id"
+    )
+    fun updateOrder(id: Long, order: Double)
 }

@@ -2,6 +2,7 @@ package manga.source.domain
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import manga.core.network.ProgressListener
@@ -11,20 +12,24 @@ open class Page(
     val index: Int,
     val url: String = "",
     var imageUrl: String? = null,
+    @Transient
+    private val defaultStatus: State = State.QUEUE,
 ) : ProgressListener {
 
     val number: Int
         get() = index + 1
 
     @Transient
-    private val _statusFlow = MutableStateFlow(State.QUEUE)
+    private val _statusFlow: MutableStateFlow<State> = MutableStateFlow(defaultStatus)
 
     @Transient
     val statusFlow = _statusFlow.asStateFlow()
     var status: State
         get() = _statusFlow.value
         set(value) {
-            _statusFlow.value = value
+            _statusFlow.update {
+                value
+            }
         }
 
     @Transient

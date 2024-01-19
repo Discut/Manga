@@ -1,7 +1,9 @@
 package com.discut.manga.ui.download
 
+import androidx.lifecycle.viewModelScope
 import com.discut.core.mvi.BaseViewModel
 import com.discut.manga.service.saver.download.DownloadProvider
+import com.discut.manga.util.launchIO
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -16,8 +18,18 @@ class DownloadViewModel @Inject constructor(
     override fun initialState(): DownloadState = DownloadState()
 
     init {
-        sendEvent {
-            DownloadEvent.Init
+        viewModelScope.launchIO {
+            val downloads = downloadProvider.getAllDownloads()
+                .stateIn(
+                    CoroutineScope(
+                        Dispatchers.IO
+                    )
+                )
+            sendState {
+                copy(
+                    downloads = downloads
+                )
+            }
         }
     }
 
@@ -38,8 +50,39 @@ class DownloadViewModel @Inject constructor(
                 state
             }
 
+            is DownloadEvent.Pause -> {
+                downloadProvider.pauseDownload(event.download)
+                state
+            }
+
+            is DownloadEvent.Start -> {
+                downloadProvider.startDownload(event.download)
+                state
+            }
+
+            is DownloadEvent.Retry -> {
+                downloadProvider.retryDownload(event.download)
+                state
+            }
+
+
             is DownloadEvent.UpdateDownloadList -> {
-                downloadProvider.updateQueueOrder()
+                downloadProvider.updateQueueOrder(event.source, event.orders)
+                state
+            }
+
+            is DownloadEvent.StartAllDownloads -> {
+                downloadProvider.startDownloads()
+                state
+            }
+
+            is DownloadEvent.PauseAllDownloads -> {
+                downloadProvider.pauseDownloads()
+                state
+            }
+
+            is DownloadEvent.CancelAllDownloads -> {
+                downloadProvider.cancelDownloads()
                 state
             }
 

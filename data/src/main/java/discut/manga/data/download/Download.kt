@@ -18,4 +18,5 @@ data class Download(
     val queue: List<Long>,
     val downloaded: List<Long>,
     val addAt: Long,
+    val remarks: String,
 )
