@@ -2,12 +2,10 @@ package com.discut.manga.ui.download
 
 import android.util.Log
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -41,6 +39,7 @@ fun DownloadScreen(
     onBack: () -> Unit
 ) {
     val state by vm.uiState.collectAsState()
+    var queryKey by remember { mutableStateOf("") }
     Scaffold(
         topBar = {
             SearchAppToolbar(
@@ -53,47 +52,95 @@ fun DownloadScreen(
                 actions = {
                     AppBarActions {
                         toOverflowAction {
+                            title = "Start All"
+                            onClick = {
+                                vm.sendEvent {
+                                    DownloadEvent.StartAllDownloads
+                                }
+                            }
+                        }
+                        toOverflowAction {
+                            title = "Pause All"
+                            onClick = {
+                                vm.sendEvent {
+                                    DownloadEvent.PauseAllDownloads
+                                }
+                            }
+                        }
+                        toOverflowAction {
                             title = "Cancel All"
-                            onClick = onBack
+                            onClick = {
+                                vm.sendEvent {
+                                    DownloadEvent.CancelAllDownloads
+                                }
+                            }
                         }
                     }
+                },
+                defaultSearchKey = queryKey,
+                onChangeSearchKey = {
+                    queryKey = it
                 }
             )
         }
     ) { paddingValues ->
         val downloads by state.downloads.collectAsStateWithLifecycle()
+        LaunchedEffect(key1 = downloads) {
+            Log.d("DownloadScreen", downloads.toString())
+        }
         Column(modifier = Modifier.padding(paddingValues)) {
-            downloads.forEach { it ->
-                val downloaderList by it.collectAsStateWithLifecycle()
-                var unrealDownloaderList by remember { mutableStateOf(downloaderList) }
-                /*                LaunchedEffect(key1 = downloaderList) {
-                                    unrealDownloaderList = downloaderList
-                                }*/
-                if (downloaderList.isEmpty()) {
+            downloads.forEach { (source, downloads) ->
+                if (downloads.isEmpty()) {
                     return@forEach
                 }
+                val sortedList = downloads.sortedBy { it.download.order }
                 Text(
-                    text = downloaderList.first().source.name,
+                    text = source.name,
                     modifier = Modifier
                         .padding(horizontal = MaterialTheme.padding.Normal)
                         .alpha(MaterialTheme.alpha.Normal)
                 )
+                var unrealDownloaderList by remember { mutableStateOf(sortedList) }
+                LaunchedEffect(key1 = downloads) {
+                    unrealDownloaderList = sortedList
+                }
                 val reorderableState = rememberReorderableLazyListState(
                     onMove = { from, to ->
                         unrealDownloaderList = unrealDownloaderList.toMutableList().apply {
                             add(to.index, removeAt(from.index))
                         }
+                        Log.i(
+                            "DownloadScreen", "before ${
+                                unrealDownloaderList.map {
+                                    "${it.chapter.name}:${it.download.order}  "
+                                }
+                            }"
+                        )
+
                         unrealDownloaderList.forEachIndexed { index, it ->
                             it.download = it.download.copy(order = index.toDouble())
                         }
+                        Log.i("DownloadScreen", unrealDownloaderList.map {
+                            "${it.chapter.name}:${it.download.order}  "
+                        }.toString())
                     },
                     onDragEnd = { _, _ ->
                         vm.sendEvent {
-                            DownloadEvent.UpdateDownloadList
+                            DownloadEvent.UpdateDownloadList(
+                                source,
+                                unrealDownloaderList.associate {
+                                    it.download.id to it.download.order
+                                }
+                            )
                         }
                     })
                 val data by derivedStateOf {
-                    unrealDownloaderList.toMutableStateList()
+                    unrealDownloaderList
+                        .filter {
+                            it.chapter.name.contains(queryKey) || it.manga.title.contains(
+                                queryKey
+                            )
+                        }.toMutableStateList()
                 }
                 LazyColumn(
                     state = reorderableState.listState,
@@ -114,6 +161,21 @@ fun DownloadScreen(
                                 onCancel = {
                                     vm.sendEvent {
                                         DownloadEvent.Cancel(it)
+                                    }
+                                },
+                                onStart = {
+                                    vm.sendEvent {
+                                        DownloadEvent.Start(it)
+                                    }
+                                },
+                                onPause = {
+                                    vm.sendEvent {
+                                        DownloadEvent.Pause(it)
+                                    }
+                                },
+                                onRetry = {
+                                    vm.sendEvent {
+                                        DownloadEvent.Retry(it)
                                     }
                                 }
                             )

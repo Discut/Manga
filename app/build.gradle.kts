@@ -72,6 +72,7 @@ dependencies {
     implementation(project(mapOf("path" to ":common-res")))
     val roomVersion = "2.5.1"
     val composeBom = platform("androidx.compose:compose-bom:2023.01.00")
+    //val composeBom = platform("dev.chrisbanes.compose:compose-bom:2024.01.00-alpha01")
 
     implementation(project(mapOf("path" to ":data")))
     implementation(project(mapOf("path" to ":source-local")))

@@ -1,7 +1,9 @@
 package com.discut.manga.service.saver.download.model
 
+import com.discut.manga.data.transitionToDownloaderState
 import discut.manga.data.chapter.Chapter
 import discut.manga.data.download.Download
+import discut.manga.data.download.DownloadState
 import discut.manga.data.manga.Manga
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
@@ -12,6 +14,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.update
 import manga.source.HttpSource
 import manga.source.domain.Page
 
@@ -31,14 +34,18 @@ data class Downloader(
 
     @Transient
     private val _statusFlow: MutableStateFlow<DownloadState> =
-        MutableStateFlow(DownloadState.Waiting)
+        MutableStateFlow(
+            download.transitionToDownloaderState()
+        )
 
     @Transient
     val statusFlow = _statusFlow.asStateFlow()
     var status: DownloadState
         get() = _statusFlow.value
         set(status) {
-            _statusFlow.value = status
+            _statusFlow.update {
+                status
+            }
         }
 
     @OptIn(FlowPreview::class)
@@ -67,9 +74,18 @@ data class Downloader(
     sealed interface DownloadState {
         data object Downloading : DownloadState
         data object Downloaded : DownloadState
-        data class Error(val error: Throwable, val msg: String) : DownloadState
+        data class Error(val error: Throwable? = null, val msg: String) : DownloadState
         data object Waiting : DownloadState
 
         data object InQueue : DownloadState
     }
+
+}
+
+fun Downloader.DownloadState.getNumber() = when (this) {
+    Downloader.DownloadState.Downloading -> 0
+    Downloader.DownloadState.Waiting -> 1
+    Downloader.DownloadState.InQueue -> 2
+    is Downloader.DownloadState.Error -> 3
+    Downloader.DownloadState.Downloaded -> 2
 }

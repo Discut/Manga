@@ -3,11 +3,9 @@ package com.discut.manga.ui.settings.download
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.database.Cursor
 import android.net.Uri
 import android.os.Environment
 import android.provider.DocumentsContract
-import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -24,7 +22,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -132,12 +129,8 @@ private fun Content(
         })
     val downloadIntervalState = rememberRadioPreferenceState(
         default = downloadInterval,
-        data = mapOf(
-            0 to "0",
-            100 to "100",
-            200 to "200",
-            300 to "300",
-        ), onSelected = { key, _ ->
+        data = DOWNLOAD_INTERVAL_MAP,
+        onSelected = { key, _ ->
             onDownloadIntervalChanged(key)
         }
     )
@@ -180,3 +173,10 @@ fun getRealPathFromURI(context: Context, uri: Uri): String {
     if (!base.isDirectory) throw Exception("'${uri}' cannot be resolved in a valid path")
     return File(base, split[1]).canonicalPath.toString()
 }
+
+private val DOWNLOAD_INTERVAL_MAP = mapOf(
+    0 to "0",
+    500 to "0.5s",
+    1000 to "1s",
+    2000 to "2s",
+)
