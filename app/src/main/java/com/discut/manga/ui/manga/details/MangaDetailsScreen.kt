@@ -218,6 +218,19 @@ fun MangaDetailsScreen(
                                     vm.sendEvent(MangaDetailsEvent.BootSync(mangaId))
                                 }
                             }
+                            toOverflowAction {
+                                title = "download"
+                                onClick = {
+                                    FlowBus.with<ToRouteEvent>()
+                                        .post(
+                                            scope,
+                                            ToRouteEvent(
+                                                NavigationRoute.DownloadScreen.route,
+                                                popup = false
+                                            )
+                                        )
+                                }
+                            }
                         }
                     })
             },
