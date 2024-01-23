@@ -164,6 +164,15 @@ class DownloadProvider @Inject constructor(
     }
 
 
+    suspend fun deleteDownload(mangaId: Long, chapterId: Long) {
+        withIOContext {
+            checkDataAndRun(mangaId, chapterId) { manga, chapter, source ->
+                cancelDownload(buildDownloader(manga, chapter, source))
+            }
+        }
+    }
+
+
     /**
      * 取消下载
      */
