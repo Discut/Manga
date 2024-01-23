@@ -39,6 +39,8 @@ sealed interface MangaDetailsEvent : UiEvent {
 
     data class DownloadChapter(val manga: Manga, val chapter: Chapter) : MangaDetailsEvent
 
+    data class DeleteChapter(val manga: Manga, val chapter: Chapter) : MangaDetailsEvent
+
 }
 
 sealed interface MangaDetailsEffect : UiEffect {

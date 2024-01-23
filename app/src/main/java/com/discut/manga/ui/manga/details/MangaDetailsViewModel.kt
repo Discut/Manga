@@ -180,6 +180,20 @@ class MangaDetailsViewModel @Inject constructor(
                 }
                 state
             }
+
+            is MangaDetailsEvent.DeleteChapter -> {
+                try {
+                    downloadProvider.deleteDownload(event.manga.id, event.chapter.id)
+                } catch (e: NetworkException) {
+                    sendEffect(
+                        MangaDetailsEffect.NetworkError(
+                            e,
+                            "Unable to delete chapter, please check your network connection and try again"
+                        )
+                    )
+                }
+                state
+            }
         }
     }
 

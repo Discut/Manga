@@ -26,6 +26,8 @@ import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.twotone.CropRotate
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FilledIconButton
@@ -398,6 +400,11 @@ fun MangaDetailsScreen(
                                     },
                                     onDownloadedClick = {
 
+                                    },
+                                    onDeleteClick = {
+                                        vm.sendEvent {
+                                            MangaDetailsEvent.DeleteChapter(manga!!, chapter)
+                                        }
                                     }
                                 )
                             },
@@ -522,7 +529,8 @@ private fun DownloadIcon(
     chapterScope: ChapterScope,
     onDownloadClick: () -> Unit,
     onProgressingClick: () -> Unit,
-    onDownloadedClick: () -> Unit
+    onDownloadedClick: () -> Unit,
+    onDeleteClick: () -> Unit = {}
 ) {
     val downloadState by chapterScope.downloadState.collectAsStateWithLifecycle()
     CompositionLocalProvider(
@@ -556,11 +564,27 @@ private fun DownloadIcon(
             }
 
             DownloadState.Completed -> {
-                IconButton(onClick = onDownloadedClick) {
+                var expending by remember {
+                    mutableStateOf(false)
+                }
+                IconButton(onClick = {
+                    onDownloadedClick()
+                    expending = true
+                }) {
                     Icon(
                         imageVector = Icons.Outlined.CheckCircle,
                         contentDescription = "downloaded"
                     )
+
+                    DropdownMenu(expanded = expending, onDismissRequest = { expending = false }) {
+                        DropdownMenuItem(
+                            text = { Text(text = "Delete") },
+                            onClick = {
+                                onDeleteClick()
+                                expending = false
+                            }
+                        )
+                    }
                 }
             }
         }
