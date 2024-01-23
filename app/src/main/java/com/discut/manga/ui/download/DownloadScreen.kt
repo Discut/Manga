@@ -80,7 +80,8 @@ fun DownloadScreen(
                 defaultSearchKey = queryKey,
                 onChangeSearchKey = {
                     queryKey = it
-                }
+                },
+                onBack = onBack
             )
         }
     ) { paddingValues ->
