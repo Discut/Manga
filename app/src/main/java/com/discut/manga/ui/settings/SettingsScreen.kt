@@ -6,6 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material.icons.outlined.Explore
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -54,7 +55,8 @@ fun SettingsScreen(navController: NavController) {
                 .padding(innerPadding)
                 .nestedScroll(scrollBehavior.nestedScrollConnection),
             onSecuritySettingsClick = { navController.navigate("security") },
-            onDownloadSettingsClick = { navController.navigate(NavigationRoute.SettingsScreen.Download.route) }
+            onDownloadSettingsClick = { navController.navigate(NavigationRoute.SettingsScreen.Download.route) },
+            onBrowseSettingsClick = { navController.navigate(NavigationRoute.SettingsScreen.Browse.route) }
         )
     }
 }
@@ -63,6 +65,7 @@ fun SettingsScreen(navController: NavController) {
 private fun SettingsScreenContent(
     modifier: Modifier = Modifier,
     onSecuritySettingsClick: () -> Unit,
+    onBrowseSettingsClick: () -> Unit,
     onDownloadSettingsClick: () -> Unit
 ) {
     Column(modifier = modifier) {
@@ -71,6 +74,12 @@ private fun SettingsScreenContent(
             subTitle = "app锁定、隐藏预览图",
             icon = Icons.Default.Security,
             onPreferenceClick = onSecuritySettingsClick
+        )
+        TextPreferenceComponent(
+            title = "浏览",
+            subTitle = "添加仓库",
+            icon = Icons.Outlined.Explore,
+            onPreferenceClick = onBrowseSettingsClick
         )
         TextPreferenceComponent(
             title = "下载",
