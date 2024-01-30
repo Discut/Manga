@@ -32,6 +32,7 @@ class MainActivity : BaseActivity() {
     @SuppressLint("CoroutineCreationDuringComposition")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        registerExtensionChangeEventReceiver(this)
         checkStorageManagerPermission()
         setComposeContent {
             val navController = rememberNavController()

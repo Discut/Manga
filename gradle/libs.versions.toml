@@ -30,6 +30,7 @@ accompanist = "0.33.1-alpha"
 paging_version = "3.2.1"
 work_version = "2.9.0"
 lottie_version = "6.3.0"
+palette_version = "1.0.0"
 
 [libraries]
 datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
@@ -78,6 +79,9 @@ serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-jso
 serialization-json-okio = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json-okio", version.ref = "serialization_version" }
 
 workmanager = { module = "androidx.work:work-runtime-ktx", version.ref = "work_version" }
+
+# palette
+palette = { module = "androidx.palette:palette-ktx", version.ref = "palette_version" }
 
 # animate icon
 

@@ -9,11 +9,14 @@ import com.discut.core.mvi.collectState
 import com.discut.core.mvi.contract.UiEffect
 import com.discut.core.mvi.contract.UiEvent
 import com.discut.core.mvi.contract.UiState
+import com.discut.manga.receiver.ExtensionChangeEventDelegate
+import com.discut.manga.receiver.ExtensionChangeEventDelegateImpl
 import com.discut.manga.ui.security.SecurityActivityDelegate
 import com.discut.manga.ui.security.SecurityActivityDelegateImpl
 
 abstract class BaseActivity : AppCompatActivity(),
-    SecurityActivityDelegate by SecurityActivityDelegateImpl() {
+    SecurityActivityDelegate by SecurityActivityDelegateImpl(),
+    ExtensionChangeEventDelegate by ExtensionChangeEventDelegateImpl(){
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

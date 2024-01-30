@@ -20,11 +20,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.discut.core.flowbus.observeEvent
 import com.discut.manga.components.CustomModalBottomSheet
+import com.discut.manga.event.ExtensionChangeEvent
 import com.discut.manga.event.NavigationEvent
 import com.discut.manga.navigation.NavigationRoute
-import com.discut.manga.ui.browse.source.SourceStoreSheet
+import com.discut.manga.ui.browse.source.SourceStoreScreen
 import com.discut.manga.util.dispatchBy
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,9 +41,13 @@ internal fun BrowseScreen(
     var isShowSourceStore by remember {
         mutableStateOf(false)
     }
-    val sources = state.sourceItems.filterIsInstance<SourceItem.Custom>().getOrElse(0) {
-        SourceItem.Nothing
-    }.sources
+    val sources = state.sourceItemsState.collectAsStateWithLifecycle().value
+        .filterIsInstance<SourceItem.Custom>().getOrElse(0) {
+            SourceItem.Nothing
+        }.sources
+    /*    val sources = state.sourceItems.filterIsInstance<SourceItem.Custom>().getOrElse(0) {
+            SourceItem.Nothing
+        }.sources*/
     Scaffold(topBar = {
         TopAppBar(
             title = { Text(text = "Browse") },
@@ -66,10 +74,11 @@ internal fun BrowseScreen(
     }
     CustomModalBottomSheet(
         isShow = isShowSourceStore,
+        enableSpacer = false,
         onDismissRequest = {
             isShowSourceStore = false
         }
     ) {
-        SourceStoreSheet(modifier = Modifier.fillMaxSize())
+        SourceStoreScreen(modifier = Modifier.fillMaxSize())
     }
 }

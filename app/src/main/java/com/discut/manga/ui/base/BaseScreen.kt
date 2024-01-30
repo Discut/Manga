@@ -3,6 +3,7 @@ package com.discut.manga.ui.base
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 
+@Deprecated("Use Jetpack Compose instead")
 abstract class BaseScreen<V : ViewModel> {
 
     @Composable
