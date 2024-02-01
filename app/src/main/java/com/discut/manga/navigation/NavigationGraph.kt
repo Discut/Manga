@@ -54,6 +54,13 @@ sealed class NavigationRoute(
 
     data object DownloadScreen : NavigationRoute("download")
 
+    data object SourcePreferenceScreen : NavigationRoute(
+        route = "sourcePreference/{sourceId}",
+        arguments = listOf(
+            navArgument("sourceId") { type = NavType.LongType }
+        )
+    )
+
     data object SettingsScreen : NavigationRoute("settings") {
         data object Security : NavigationRoute("security")
 

@@ -31,6 +31,7 @@ paging_version = "3.2.1"
 work_version = "2.9.0"
 lottie_version = "6.3.0"
 palette_version = "1.0.0"
+preference_version = "1.0.0"
 
 [libraries]
 datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
@@ -86,6 +87,9 @@ palette = { module = "androidx.palette:palette-ktx", version.ref = "palette_vers
 # animate icon
 
 lottie = { module = "com.airbnb.android:lottie-compose", version.ref = "lottie_version" }
+
+# compose preferenc
+preference-compose = { module = "me.zhanghai.compose.preference:library", version.ref = "preference_version" }
 
 
 

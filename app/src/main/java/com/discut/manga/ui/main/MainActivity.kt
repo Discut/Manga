@@ -17,6 +17,7 @@ import com.discut.manga.navigation.NavigationRoute
 import com.discut.manga.navigation.composableWithAnimation
 import com.discut.manga.navigation.settingsGraph
 import com.discut.manga.ui.base.BaseActivity
+import com.discut.manga.ui.browse.source.preference.SourcePreferenceScreen
 import com.discut.manga.ui.browse.viewer.MangasViewer
 import com.discut.manga.ui.categories.CategoryScreen
 import com.discut.manga.ui.download.DownloadScreen
@@ -84,6 +85,16 @@ class MainActivity : BaseActivity() {
                 }
                 composableWithAnimation(NavigationRoute.DownloadScreen.route) {
                     DownloadScreen {
+                        navController.popBackStack()
+                    }
+                }
+                composableWithAnimation(
+                    route = NavigationRoute.SourcePreferenceScreen.route,
+                    arguments = NavigationRoute.SourcePreferenceScreen.arguments
+                ) {
+                    val sourceId = it.arguments?.getLong("sourceId")
+                        ?: throw IllegalArgumentException("sourceId is null")
+                    SourcePreferenceScreen(sourceId = sourceId) {
                         navController.popBackStack()
                     }
                 }

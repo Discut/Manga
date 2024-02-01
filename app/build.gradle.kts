@@ -108,6 +108,7 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.swipe)
     implementation(libs.workmanager)
+    implementation(libs.preference.compose)
 
     // for unlock app
     implementation(libs.biometric.ktx)
