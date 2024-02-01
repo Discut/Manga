@@ -67,30 +67,46 @@ class SourceManager @Inject constructor(
     }
 
     private fun updateInstalledExtensions() {
-        _installedExtensionsFlow.update { emptyList() }
-        val extensions = ExtensionsLoader.loadExtensions(context)
+        val localExtensions = _installedExtensionsFlow.value
+        val extensionList = ExtensionsLoader.loadExtensions(context)
+        val pkgs = localExtensions.associate { it.pkg to it.versionCode }
+        val newExtensions =
+            extensionList.filter { pkgs.getOrDefault(it.pkg, -1L) != it.versionCode }
+        val newPkgs = newExtensions.map { it.pkg }
+        val oldExtensions = localExtensions.filter { it.pkg !in newPkgs }
+        val installed =
+            _installedExtensionsFlow.value.filter { it.pkg !in extensionList.map { it.pkg } }
+                .toSet()
         _installedExtensionsFlow.update {
-            extensions
+            oldExtensions + newExtensions - installed
         }
-        _allExtensionsFlow.update { emptyList() }
+        _allExtensionsFlow.update { all ->
+            (all.filter { old -> newExtensions.none { new -> old.pkg == new.pkg } } + newExtensions).sortedBy { it.name } - installed
+        }
+        /*val extensions = ExtensionsLoader.loadExtensions(context)
+
+        val uninstalled =
+            _installedExtensionsFlow.value.filter { it.pkg !in extensions.map { it.pkg } }
+        val newInstalled =
+            extensions.filter { it.pkg !in _installedExtensionsFlow.value.map { it.pkg } }
+        _installedExtensionsFlow.update { list ->
+            list - uninstalled.toSet() + newInstalled
+        }
+        val filter = extensions.filter { it.pkg !in _allExtensionsFlow.value.map { it.pkg } }
         _allExtensionsFlow.update { extensionsBuffer ->
-            (extensionsBuffer + extensions).distinctBy { it.pkg }
-        }
+            (extensionsBuffer + filter)
+                .filter { (it is Extension.LocalExtension && it.pkg in uninstalled.map { it.pkg }).not() }
+        }*/
     }
 
     private fun subscribeInstalledExtensions() {
         scope.launchIO {
             installedExtensionsFlow
-                //.filter { it.isNotEmpty() }
                 .collect { extensions ->
-                    Log.d(TAG, "new extensions: $extensions")
                     val sources = extensions.filterIsInstance<Extension.LocalExtension.Success>()
                         .flatMap { it.sources }
                     _sourcesMapFlow.update { sourceMap ->
                         ConcurrentHashMap(localSources + sources.associateBy { it.id })
-                        /*sourceMap.apply {
-                            putAll(sources.associateBy { it.id })
-                        }*/
                     }
                 }
         }

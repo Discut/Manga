@@ -50,7 +50,25 @@ object ExtensionsLoader {
         }
     }
 
-    private fun loadExtension(context: Context, extensionInfo: PackageInfo): Extension.LocalExtension {
+
+    @Deprecated("Use loadExtensions instead")
+    fun loadExtensions(
+        context: Context,
+        extensions: Set<Extension.LocalExtension.Success>
+    ): List<Extension.LocalExtension> {
+        val extensionList = loadExtensions(context)
+        val pkgs = extensions.associate { it.pkg to it.versionCode }
+        val newExtensions =
+            extensionList.filter { pkgs.getOrDefault(it.pkg, -1L) != it.versionCode }
+        val newPkgs = newExtensions.map { it.pkg }
+        val oldExtensions = extensions.filter { it.pkg !in newPkgs }
+        return oldExtensions + newExtensions
+    }
+
+    private fun loadExtension(
+        context: Context,
+        extensionInfo: PackageInfo
+    ): Extension.LocalExtension {
         val pkgManager = context.packageManager
         val appInfo = extensionInfo.applicationInfo
         val pkgName = extensionInfo.packageName
