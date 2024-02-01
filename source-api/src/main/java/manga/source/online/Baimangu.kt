@@ -2,13 +2,14 @@ package manga.source.online
 
 import android.content.SharedPreferences
 import android.widget.Toast
+import manga.core.network.GET
+import manga.core.network.interceptor.rateLimitHost
 import manga.source.domain.Filter
 import manga.source.domain.FilterList
 import manga.source.domain.Page
 import manga.source.domain.SChapter
 import manga.source.domain.SManga
-import manga.core.network.GET
-import manga.core.network.interceptor.rateLimitHost
+import manga.source.preference.SourcePreference
 import okhttp3.Headers
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.OkHttpClient
@@ -202,7 +203,7 @@ class Baimangu : ParsedHttpSource() {
             throw Error("Failed to request OScript URL")
         }
 
-        val content = oScriptResp.body!!.string()
+        val content = oScriptResp.body.string()
         return extractPagesFromOScript(content)
     }
 
@@ -303,6 +304,15 @@ class Baimangu : ParsedHttpSource() {
         screen.addPreference(mainSiteUrlPreference)
         screen.addPreference(mainSiteRatePermitsPreference)
         screen.addPreference(mainSiteRatePeriodPreference)
+    }
+
+    override fun SourcePreference.setPreferenceScreen() {
+        textFiledPreference {
+            key = MAINSITE_URL_PREF
+            title = MAINSITE_URL_PREF_TITLE
+            summary = MAINSITE_URL_PREF_SUMMARY
+            defaultValue = MAINSITE_URL_PREF_DEFAULT
+        }
     }
 
     companion object {
