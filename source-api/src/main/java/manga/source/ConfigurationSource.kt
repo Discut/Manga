@@ -20,7 +20,7 @@ interface ConfigurationSource : BaseSource {
     fun setPreferenceScreen(screen: PreferenceScreen) {/*Deprecated*/
     }
 
-    fun getSourcePreferences():List<SourcePreferenceType>{
+    fun getSourcePreferences():List<SourcePreferenceType<*>>{
         return SourcePreferenceImpl().apply {
             setPreferenceScreen()
         }.preferences.toList()

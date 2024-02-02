@@ -10,6 +10,7 @@ import manga.source.domain.Page
 import manga.source.domain.SChapter
 import manga.source.domain.SManga
 import manga.source.preference.SourcePreference
+import manga.source.preference.SourcePreferenceType
 import okhttp3.Headers
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.OkHttpClient
@@ -237,6 +238,7 @@ class Baimangu : ParsedHttpSource() {
         }.toList()
     }
 
+    @Deprecated("use setPreferenceScreen(builder: (LazyListScope.() -> Unit) -> Unit)")
     override fun setPreferenceScreen(screen: androidx.preference.PreferenceScreen) {
         val mainSiteUrlPreference = androidx.preference.EditTextPreference(screen.context).apply {
             key = MAINSITE_URL_PREF
@@ -308,10 +310,44 @@ class Baimangu : ParsedHttpSource() {
 
     override fun SourcePreference.setPreferenceScreen() {
         textFiledPreference {
-            key = MAINSITE_URL_PREF
-            title = MAINSITE_URL_PREF_TITLE
-            summary = MAINSITE_URL_PREF_SUMMARY
-            defaultValue = MAINSITE_URL_PREF_DEFAULT
+            SourcePreferenceType.TextFiled(
+                key = MAINSITE_URL_PREF,
+                title = MAINSITE_URL_PREF_TITLE,
+                defaultValue = MAINSITE_URL_PREF_DEFAULT,
+                summaryBuilder = {
+                    MAINSITE_URL_PREF_SUMMARY
+                }
+            )
+        }
+
+        listSelectPreference {
+            SourcePreferenceType.ListSelect(
+                key = MAINSITE_RATEPERMITS_PREF,
+                title = MAINSITE_RATEPERMITS_PREF_TITLE,
+                values = MAINSITE_RATEPERMITS_PREF_ENTRIES_ARRAY.toList(),
+                defaultValue = MAINSITE_RATEPERMITS_PREF_DEFAULT,
+                summaryBuilder = {
+                    String.format(
+                        MAINSITE_RATEPERMITS_PREF_SUMMARY,
+                        it.getOrDefault(MAINSITE_RATEPERMITS_PREF, MAINSITE_RATEPERMITS_PREF_DEFAULT)
+                    )
+                }
+            )
+        }
+
+        listSelectPreference {
+            SourcePreferenceType.ListSelect(
+                key = MAINSITE_RATEPERIOD_PREF,
+                title = MAINSITE_RATEPERIOD_PREF_TITLE,
+                values = MAINSITE_RATEPERIOD_PREF_ENTRIES_ARRAY.toList(),
+                defaultValue = MAINSITE_RATEPERIOD_PREF_DEFAULT,
+                summaryBuilder = {
+                    String.format(
+                        MAINSITE_RATEPERIOD_PREF_SUMMARY,
+                        it.getOrDefault(MAINSITE_RATEPERIOD_PREF, MAINSITE_RATEPERIOD_PREF_DEFAULT)
+                    )
+                }
+            )
         }
     }
 

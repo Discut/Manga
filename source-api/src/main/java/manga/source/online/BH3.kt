@@ -14,6 +14,7 @@ import manga.source.domain.Page
 import manga.source.domain.SChapter
 import manga.source.domain.SManga
 import manga.core.network.GET
+import manga.source.preference.SourcePreference
 import okhttp3.OkHttpClient
 import okhttp3.Response
 import org.jsoup.nodes.Document
@@ -30,6 +31,10 @@ class BH3 : ParsedHttpSource() {
 
     override fun setPreferenceScreen(screen: PreferenceScreen) {
         TODO("Not yet implemented")
+    }
+
+    override fun SourcePreference.setPreferenceScreen() {
+        //TODO("Not yet implemented")
     }
 
     override val baseUrl = "https://comic.bh3.com"

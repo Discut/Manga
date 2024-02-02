@@ -55,7 +55,7 @@ fun SourcePreferenceScreen(
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
-                sourcePreferences(source.getSourcePreferences())
+                sourcePreferences(source)
             }
         }
     }
