@@ -87,6 +87,9 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation(libs.material)
 
+    //palette
+    implementation(libs.palette)
+
     // Material Design 3
     implementation("androidx.compose.material3:material3:1.2.0-alpha12")
 
@@ -105,6 +108,7 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.swipe)
     implementation(libs.workmanager)
+    implementation(libs.preference.compose)
 
     // for unlock app
     implementation(libs.biometric.ktx)

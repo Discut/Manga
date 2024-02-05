@@ -21,8 +21,9 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
-import com.discut.manga.ui.download.DownloadScreen
 import com.discut.manga.ui.settings.SettingsScreen
+import com.discut.manga.ui.settings.browse.BrowseSettingsScreen
+import com.discut.manga.ui.settings.browse.repo.RepoScreen
 import com.discut.manga.ui.settings.download.DownloadSettingsScreen
 import com.discut.manga.ui.settings.security.SecuritySettingsScreen
 
@@ -53,10 +54,22 @@ sealed class NavigationRoute(
 
     data object DownloadScreen : NavigationRoute("download")
 
+    data object SourcePreferenceScreen : NavigationRoute(
+        route = "sourcePreference/{sourceId}",
+        arguments = listOf(
+            navArgument("sourceId") { type = NavType.LongType }
+        )
+    )
+
     data object SettingsScreen : NavigationRoute("settings") {
         data object Security : NavigationRoute("security")
 
         data object Download : NavigationRoute("downloadSettings")
+
+        data object Browse : NavigationRoute("browseSettings") {
+            data object ExtensionRepos : NavigationRoute("extensionRepos")
+        }
+
         data object SettingsMain : NavigationRoute("settingsMain")
     }
 }
@@ -76,6 +89,18 @@ fun NavGraphBuilder.settingsGraph(navController: NavController) {
         }
         composableWithAnimation(route = NavigationRoute.SettingsScreen.Download.route) {
             DownloadSettingsScreen {
+                navController.popBackStack()
+            }
+        }
+        composableWithAnimation(route = NavigationRoute.SettingsScreen.Browse.route) {
+            BrowseSettingsScreen {
+                navController.popBackStack()
+            }
+        }
+        composableWithAnimation(
+            route = NavigationRoute.SettingsScreen.Browse.ExtensionRepos.route
+        ) {
+            RepoScreen {
                 navController.popBackStack()
             }
         }

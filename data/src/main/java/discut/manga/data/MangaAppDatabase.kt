@@ -14,9 +14,11 @@ import discut.manga.data.history.History
 import discut.manga.data.history.HistoryDao
 import discut.manga.data.manga.Manga
 import discut.manga.data.manga.MangaDao
+import discut.manga.data.source.SourceRepo
+import discut.manga.data.source.SourceRepoDao
 
 @Database(
-    entities = [Manga::class, Chapter::class, Category::class, History::class, Download::class],
+    entities = [Manga::class, Chapter::class, Category::class, History::class, Download::class, SourceRepo::class],
     version = 1,
     exportSchema = false
 )
@@ -30,6 +32,8 @@ abstract class MangaAppDatabase : RoomDatabase() {
     abstract fun historyDao(): HistoryDao
 
     abstract fun downloadDao(): DownloadDao
+
+    abstract fun sourceRepoDao(): SourceRepoDao
 
     companion object {
         private var INSTANCE: MangaAppDatabase? = null

@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.discut.manga.components.scaffold.AppBarActions
+import com.discut.manga.components.scaffold.ItemActions
 import com.discut.manga.components.scaffold.SearchAppToolbar
 
 @OptIn(
@@ -44,7 +44,7 @@ fun BookshelfScreen(
                 )
             },
             actions = {
-                AppBarActions {
+                ItemActions {
                     toIconAction {
                         icon = Icons.Outlined.MoreVert
                         onClick = {

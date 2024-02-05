@@ -72,7 +72,7 @@ import com.discut.manga.components.domain.toMangaCoverInfo
 import com.discut.manga.components.indicator.AppLinearIndicator
 import com.discut.manga.components.manga.MangaCover
 import com.discut.manga.components.manga.MangaInfoBox
-import com.discut.manga.components.scaffold.AppBarActions
+import com.discut.manga.components.scaffold.ItemActions
 import com.discut.manga.data.manga.isLocal
 import com.discut.manga.data.shouldRead
 import com.discut.manga.navigation.NavigationRoute
@@ -211,14 +211,14 @@ fun MangaDetailsScreen(
                                 )
                             }
                         }
-                        AppBarActions {
-                            toOverflowAction {
+                        ItemActions {
+                            toOverflowTextAction {
                                 title = "refresh"
                                 onClick = {
                                     vm.sendEvent(MangaDetailsEvent.BootSync(mangaId))
                                 }
                             }
-                            toOverflowAction {
+                            toOverflowTextAction {
                                 title = "download"
                                 onClick = {
                                     FlowBus.with<ToRouteEvent>()

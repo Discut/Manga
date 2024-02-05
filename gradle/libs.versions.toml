@@ -30,6 +30,8 @@ accompanist = "0.33.1-alpha"
 paging_version = "3.2.1"
 work_version = "2.9.0"
 lottie_version = "6.3.0"
+palette_version = "1.0.0"
+preference_version = "1.0.0"
 
 [libraries]
 datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
@@ -79,9 +81,15 @@ serialization-json-okio = { module = "org.jetbrains.kotlinx:kotlinx-serializatio
 
 workmanager = { module = "androidx.work:work-runtime-ktx", version.ref = "work_version" }
 
+# palette
+palette = { module = "androidx.palette:palette-ktx", version.ref = "palette_version" }
+
 # animate icon
 
 lottie = { module = "com.airbnb.android:lottie-compose", version.ref = "lottie_version" }
+
+# compose preferenc
+preference-compose = { module = "me.zhanghai.compose.preference:library", version.ref = "preference_version" }
 
 
 

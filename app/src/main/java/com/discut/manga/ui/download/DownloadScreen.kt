@@ -24,7 +24,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.discut.manga.components.scaffold.AppBarActions
+import com.discut.manga.components.scaffold.ItemActions
 import com.discut.manga.components.scaffold.SearchAppToolbar
 import com.discut.manga.theme.alpha
 import com.discut.manga.theme.padding
@@ -50,8 +50,8 @@ fun DownloadScreen(
                     )
                 },
                 actions = {
-                    AppBarActions {
-                        toOverflowAction {
+                    ItemActions {
+                        toOverflowTextAction {
                             title = "Start All"
                             onClick = {
                                 vm.sendEvent {
@@ -59,7 +59,7 @@ fun DownloadScreen(
                                 }
                             }
                         }
-                        toOverflowAction {
+                        toOverflowTextAction {
                             title = "Pause All"
                             onClick = {
                                 vm.sendEvent {
@@ -67,7 +67,7 @@ fun DownloadScreen(
                                 }
                             }
                         }
-                        toOverflowAction {
+                        toOverflowTextAction {
                             title = "Cancel All"
                             onClick = {
                                 vm.sendEvent {

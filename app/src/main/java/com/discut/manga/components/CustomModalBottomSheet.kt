@@ -23,6 +23,7 @@ import com.discut.manga.components.utils.maxHeightWithoutStatusBar
 fun CustomModalBottomSheet(
     modifier: Modifier = Modifier,
     isShow: Boolean = false,
+    enableSpacer: Boolean = true,
     sheetState: SheetState = rememberModalBottomSheetState(),
     sheetMaxWidth: Dp = BottomSheetDefaults.SheetMaxWidth,
 
@@ -35,7 +36,9 @@ fun CustomModalBottomSheet(
         ModalBottomSheet(
             modifier = Modifier
                 //.requiredHeightIn(max = getMaxHeightWithoutStatusBar())
-                .maxHeightWithoutStatusBar()
+
+                //.maxHeightWithoutStatusBar()
+                .statusBarSpacer(enableSpacer)
                 .then(modifier),
             sheetState = sheetState,
             sheetMaxWidth = sheetMaxWidth,
@@ -47,4 +50,11 @@ fun CustomModalBottomSheet(
             }
         }
     }
+}
+
+@Composable
+private fun Modifier.statusBarSpacer(enableSpacer: Boolean): Modifier = if (enableSpacer) {
+    maxHeightWithoutStatusBar()
+} else {
+    this
 }
