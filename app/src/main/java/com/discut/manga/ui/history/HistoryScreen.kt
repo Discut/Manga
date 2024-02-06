@@ -19,23 +19,27 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.discut.manga.components.scaffold.ItemActions
 import com.discut.manga.components.scaffold.SearchAppToolbar
+import com.discut.manga.event.NavigationEvent
 import com.discut.manga.theme.padding
 import com.discut.manga.ui.history.component.HistoryHeader
 import com.discut.manga.ui.history.component.HistoryItem
 import com.discut.manga.ui.history.component.ListSettingsSheet
 import com.discut.manga.ui.reader.ReaderActivity
+import com.discut.manga.util.postBy
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun HistoryScreen(
     vm: HistoryViewModel = hiltViewModel()
 ) {
+    val scope = rememberCoroutineScope()
     val state by vm.uiState.collectAsState()
     val histories by state.histories.collectAsState()
     val current = LocalContext.current
@@ -116,7 +120,9 @@ fun HistoryScreen(
                                 current,
                                 it.history.mangaId,
                                 it.history.chapterId
-                            )
+                            ) { mangaId ->
+                                NavigationEvent("mangaDetails/${mangaId}").postBy(scope)
+                            }
                         }
                     }
                 }

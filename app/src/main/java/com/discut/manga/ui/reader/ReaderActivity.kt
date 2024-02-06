@@ -17,9 +17,9 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import com.discut.manga.R
-import com.discut.manga.event.NavigationEvent
 import com.discut.manga.ui.base.BaseActivity
 import com.discut.manga.ui.common.LoadingScreen
+import com.discut.manga.ui.main.MainActivity
 import com.discut.manga.ui.reader.adapter.RecyclerPagesViewAdapter
 import com.discut.manga.ui.reader.component.BottomSheetMenu
 import com.discut.manga.ui.reader.component.ReaderNavigationBar
@@ -28,7 +28,6 @@ import com.discut.manga.ui.reader.domain.ReaderActivityEvent
 import com.discut.manga.ui.reader.viewer.container.PagesContainer
 import com.discut.manga.ui.reader.viewer.container.VerticalPagesContainer
 import com.discut.manga.ui.reader.viewer.domain.ReaderChapter
-import com.discut.manga.util.postBy
 import com.discut.manga.util.setComposeContent
 import com.discut.manga.util.toast
 import dagger.hilt.android.AndroidEntryPoint
@@ -37,6 +36,7 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+
 @AndroidEntryPoint
 class ReaderActivity : BaseActivity() {
 
@@ -44,14 +44,22 @@ class ReaderActivity : BaseActivity() {
     private var pagesContainer: PagesContainer? = null
 
     companion object {
-        fun startActivity(context: Context, manga: Long, chapter: Long) {
+        fun startActivity(
+            context: Context,
+            manga: Long,
+            chapter: Long,
+            onBack: (Long) -> Unit = {}
+        ) {
             val intent = Intent(context, ReaderActivity::class.java)
             intent.apply {
                 putExtra("manga", manga)
                 putExtra("chapter", chapter)
             }
-            context.startActivity(intent)
+            MainActivity.buildLauncher(onBack).launch(intent)
+            //context.startActivity(intent)
         }
+
+        const val LAUNCH_MANGA_DETAILS_CODE = 0x01
     }
 
     private val vm: ReaderViewModel by viewModels()
@@ -125,7 +133,12 @@ class ReaderActivity : BaseActivity() {
                     finish()
                 },
                 onMangaTitleClick = {
-                    NavigationEvent("mangaDetails/${state.manga!!.id}").postBy(scope)
+                    Intent().apply {
+                        putExtra("mangaId", state.manga?.id)
+                    }.also {
+                        setResult(LAUNCH_MANGA_DETAILS_CODE, it)
+                        finish()
+                    }
                 }
             )
 

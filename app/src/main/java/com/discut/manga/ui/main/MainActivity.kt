@@ -6,6 +6,8 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -23,6 +25,7 @@ import com.discut.manga.ui.categories.CategoryScreen
 import com.discut.manga.ui.download.DownloadScreen
 import com.discut.manga.ui.main.domain.ToRouteEvent
 import com.discut.manga.ui.manga.details.MangaDetailsScreen
+import com.discut.manga.ui.reader.ReaderActivity
 import com.discut.manga.util.setComposeContent
 import com.discut.manga.util.toast
 import dagger.hilt.android.AndroidEntryPoint
@@ -33,8 +36,7 @@ class MainActivity : BaseActivity() {
     @SuppressLint("CoroutineCreationDuringComposition")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        registerExtensionChangeEventReceiver(this)
-        checkStorageManagerPermission()
+        init()
         setComposeContent {
             val navController = rememberNavController()
             LocalLifecycleOwner.current.observeEvent<ToRouteEvent> {
@@ -111,6 +113,30 @@ class MainActivity : BaseActivity() {
         } else {
             val intent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
             startActivity(intent)
+        }
+    }
+
+    private fun init() {
+        registerExtensionChangeEventReceiver(this)
+        checkStorageManagerPermission()
+
+        launcher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == ReaderActivity.LAUNCH_MANGA_DETAILS_CODE) {
+                val mangaId = it.data?.getLongExtra("mangaId", -1) ?: -1
+                if (mangaId != -1L) {
+                    callBack.invoke(mangaId)
+                }
+            }
+        }
+    }
+
+    companion object {
+        lateinit var launcher: ActivityResultLauncher<Intent>
+        lateinit var callBack: (Long) -> Unit
+
+        fun buildLauncher(callBack: (Long) -> Unit): ActivityResultLauncher<Intent> {
+            this.callBack = callBack
+            return launcher
         }
     }
 
