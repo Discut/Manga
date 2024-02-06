@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.surfaceColorAtElevation
@@ -36,7 +35,8 @@ fun ReaderNavigationBar(
     onPreviousChapter: () -> Unit,
     onClickSettings: () -> Unit,
 
-    onBackActionClick: () -> Unit
+    onBackActionClick: () -> Unit,
+    onMangaTitleClick: () -> Unit
 ) {
 
     val backgroundColor = MaterialTheme.colorScheme
@@ -55,6 +55,8 @@ fun ReaderNavigationBar(
                 subtitle = chapterTitle,
                 onBackActionClick = onBackActionClick,
                 backgroundColor = backgroundColor,
+
+                onTitleClick = onMangaTitleClick
             )
         }
         Spacer(modifier = Modifier.weight(1f))// Context Space

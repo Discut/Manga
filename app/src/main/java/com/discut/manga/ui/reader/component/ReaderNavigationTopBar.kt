@@ -2,10 +2,11 @@ package com.discut.manga.ui.reader.component
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,7 +33,9 @@ fun ReaderNavigationTopBar(
     subtitle: String?,
     actions: @Composable RowScope.() -> Unit = {},
     backgroundColor: Color? =null,
-    scrollBehavior: TopAppBarScrollBehavior? = null
+    scrollBehavior: TopAppBarScrollBehavior? = null,
+
+    onTitleClick: () -> Unit = {},
 ) {
     Column(
         modifier = modifier,
@@ -41,7 +44,7 @@ fun ReaderNavigationTopBar(
             navigationIcon = {
                 IconButton(onClick = onBackActionClick) {
                     Icon(
-                        imageVector = Icons.Outlined.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                         contentDescription = stringResource(R.string.back),
                     )
                 }
@@ -50,6 +53,9 @@ fun ReaderNavigationTopBar(
                 Column {
                     title?.let {
                         Text(
+                            modifier = Modifier.clickable {
+                                onTitleClick()
+                            },
                             text = it,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,

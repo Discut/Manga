@@ -10,12 +10,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import com.discut.manga.R
+import com.discut.manga.event.NavigationEvent
 import com.discut.manga.ui.base.BaseActivity
 import com.discut.manga.ui.common.LoadingScreen
 import com.discut.manga.ui.reader.adapter.RecyclerPagesViewAdapter
@@ -26,6 +28,7 @@ import com.discut.manga.ui.reader.domain.ReaderActivityEvent
 import com.discut.manga.ui.reader.viewer.container.PagesContainer
 import com.discut.manga.ui.reader.viewer.container.VerticalPagesContainer
 import com.discut.manga.ui.reader.viewer.domain.ReaderChapter
+import com.discut.manga.util.postBy
 import com.discut.manga.util.setComposeContent
 import com.discut.manga.util.toast
 import dagger.hilt.android.AndroidEntryPoint
@@ -89,6 +92,7 @@ class ReaderActivity : BaseActivity() {
 
 
         menuRoot.setComposeContent {
+            val scope = rememberCoroutineScope()
             val state by vm.uiState.collectAsState()
             var showBottomSheet by remember { mutableStateOf(false) }
 
@@ -119,6 +123,9 @@ class ReaderActivity : BaseActivity() {
 
                 onBackActionClick = {
                     finish()
+                },
+                onMangaTitleClick = {
+                    NavigationEvent("mangaDetails/${state.manga!!.id}").postBy(scope)
                 }
             )
 
