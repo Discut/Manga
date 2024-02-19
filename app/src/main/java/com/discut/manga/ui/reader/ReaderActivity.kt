@@ -2,7 +2,6 @@ package com.discut.manga.ui.reader
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.WindowManager
@@ -34,6 +33,7 @@ import com.discut.manga.ui.reader.viewer.container.HorizontalPagesContainer
 import com.discut.manga.ui.reader.viewer.container.PagesContainer
 import com.discut.manga.ui.reader.viewer.container.VerticalPagesContainer
 import com.discut.manga.ui.reader.viewer.domain.ReaderChapter
+import com.discut.manga.ui.reader.viewer.domain.ReaderPage
 import com.discut.manga.util.setComposeContent
 import com.discut.manga.util.toast
 import dagger.hilt.android.AndroidEntryPoint
@@ -161,6 +161,11 @@ class ReaderActivity : BaseActivity() {
                 readerMode = state.readerMode,
                 onReaderModeChange = {
                     vm.sendEvent(ReaderActivityEvent.ReaderModeChange(it))
+                    if (state.currentChapters?.currReaderChapter?.state is ReaderChapter.State.Loaded) {
+                        val chapterState =
+                            state.currentChapters?.currReaderChapter?.state as ReaderChapter.State.Loaded
+                        showPages(chapterState.pages, it)
+                    }
                 }) {
                 showReaderModeSheet = false
             }
@@ -211,38 +216,17 @@ class ReaderActivity : BaseActivity() {
         }
     }
 
-    private fun handleChapterStateChange(chapterState: ReaderChapter.State?, readerMode: ReaderMode) {
+    private fun handleChapterStateChange(
+        chapterState: ReaderChapter.State?,
+        readerMode: ReaderMode
+    ) {
         when (chapterState) {
             is ReaderChapter.State.Error -> {
                 toast(chapterState.error.message)
                 finish()
             }
 
-            is ReaderChapter.State.Loaded -> {
-                when (readerMode) {
-                    ReaderMode.WEBTOON -> {
-                        val verticalPagesContainer = VerticalPagesContainer(vm, this)
-                        pagesContainer = verticalPagesContainer
-                        val pageViewerAdapter = RecyclerPagesViewAdapter(this, chapterState.pages)
-                        verticalPagesContainer.adapter = pageViewerAdapter
-                        verticalPagesContainer.isVisible = true
-                        //pageViewer.adapter = pageViewerAdapter
-
-                    }
-                    ReaderMode.LEFT_TO_RIGHT -> {
-                        val horizontalPagesContainer = HorizontalPagesContainer(vm, this)
-                        pagesContainer = horizontalPagesContainer
-                        val pageViewerAdapter = PageViewerAdapter(this, chapterState.pages)
-                        horizontalPagesContainer.adapter = pageViewerAdapter
-                        horizontalPagesContainer.isVisible = true
-
-                    }
-                }
-            }
-
-            is ReaderChapter.State.ReLoaded -> {
-
-            }
+            is ReaderChapter.State.Loaded -> showPages(chapterState.pages, readerMode)
 
             ReaderChapter.State.Loading -> {
 
@@ -253,6 +237,33 @@ class ReaderActivity : BaseActivity() {
             }
 
             else -> {}
+        }
+    }
+
+    /**
+     * Show pages of loaded on screen.
+     */
+    private fun showPages(pages: List<ReaderPage>, readerMode: ReaderMode) {
+        pagesContainer?.destroy()
+        when (readerMode) {
+            ReaderMode.WEBTOON -> {
+                val verticalPagesContainer = VerticalPagesContainer(vm, this)
+                pagesContainer = verticalPagesContainer
+                val pageViewerAdapter = RecyclerPagesViewAdapter(this, pages)
+                verticalPagesContainer.adapter = pageViewerAdapter
+                verticalPagesContainer.isVisible = true
+                //pageViewer.adapter = pageViewerAdapter
+
+            }
+
+            ReaderMode.LEFT_TO_RIGHT -> {
+                val horizontalPagesContainer = HorizontalPagesContainer(vm, this)
+                pagesContainer = horizontalPagesContainer
+                val pageViewerAdapter = PageViewerAdapter(this, pages)
+                horizontalPagesContainer.adapter = pageViewerAdapter
+                horizontalPagesContainer.isVisible = true
+
+            }
         }
     }
 

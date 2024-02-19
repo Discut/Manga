@@ -109,7 +109,8 @@ class RecyclerPagesView @JvmOverloads constructor(
         originalHeight = heightPixels
         (context as? Activity)?.apply {
             window.decorView.setOnApplyWindowInsetsListener { v, insets ->
-                val navigationHeight = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                val navigationHeight = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
+                    rootWindowInsets != null) {
                     rootWindowInsets.getInsetsIgnoringVisibility(WindowInsets.Type.navigationBars()).bottom
                 } else {
                     insets.stableInsetBottom

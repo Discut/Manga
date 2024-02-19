@@ -9,4 +9,6 @@ interface PagesContainer {
 
     fun moveToPage(position: Int)
 
+    fun destroy()
+
 }

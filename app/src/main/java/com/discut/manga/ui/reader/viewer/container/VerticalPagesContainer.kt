@@ -137,6 +137,11 @@ class VerticalPagesContainer(
         }
     }
 
+    override fun destroy() {
+        container.removeAllViews()
+        readerActivity.findViewById<FrameLayout>(R.id.page_container).removeView(this)
+    }
+
 
     private fun changeMenuVisible(visible: Boolean) {
         if (visible == readerViewModel.uiState.value.isMenuShow) {

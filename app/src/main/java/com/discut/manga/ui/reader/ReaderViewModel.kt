@@ -113,7 +113,21 @@ class ReaderViewModel @Inject constructor(
 
             is ReaderActivityEvent.ReaderModeChange -> {
                 pref.readerMode = event.mode
-                state.copy(readerMode = event.mode)
+                state.currentChapters?.apply {
+                    copy(
+                        prevReaderChapter = prevReaderChapter,
+                        currReaderChapter = currReaderChapter.apply {
+                            state.copy(
+
+                            )
+                        }
+                    )
+                }
+                state.copy(
+                    readerMode = event.mode,
+                    currentChapters = state.currentChapters?.copy(
+                        prevReaderChapter = state.currentChapters.prevReaderChapter
+                    ))
             }
 
         }

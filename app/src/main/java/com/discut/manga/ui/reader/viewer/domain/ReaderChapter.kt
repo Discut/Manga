@@ -20,8 +20,6 @@ class ReaderChapter(
         data object Wait : State
         data object Loading : State
         data class Loaded(val pages: List<ReaderPage>) : State
-
-        data class ReLoaded(val prevState: State) : State
         data class Error(val error: Throwable) : State
     }
 
