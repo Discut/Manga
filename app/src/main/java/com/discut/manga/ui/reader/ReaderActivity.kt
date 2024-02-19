@@ -2,10 +2,12 @@ package com.discut.manga.ui.reader
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.WindowManager
 import androidx.activity.viewModels
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,6 +24,7 @@ import com.discut.manga.ui.common.LoadingScreen
 import com.discut.manga.ui.main.MainActivity
 import com.discut.manga.ui.reader.adapter.RecyclerPagesViewAdapter
 import com.discut.manga.ui.reader.component.BottomSheetMenu
+import com.discut.manga.ui.reader.component.ReaderModeSheetMenu
 import com.discut.manga.ui.reader.component.ReaderNavigationBar
 import com.discut.manga.ui.reader.domain.ReaderActivityEffect
 import com.discut.manga.ui.reader.domain.ReaderActivityEvent
@@ -95,6 +98,7 @@ class ReaderActivity : BaseActivity() {
         }
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     private fun initMenuView() {
         val menuRoot = findViewById<ComposeView>(R.id.menu_root)
 
@@ -103,12 +107,13 @@ class ReaderActivity : BaseActivity() {
             val scope = rememberCoroutineScope()
             val state by vm.uiState.collectAsState()
             var showBottomSheet by remember { mutableStateOf(false) }
-
+            var showReaderModeSheet by remember { mutableStateOf(false) }
 
             ReaderNavigationBar(
                 visibility = state.isMenuShow,
                 mangaTitle = state.manga?.title,
                 chapterTitle = state.currentChapters?.currReaderChapter?.dbChapter?.name,
+                readerMode = state.readerMode,
 
                 currentPage = state.currentPage,
                 pageCount = state.readerPages,
@@ -124,6 +129,9 @@ class ReaderActivity : BaseActivity() {
                 },
                 onPreviousChapter = {
 
+                },
+                onClickReaderMode = {
+                    showReaderModeSheet = true
                 },
                 onClickSettings = {
                     showBottomSheet = true
@@ -142,8 +150,16 @@ class ReaderActivity : BaseActivity() {
                 }
             )
 
-            BottomSheetMenu(showBottomSheet) {
+            BottomSheetMenu(isShow = showBottomSheet) {
                 showBottomSheet = false
+            }
+            ReaderModeSheetMenu(
+                isShow = showReaderModeSheet,
+                readerMode = state.readerMode,
+                onReaderModeChange = {
+                    vm.sendEvent(ReaderActivityEvent.ReaderModeChange(it))
+                }) {
+                showReaderModeSheet = false
             }
             if (state.currentChapters == null ||
                 state.currentChapters?.currReaderChapter?.state is ReaderChapter.State.Loading ||
@@ -224,10 +240,15 @@ class ReaderActivity : BaseActivity() {
         if (visible) {
             windowInsetsController.show(WindowInsetsCompat.Type.systemBars())
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+            window.statusBarColor = 0x04000000 // TRANSLUCENT
+            window.navigationBarColor = Color.TRANSPARENT
+            window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+            window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION)
         } else {
             windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
             windowInsetsController.systemBarsBehavior =
                 WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
     }
+
 }

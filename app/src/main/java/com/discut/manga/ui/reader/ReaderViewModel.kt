@@ -6,6 +6,7 @@ import com.discut.manga.App
 import com.discut.manga.data.SnowFlakeUtil
 import com.discut.manga.data.shouldRead
 import com.discut.manga.domain.history.MangaChapterHistory
+import com.discut.manga.preference.ReaderPreference
 import com.discut.manga.service.history.IHistoryProvider
 import com.discut.manga.service.source.ISourceManager
 import com.discut.manga.ui.reader.domain.CurrentChapters
@@ -16,6 +17,7 @@ import com.discut.manga.ui.reader.viewer.domain.ReaderChapter
 import com.discut.manga.ui.reader.viewer.domain.ReaderPage
 import com.discut.manga.ui.reader.viewer.loader.ChapterLoader
 import com.discut.manga.ui.reader.viewer.loader.IChapterLoader
+import com.discut.manga.util.get
 import com.discut.manga.util.launchIO
 import com.discut.manga.util.withIOContext
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,6 +25,7 @@ import discut.manga.data.MangaAppDatabase
 import discut.manga.data.chapter.Chapter
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
+import manga.core.preference.PreferenceManager
 import javax.inject.Inject
 
 @HiltViewModel
@@ -33,9 +36,12 @@ class ReaderViewModel @Inject constructor(
     BaseViewModel<ReaderActivityState, ReaderActivityEvent, ReaderActivityEffect>() {
 
     private val dbManager = MangaAppDatabase.DB
+    private val pref = PreferenceManager.get<ReaderPreference>()
+
 
     private val scope = viewModelScope
     override fun initialState(): ReaderActivityState = ReaderActivityState(
+        readerMode = pref.readerMode
     )
 
     override suspend fun handleEvent(
@@ -103,6 +109,11 @@ class ReaderViewModel @Inject constructor(
                     }
                 }
                 state.copy(currentPage = event.index)
+            }
+
+            is ReaderActivityEvent.ReaderModeChange -> {
+                pref.readerMode = event.mode
+                state.copy(readerMode = event.mode)
             }
 
         }

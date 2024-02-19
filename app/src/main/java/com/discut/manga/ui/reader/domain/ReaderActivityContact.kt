@@ -5,6 +5,7 @@ import androidx.compose.runtime.Immutable
 import com.discut.core.mvi.contract.UiEffect
 import com.discut.core.mvi.contract.UiEvent
 import com.discut.core.mvi.contract.UiState
+import com.discut.manga.preference.ReaderMode
 import com.discut.manga.ui.reader.viewer.domain.ReaderChapter
 import discut.manga.data.manga.Manga
 
@@ -15,6 +16,8 @@ data class ReaderActivityState(
     val currentChapters: CurrentChapters? = null,
     val currentPage: Int = -1,
     val isMenuShow: Boolean = false,
+
+    val readerMode: ReaderMode
 ) : UiState {
     val readerPages: Int by lazy {
         when (val chapterState = currentChapters?.currReaderChapter?.state) {
@@ -31,6 +34,8 @@ sealed interface ReaderActivityEvent : UiEvent {
     data class ReaderNavigationMenuVisibleChange(val visible: Boolean) : ReaderActivityEvent
 
     data class PageSelected(val index: Int) : ReaderActivityEvent
+
+    data class ReaderModeChange(val mode: ReaderMode) : ReaderActivityEvent
 
 }
 

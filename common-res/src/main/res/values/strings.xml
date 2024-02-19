@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Manga</string>
+    <string name="app_name" translatable="false">Manga</string>
 
     <string name="reader_click_nav_menu">Menu</string>
     <string name="reader_click_nav_next">Next</string>
@@ -9,4 +9,7 @@
     <string name="back">Back</string>
     <string name="unknown_manga_title">Unknown Manga</string>
     <string name="unknown_source">Unknown source</string>
+    
+    <string name="reader_mode_webtoon">Webtoon</string>
+    <string name="reader_mode_left_to_right">left to right</string>
 </resources>

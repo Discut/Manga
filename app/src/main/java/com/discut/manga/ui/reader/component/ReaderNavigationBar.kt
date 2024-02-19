@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import com.discut.manga.preference.ReaderMode
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -24,6 +25,7 @@ fun ReaderNavigationBar(
     visibility: Boolean = false,
     mangaTitle: String?,
     chapterTitle: String?,
+    readerMode: ReaderMode,
 
     currentPage: Int,
     pageCount: Int,
@@ -33,6 +35,7 @@ fun ReaderNavigationBar(
     onSliderChangeFinished: (() -> Unit)? = null,
     onNextChapter: () -> Unit,
     onPreviousChapter: () -> Unit,
+    onClickReaderMode: () -> Unit,
     onClickSettings: () -> Unit,
 
     onBackActionClick: () -> Unit,
@@ -64,6 +67,7 @@ fun ReaderNavigationBar(
             visibility = visibility
         ) {
             ReaderNavigationBottomBar(
+                readerMode = readerMode,
                 currentPage = currentPage,
                 pageCount = pageCount,
                 enableNextChapter = enableNextChapter,
@@ -72,6 +76,7 @@ fun ReaderNavigationBar(
                 onNextChapter = onNextChapter,
                 onPreviousChapter = onPreviousChapter,
                 onClickSettings = onClickSettings,
+                onClickReaderMode = onClickReaderMode,
                 onSliderChangeFinished = onSliderChangeFinished
             )
         }

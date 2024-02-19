@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="reader_mode_webtoon">条漫</string>
+    <string name="reader_click_nav_menu">菜单</string>
+    <string name="reader_click_nav_next">下一章</string>
+    <string name="back">返回</string>
+    <string name="unknown_manga_title">无法识别的漫画</string>
+    <string name="unknown_source">无法识别的资源</string>
+    <string name="reader_mode_left_to_right">从左到右</string>
+</resources>

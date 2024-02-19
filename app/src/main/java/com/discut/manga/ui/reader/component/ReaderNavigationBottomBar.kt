@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Timelapse
@@ -18,16 +17,16 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.core.view.WindowCompat
+import com.discut.manga.preference.ReaderMode
 
 @Composable
 fun ReaderNavigationBottomBar(
     modifier: Modifier = Modifier,
+    readerMode: ReaderMode,
     currentPage: Int,
     pageCount: Int,
     enableNextChapter: Boolean,
@@ -36,6 +35,7 @@ fun ReaderNavigationBottomBar(
     onNextChapter: () -> Unit,
     onPreviousChapter: () -> Unit,
     onClickSettings: () -> Unit,
+    onClickReaderMode: () -> Unit,
     onSliderChangeFinished: (() -> Unit)? = null
 ) {
     val backgroundColor = MaterialTheme.colorScheme
@@ -72,6 +72,12 @@ fun ReaderNavigationBottomBar(
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            IconButton(onClick = onClickReaderMode) {
+                Icon(
+                    painter = painterResource(id = readerMode.iconRes),
+                    contentDescription = ""
+                )
+            }
 
             IconButton(onClick = onClickSettings) {
                 Icon(
