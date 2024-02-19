@@ -44,6 +44,7 @@ class HorizontalPagesContainer(
         readerActivity.findViewById<FrameLayout>(R.id.page_container)
             .addView(pageViewContainer)
     }
+
     fun createContainer(context: Context): PagesView = PagesView(context, true)
     override fun onScrolled(index: Int?) {
         TODO("Not yet implemented")

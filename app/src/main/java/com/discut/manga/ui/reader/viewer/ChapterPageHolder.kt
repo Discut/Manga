@@ -30,10 +30,6 @@ class ChapterPageHolder(
         loadJob = MainScope().launch {
             loadPage()
         }
-        /*        layoutParams = ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )*/
     }
 
     private suspend fun loadPage() {

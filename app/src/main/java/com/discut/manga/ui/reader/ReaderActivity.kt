@@ -19,15 +19,18 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import com.discut.manga.R
+import com.discut.manga.preference.ReaderMode
 import com.discut.manga.ui.base.BaseActivity
 import com.discut.manga.ui.common.LoadingScreen
 import com.discut.manga.ui.main.MainActivity
+import com.discut.manga.ui.reader.adapter.PageViewerAdapter
 import com.discut.manga.ui.reader.adapter.RecyclerPagesViewAdapter
 import com.discut.manga.ui.reader.component.BottomSheetMenu
 import com.discut.manga.ui.reader.component.ReaderModeSheetMenu
 import com.discut.manga.ui.reader.component.ReaderNavigationBar
 import com.discut.manga.ui.reader.domain.ReaderActivityEffect
 import com.discut.manga.ui.reader.domain.ReaderActivityEvent
+import com.discut.manga.ui.reader.viewer.container.HorizontalPagesContainer
 import com.discut.manga.ui.reader.viewer.container.PagesContainer
 import com.discut.manga.ui.reader.viewer.container.VerticalPagesContainer
 import com.discut.manga.ui.reader.viewer.domain.ReaderChapter
@@ -187,7 +190,7 @@ class ReaderActivity : BaseActivity() {
             val chapterState = it.currentChapters?.currReaderChapter?.state
             if (oldChapterState != chapterState) {
                 oldChapterState = chapterState
-                handleChapterStateChange(chapterState)
+                handleChapterStateChange(chapterState, it.readerMode)
             }
             handleMenuStateChange(it.isMenuShow)
         }
@@ -208,7 +211,7 @@ class ReaderActivity : BaseActivity() {
         }
     }
 
-    private fun handleChapterStateChange(chapterState: ReaderChapter.State?) {
+    private fun handleChapterStateChange(chapterState: ReaderChapter.State?, readerMode: ReaderMode) {
         when (chapterState) {
             is ReaderChapter.State.Error -> {
                 toast(chapterState.error.message)
@@ -216,12 +219,29 @@ class ReaderActivity : BaseActivity() {
             }
 
             is ReaderChapter.State.Loaded -> {
-                val horizontalPagesContainer = VerticalPagesContainer(vm, this)
-                pagesContainer = horizontalPagesContainer
-                val pageViewerAdapter = RecyclerPagesViewAdapter(this, chapterState.pages)
-                horizontalPagesContainer.adapter = pageViewerAdapter
-                horizontalPagesContainer.isVisible = true
-                //pageViewer.adapter = pageViewerAdapter
+                when (readerMode) {
+                    ReaderMode.WEBTOON -> {
+                        val verticalPagesContainer = VerticalPagesContainer(vm, this)
+                        pagesContainer = verticalPagesContainer
+                        val pageViewerAdapter = RecyclerPagesViewAdapter(this, chapterState.pages)
+                        verticalPagesContainer.adapter = pageViewerAdapter
+                        verticalPagesContainer.isVisible = true
+                        //pageViewer.adapter = pageViewerAdapter
+
+                    }
+                    ReaderMode.LEFT_TO_RIGHT -> {
+                        val horizontalPagesContainer = HorizontalPagesContainer(vm, this)
+                        pagesContainer = horizontalPagesContainer
+                        val pageViewerAdapter = PageViewerAdapter(this, chapterState.pages)
+                        horizontalPagesContainer.adapter = pageViewerAdapter
+                        horizontalPagesContainer.isVisible = true
+
+                    }
+                }
+            }
+
+            is ReaderChapter.State.ReLoaded -> {
+
             }
 
             ReaderChapter.State.Loading -> {

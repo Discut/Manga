@@ -67,7 +67,7 @@ open class PageView @JvmOverloads constructor(
                 )
                 setOnClickListener { /*this@ReaderPageImageView.onViewClicked()*/ }
             }
-        addView(content, MATCH_PARENT, WRAP_CONTENT)
+        addView(content, MATCH_PARENT, MATCH_PARENT)
         (content as? SubsamplingScaleImageView)?.apply {
             setDoubleTapZoomDuration(100)
             setMinimumScaleType(config.minimumScaleType)

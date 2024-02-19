@@ -26,8 +26,8 @@ class PageViewerAdapter(context: Context, readerPages: List<ReaderPage>) : IPage
             is ReaderPage.ChapterPage -> {
                 ChapterPageHolder(container.context, page).apply {
                     layoutParams = ViewGroup.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT
                     )
                 }
             }
