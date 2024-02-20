@@ -18,7 +18,7 @@ class ChapterPageHolder(
     context: Context,
     //private val readerPage: ReaderPage.ChapterPage,
     attrs: AttributeSet? = null,
-) : PageView(context, attrs) {
+) : PageView(context, attrs),IPageView {
 
     private val imageLoadProgress: ReaderProgressIndicatorComponent =
         ReaderProgressIndicatorComponent(context)
@@ -84,6 +84,12 @@ class ChapterPageHolder(
                     }
                 }
             }
+        }
+    }
+
+    override fun bind(readerPage: ReaderPage) {
+        if (readerPage is ReaderPage.ChapterPage) {
+            bind(readerPage)
         }
     }
 

@@ -6,6 +6,8 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.viewpager.widget.PagerAdapter
 import com.discut.manga.ui.reader.viewer.ChapterPageHolder
+import com.discut.manga.ui.reader.viewer.IPageView
+import com.discut.manga.ui.reader.viewer.PageTransitionView
 import com.discut.manga.ui.reader.viewer.domain.ReaderPage
 
 class PageViewerAdapter(context: Context, readerPages: List<ReaderPage>) : IPagesViewAdapter,
@@ -33,9 +35,7 @@ class PageViewerAdapter(context: Context, readerPages: List<ReaderPage>) : IPage
                 }
             }
 
-            IPagesViewAdapter.PageType.TRANSITION_VIEW -> TextView(container.context).apply {
-
-            }
+            IPagesViewAdapter.PageType.TRANSITION_VIEW -> PageTransitionView(container.context)
 
             // else -> throw NotImplementedError("Unsupported page type: $page")
         }
@@ -49,8 +49,11 @@ class PageViewerAdapter(context: Context, readerPages: List<ReaderPage>) : IPage
 
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
         val view = createPageView(container, readerPages[position])
-        if (view is ChapterPageHolder && readerPages[position] is ReaderPage.ChapterPage) {
+        /*if (view is ChapterPageHolder && readerPages[position] is ReaderPage.ChapterPage) {
             view.bind(readerPages[position] as ReaderPage.ChapterPage)
+        }*/
+        if (view is IPageView) {
+            view.bind(readerPages[position])
         }
         container.addView(view)
         return view
@@ -66,10 +69,16 @@ class PageViewerAdapter(context: Context, readerPages: List<ReaderPage>) : IPage
     }
 
     override fun getItemPosition(obj: Any): Int {
-        val position = readerPages.indexOf(obj as ReaderPage)
+        if (obj is ReaderPage.ChapterPage) {
+            val position = readerPages.indexOf(obj)
+            if (position != -1) {
+                return position
+            }
+        }
+/*        val position = readerPages.indexOf(obj)
         if (position != -1) {
             return position
-        }
+        }*/
         return POSITION_NONE
     }
 }

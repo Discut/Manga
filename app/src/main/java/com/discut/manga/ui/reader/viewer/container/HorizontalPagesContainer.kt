@@ -14,6 +14,7 @@ import com.discut.manga.ui.reader.navigation.BaseReaderClickNavigation
 import com.discut.manga.ui.reader.navigation.LShapeNavigation
 import com.discut.manga.ui.reader.utils.transformToAction
 import com.discut.manga.ui.reader.viewer.PagesView
+import com.discut.manga.ui.reader.viewer.domain.ReaderChapter
 import com.discut.manga.ui.reader.viewer.domain.ReaderPage
 
 class HorizontalPagesContainer(
@@ -23,6 +24,8 @@ class HorizontalPagesContainer(
     private var pageViewContainer: PagesView = createContainer(readerActivity)
 
     private lateinit var _adapter: PageViewerAdapter
+
+    private var waitSwitch: ReaderChapter? = null
 
     /**
      * 'pvc' means 'page viewer container'
@@ -90,9 +93,24 @@ class HorizontalPagesContainer(
                 readerViewModel.sendEvent(
                     ReaderActivityEvent.PageSelected(position)
                 )
+                val state = readerViewModel.uiState.value.currentChapters?.currReaderChapter?.state
+                if (state is ReaderChapter.State.Loaded) {
+                    if (state.pages.contains(page).not() && waitSwitch != null) {
+                        readerViewModel.sendEvent(
+                            ReaderActivityEvent.SwitchToChapter(waitSwitch!!)
+                        )
+                    } else {
+                        waitSwitch = null
+                    }
+                }
             }
 
-            is ReaderPage.ChapterTransition -> TODO()
+            is ReaderPage.ChapterTransition -> {
+                waitSwitch =
+                    if (readerViewModel.uiState.value.currentChapters?.currReaderChapter == page.currChapter) {
+                        page.prevChapter
+                    } else page.currChapter
+            }
         }
     }
 
@@ -105,7 +123,13 @@ class HorizontalPagesContainer(
     }
 
     override fun setPages(pages: List<ReaderPage>) {
+        val currentItem = pageViewContainer.currentItem
         adapter.setPages(pages)
+        if (currentItem == 1) {
+            moveToPage(2 + pages.size - 6)
+        }else{
+            moveToPage(3)
+        }
     }
 
 

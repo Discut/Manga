@@ -16,7 +16,7 @@ import com.discut.manga.ui.reader.component.ChapterTransition
 import com.discut.manga.ui.reader.viewer.domain.ReaderPage
 
 class PageTransitionView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
-    AbstractComposeView(context, attrs) {
+    AbstractComposeView(context, attrs),IPageView {
 
     private var transitionDate: ReaderPage.ChapterTransition? by mutableStateOf(null)
 
@@ -40,6 +40,12 @@ class PageTransitionView @JvmOverloads constructor(context: Context, attrs: Attr
             ) {
                 ChapterTransition(chapterTransition = transitionDate!!)
             }
+        }
+    }
+
+    override fun bind(readerPage: ReaderPage) {
+        if (readerPage is ReaderPage.ChapterTransition) {
+            bind(readerPage)
         }
     }
 
