@@ -36,7 +36,9 @@ class ChapterPageHolder(
 
     fun bind(readerPage: ReaderPage.ChapterPage){
         this.readerPage = readerPage
-        addView(imageLoadProgress)
+        if (readerPage.state != PageState.READY) {
+            addView(imageLoadProgress)
+        }
         loadJob = MainScope().launch {
             loadPage()
         }

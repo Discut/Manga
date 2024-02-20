@@ -2,9 +2,11 @@ package com.discut.manga.ui.reader.viewer.container
 
 import android.content.Context
 import android.graphics.PointF
+import android.util.Log
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.view.isVisible
+import androidx.viewpager.widget.ViewPager
 import com.discut.manga.R
 import com.discut.manga.ui.reader.ReaderActivity
 import com.discut.manga.ui.reader.ReaderViewModel
@@ -26,6 +28,28 @@ class HorizontalPagesContainer(
     private lateinit var _adapter: PageViewerAdapter
 
     private var waitSwitch: ReaderChapter? = null
+
+    private var awaitingIdlePages: List<ReaderPage>? = null
+
+    private var isIdle = true
+        set(value) {
+            field = value
+            if (value) {
+                val prevPosition = pageViewContainer.currentItem
+                awaitingIdlePages?.let { pages ->
+                    setPagesInternal(pages)
+                    awaitingIdlePages = null
+                    if (prevPosition == 1){
+                        pageViewContainer.setCurrentItem(pages.size - 4, false)
+                    }else{
+                        pageViewContainer.setCurrentItem(3, false)
+                    }
+                    /*if (pages.currChapter.pages?.size == 1) {
+                        adapter.nextTransition?.to?.let(activity::requestPreloadChapter)
+                    }*/
+                }
+            }
+        }
 
     /**
      * 'pvc' means 'page viewer container'
@@ -75,6 +99,13 @@ class HorizontalPagesContainer(
             setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
                 onScrolled()
             }
+
+            addOnPageChangeListener(object :
+                ViewPager.SimpleOnPageChangeListener() {
+                override fun onPageScrollStateChanged(state: Int) {
+                    isIdle = state == ViewPager.SCROLL_STATE_IDLE
+                }
+            })
         }
         _pvcContainer = readerActivity.findViewById<FrameLayout>(R.id.page_container)
             .apply {
@@ -123,13 +154,27 @@ class HorizontalPagesContainer(
     }
 
     override fun setPages(pages: List<ReaderPage>) {
-        val currentItem = pageViewContainer.currentItem
+        Log.d("HorizontalPagesContainer", "setPages isIdle $isIdle")
+
+        if (isIdle) {
+            Log.d("HorizontalPagesContainer", "setPages")
+            setPagesInternal(pages)
+        } else {
+            awaitingIdlePages = pages
+        }
+/*        val currentItem = pageViewContainer.currentItem
         adapter.setPages(pages)
         if (currentItem == 1) {
             moveToPage(2 + pages.size - 6)
-        }else{
+        } else {
             moveToPage(3)
-        }
+        }*/
+    }
+
+    private fun setPagesInternal(pages: List<ReaderPage>) {
+        Log.d("HorizontalPagesContainer", "setPagesInternal")
+        // val currentItem = pageViewContainer.currentItem
+        adapter.setPages(pages)
     }
 
 

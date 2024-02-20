@@ -41,6 +41,7 @@ class PageViewerAdapter(context: Context, readerPages: List<ReaderPage>) : IPage
         }
     }
 
+
     override fun destroyItem(container: ViewGroup, position: Int, obj: Any) {
         val view = obj as View
         destroyPageView(container, position, view)

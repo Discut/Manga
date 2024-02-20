@@ -48,6 +48,7 @@
 -keep interface com.google.firebase.installations.** { *; }
 
 -keep class manga.core.preference.** { *; }
+-keep class com.discut.manga.preference.** { *; }
 -keep class com.discut.manga.ui.security.SecurityPreference { *; }
 
 -dontwarn com.oracle.svm.core.annotate.AutomaticFeature
