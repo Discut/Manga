@@ -13,6 +13,8 @@ import com.discut.manga.ui.reader.domain.CurrentChapters
 import com.discut.manga.ui.reader.domain.ReaderActivityEffect
 import com.discut.manga.ui.reader.domain.ReaderActivityEvent
 import com.discut.manga.ui.reader.domain.ReaderActivityState
+import com.discut.manga.ui.reader.utils.getNextOrNull
+import com.discut.manga.ui.reader.utils.getPrevOrNull
 import com.discut.manga.ui.reader.viewer.domain.ReaderChapter
 import com.discut.manga.ui.reader.viewer.domain.ReaderPage
 import com.discut.manga.ui.reader.viewer.loader.ChapterLoader
@@ -113,21 +115,24 @@ class ReaderViewModel @Inject constructor(
 
             is ReaderActivityEvent.ReaderModeChange -> {
                 pref.readerMode = event.mode
-                state.currentChapters?.apply {
-                    copy(
-                        prevReaderChapter = prevReaderChapter,
-                        currReaderChapter = currReaderChapter.apply {
-                            state.copy(
-
-                            )
-                        }
-                    )
-                }
                 state.copy(
                     readerMode = event.mode,
                     currentChapters = state.currentChapters?.copy(
                         prevReaderChapter = state.currentChapters.prevReaderChapter
-                    ))
+                    )
+                )
+            }
+
+            is ReaderActivityEvent.SwitchToChapter -> {
+                val manga = state.manga ?: return state
+                val source = sourceManager.get(state.manga.source) ?: return state
+                val currentChapters = withIOContext {
+                    val chapterLoader = ChapterLoader(App.instance, manga, source)
+                    buildViewerChapters(chapterLoader, state.readerChapters, event.chapter)
+                }
+                state.copy(
+                    currentChapters = currentChapters
+                )
             }
 
         }
@@ -179,14 +184,21 @@ class ReaderViewModel @Inject constructor(
         chapters: List<ReaderChapter>,
         chapter: ReaderChapter
     ): CurrentChapters {
-        loader.loadChapter(chapter)
-
         val index = chapters.indexOf(chapter)
 
+        loader.loadChapter(chapter)
+        val prev = chapters.getPrevOrNull(index)?.apply {
+            loader.loadChapter(this)
+        }
+        val next = chapters.getNextOrNull(index)?.apply {
+            loader.loadChapter(this)
+        }
+
+
         return CurrentChapters(
-            chapters.getOrNull(index - 1),
+            prev,
             chapter,
-            chapters.getOrNull(index + 1)
+            next
         )
     }
 }

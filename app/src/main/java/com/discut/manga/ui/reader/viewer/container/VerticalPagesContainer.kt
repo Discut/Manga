@@ -127,7 +127,18 @@ class VerticalPagesContainer(
                 )
             }
 
-            is ReaderPage.ChapterTransition -> TODO()
+            is ReaderPage.ChapterTransition -> {
+                val switchTo =
+                    if (readerViewModel.uiState.value.currentChapters?.currReaderChapter == page.currChapter) {
+                        page.prevChapter
+                    } else page.currChapter
+                switchTo?.apply {
+                    readerViewModel.sendEvent {
+                        ReaderActivityEvent.SwitchToChapter(switchTo)
+                    }
+                }
+
+            }
         }
     }
 
@@ -140,6 +151,10 @@ class VerticalPagesContainer(
     override fun destroy() {
         container.removeAllViews()
         readerActivity.findViewById<FrameLayout>(R.id.page_container).removeView(this)
+    }
+
+    override fun setPages(pages: List<ReaderPage>) {
+        adapter.setPages(pages)
     }
 
 

@@ -44,7 +44,10 @@ sealed class ReaderPage(var isLoad: Boolean = false) {
 
     }
 
-    class ChapterTransition : ReaderPage(true)
+    class ChapterTransition(
+        val prevChapter: ReaderChapter?,
+        val currChapter: ReaderChapter?,
+    ) : ReaderPage(true)
 
 
 }

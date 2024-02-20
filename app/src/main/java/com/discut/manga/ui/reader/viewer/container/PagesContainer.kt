@@ -1,5 +1,7 @@
 package com.discut.manga.ui.reader.viewer.container
 
+import com.discut.manga.ui.reader.viewer.domain.ReaderPage
+
 interface PagesContainer {
 
 
@@ -10,5 +12,7 @@ interface PagesContainer {
     fun moveToPage(position: Int)
 
     fun destroy()
+
+    fun setPages(pages: List<ReaderPage>)
 
 }

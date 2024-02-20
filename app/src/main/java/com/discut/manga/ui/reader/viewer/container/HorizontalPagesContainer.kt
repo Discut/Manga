@@ -104,6 +104,10 @@ class HorizontalPagesContainer(
         _pvcContainer.removeAllViews()
     }
 
+    override fun setPages(pages: List<ReaderPage>) {
+        adapter.setPages(pages)
+    }
+
 
     private fun changeMenuVisible(visible: Boolean) {
         if (visible == readerViewModel.uiState.value.isMenuShow) {

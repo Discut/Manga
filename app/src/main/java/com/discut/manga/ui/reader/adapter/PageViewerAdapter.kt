@@ -21,10 +21,11 @@ class PageViewerAdapter(context: Context, readerPages: List<ReaderPage>) : IPage
         return view === obj
     }
 
-    override fun createPageView(container: ViewGroup, position: Int): View {
-        return when (val page = readerPages[position]) {
-            is ReaderPage.ChapterPage -> {
-                ChapterPageHolder(container.context, page).apply {
+    override fun createPageView(container: ViewGroup, type: IPagesViewAdapter.PageType): View {
+        return when (type) {
+            IPagesViewAdapter.PageType.PAGE_VIEW -> {
+                // ChapterPageHolder(container.context, page).apply {
+                ChapterPageHolder(container.context).apply {
                     layoutParams = ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.MATCH_PARENT
@@ -32,7 +33,7 @@ class PageViewerAdapter(context: Context, readerPages: List<ReaderPage>) : IPage
                 }
             }
 
-            is ReaderPage.ChapterTransition -> TextView(container.context).apply {
+            IPagesViewAdapter.PageType.TRANSITION_VIEW -> TextView(container.context).apply {
 
             }
 
@@ -47,13 +48,21 @@ class PageViewerAdapter(context: Context, readerPages: List<ReaderPage>) : IPage
     }
 
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
-        val view = createPageView(container, position)
+        val view = createPageView(container, readerPages[position])
+        if (view is ChapterPageHolder && readerPages[position] is ReaderPage.ChapterPage) {
+            view.bind(readerPages[position] as ReaderPage.ChapterPage)
+        }
         container.addView(view)
         return view
     }
 
     override fun destroyPageView(container: ViewGroup, position: Int, view: View) {
         // TODO("Not yet implemented")
+    }
+
+    override fun setPages(pages: List<ReaderPage>) {
+        readerPages = pages.toMutableList()
+        notifyDataSetChanged()
     }
 
     override fun getItemPosition(obj: Any): Int {

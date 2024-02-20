@@ -27,6 +27,7 @@ import com.discut.manga.ui.reader.adapter.RecyclerPagesViewAdapter
 import com.discut.manga.ui.reader.component.BottomSheetMenu
 import com.discut.manga.ui.reader.component.ReaderModeSheetMenu
 import com.discut.manga.ui.reader.component.ReaderNavigationBar
+import com.discut.manga.ui.reader.domain.CurrentChapters
 import com.discut.manga.ui.reader.domain.ReaderActivityEffect
 import com.discut.manga.ui.reader.domain.ReaderActivityEvent
 import com.discut.manga.ui.reader.viewer.container.HorizontalPagesContainer
@@ -162,9 +163,7 @@ class ReaderActivity : BaseActivity() {
                 onReaderModeChange = {
                     vm.sendEvent(ReaderActivityEvent.ReaderModeChange(it))
                     if (state.currentChapters?.currReaderChapter?.state is ReaderChapter.State.Loaded) {
-                        val chapterState =
-                            state.currentChapters?.currReaderChapter?.state as ReaderChapter.State.Loaded
-                        showPages(chapterState.pages, it)
+                        buildPagesContainerAndShow(state.currentChapters!!.pages, it, true)
                     }
                 }) {
                 showReaderModeSheet = false
@@ -190,12 +189,32 @@ class ReaderActivity : BaseActivity() {
         }*/
 
     private fun handleUiState() {
-        var oldChapterState: ReaderChapter.State? = null
+        /*        var oldChapterState: ReaderChapter.State? = null
+                vm.collectState {
+                    val currentChapters = it.currentChapters
+                    val chapterState = currentChapters?.currReaderChapter?.state
+                    if (oldChapterState != chapterState) {
+                        oldChapterState = chapterState
+                        handleChapterStateChange(chapterState, it.readerMode)
+                    }
+                    handleMenuStateChange(it.isMenuShow)
+                }*/
+        var oldCurrentChapters: CurrentChapters? = null
         vm.collectState {
-            val chapterState = it.currentChapters?.currReaderChapter?.state
-            if (oldChapterState != chapterState) {
-                oldChapterState = chapterState
-                handleChapterStateChange(chapterState, it.readerMode)
+            it.currentChapters?.let { currentChapters ->
+                val offset =
+                    if (currentChapters.prevReaderChapter?.state is ReaderChapter.State.Loaded) {
+                        3
+                    } else -1
+                if (currentChapters != oldCurrentChapters) {
+                    handleChapterStateChange(
+                        currentChapters.currReaderChapter.state,
+                        currentChapters.pages,
+                        offset,
+                        it.readerMode
+                    )
+                }
+                oldCurrentChapters = currentChapters
             }
             handleMenuStateChange(it.isMenuShow)
         }
@@ -218,6 +237,8 @@ class ReaderActivity : BaseActivity() {
 
     private fun handleChapterStateChange(
         chapterState: ReaderChapter.State?,
+        allPages: List<ReaderPage>,
+        offset: Int,
         readerMode: ReaderMode
     ) {
         when (chapterState) {
@@ -226,7 +247,12 @@ class ReaderActivity : BaseActivity() {
                 finish()
             }
 
-            is ReaderChapter.State.Loaded -> showPages(chapterState.pages, readerMode)
+            is ReaderChapter.State.Loaded -> buildPagesContainerAndShow(
+                allPages,
+                readerMode,
+                false,
+                offset
+            )//showPages(chapterState.pages, readerMode)
 
             ReaderChapter.State.Loading -> {
 
@@ -243,7 +269,17 @@ class ReaderActivity : BaseActivity() {
     /**
      * Show pages of loaded on screen.
      */
-    private fun showPages(pages: List<ReaderPage>, readerMode: ReaderMode) {
+    private fun buildPagesContainerAndShow(
+        pages: List<ReaderPage>,
+        readerMode: ReaderMode,
+        isForce: Boolean = false,
+        offset: Int = -1
+    ) {
+        if (isForce.not() && pagesContainer != null) {
+            resetPages(pages, offset)
+            return
+        }
+
         pagesContainer?.destroy()
         when (readerMode) {
             ReaderMode.WEBTOON -> {
@@ -251,6 +287,9 @@ class ReaderActivity : BaseActivity() {
                 pagesContainer = verticalPagesContainer
                 val pageViewerAdapter = RecyclerPagesViewAdapter(this, pages)
                 verticalPagesContainer.adapter = pageViewerAdapter
+                if (offset > 0 && offset < pageViewerAdapter.itemCount) {
+                    verticalPagesContainer.moveToPage(offset)
+                }
                 verticalPagesContainer.isVisible = true
                 //pageViewer.adapter = pageViewerAdapter
 
@@ -261,9 +300,19 @@ class ReaderActivity : BaseActivity() {
                 pagesContainer = horizontalPagesContainer
                 val pageViewerAdapter = PageViewerAdapter(this, pages)
                 horizontalPagesContainer.adapter = pageViewerAdapter
+                if (offset > 0 && offset < pageViewerAdapter.count) {
+                    horizontalPagesContainer.moveToPage(offset)
+                }
                 horizontalPagesContainer.isVisible = true
 
             }
+        }
+
+    }
+
+    private fun resetPages(pages: List<ReaderPage>, offset: Int = -1) {
+        pagesContainer?.apply {
+            setPages(pages)
         }
     }
 

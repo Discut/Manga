@@ -16,7 +16,7 @@ import kotlinx.coroutines.supervisorScope
 @SuppressLint("ViewConstructor")
 class ChapterPageHolder(
     context: Context,
-    private val readerPage: ReaderPage.ChapterPage,
+    //private val readerPage: ReaderPage.ChapterPage,
     attrs: AttributeSet? = null,
 ) : PageView(context, attrs) {
 
@@ -25,7 +25,17 @@ class ChapterPageHolder(
 
     private var loadJob: Job? = null
 
-    init {
+    private lateinit var readerPage: ReaderPage.ChapterPage
+
+/*    init {
+        addView(imageLoadProgress)
+        loadJob = MainScope().launch {
+            loadPage()
+        }
+    }*/
+
+    fun bind(readerPage: ReaderPage.ChapterPage){
+        this.readerPage = readerPage
         addView(imageLoadProgress)
         loadJob = MainScope().launch {
             loadPage()

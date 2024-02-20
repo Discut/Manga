@@ -20,8 +20,10 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import manga.core.preference.HistoryPreference
 import manga.core.preference.PreferenceManager
+import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 import kotlin.math.abs
 
@@ -91,16 +93,69 @@ class HistoryViewModel @Inject constructor(
         }
     }
 
+    private fun categorizeHistoriesByDate(histories: List<MangaChapterHistory>): List<HistoryAction> {
+        histories.sortedBy { it.readAt }
+        val today = Calendar.getInstance()
+            .apply {
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+
+        val yesterday = Calendar.getInstance()
+            .apply {
+                add(Calendar.DATE, -1)
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+
+        val dateMap = mutableMapOf<String, MutableList<MangaChapterHistory>>()
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+
+
+        for (history in histories) {
+            val objDate = Calendar.getInstance()
+            objDate.time = history.readAt.toDate()
+            objDate.set(Calendar.HOUR_OF_DAY, 0)
+            objDate.set(Calendar.MINUTE, 0)
+            objDate.set(Calendar.SECOND, 0)
+            objDate.set(Calendar.MILLISECOND, 0)
+
+            when (objDate) {
+                today -> dateMap.getOrPut("Today") { mutableListOf() }.add(history)
+                yesterday -> dateMap.getOrPut("Yesterday") { mutableListOf() }.add(history)
+                else -> dateMap.getOrPut(dateFormat.format(objDate.time)) { mutableListOf() }
+                    .add(history)
+            }
+        }
+
+        val result = mutableListOf<HistoryAction>()
+        dateMap.keys.forEach {
+            result.add(HistoryAction.Header(it))
+            result.addAll(dateMap[it]!!.map { HistoryAction.Item(it) })
+        }
+        return result
+    }
+
+    @Deprecated("use categorizeHistoriesByDate instead")
     private fun paresDateToHistoryAction(histories: List<MangaChapterHistory>): List<HistoryAction> {
         var lastHistoryDate = Date(System.currentTimeMillis() + (24 * 60 * 60 * 1000))
         val historyActions: MutableList<HistoryAction> = mutableListOf()
         histories.forEachIndexed { _, mangaChapterHistory ->
             mangaChapterHistory.readAt.toDate().let {
                 if (abs(lastHistoryDate.rinse().time - it.rinse().time - 24 * 60 * 60 * 1000) < 1000 * 5) {
-                    historyActions.add(
-                        HistoryAction.Header(paresDateString(it))
-                    )
-                    lastHistoryDate = it
+                    val paresDateString = paresDateString(it)
+                    if (historyActions.filterIsInstance<HistoryAction.Header>()
+                            .count { it.title == paresDateString } == 0
+                    ) {
+                        historyActions.add(
+                            HistoryAction.Header(paresDateString)
+                        )
+                        lastHistoryDate = it
+                    }
                 }
                 historyActions.add(
                     HistoryAction.Item(mangaChapterHistory)
@@ -110,6 +165,7 @@ class HistoryViewModel @Inject constructor(
         return historyActions
     }
 
+    @Deprecated("use categorizeHistoriesByDate instead")
     private fun paresDateString(date: Date): String {
         val now = Date()
         val diff = now.time - date.time
@@ -133,10 +189,15 @@ class HistoryViewModel @Inject constructor(
         historyProvider
             .subscribeAll()
             .combine(uiState.value.queryKeyFlow) { histories, query ->
-                paresDateToHistoryAction(
+                /*paresDateToHistoryAction(
                     histories
                         .sortedBy { it.readAt }
                         .filter { it.mangaTitle.contains(query) }.reversed()
+                )*/
+                categorizeHistoriesByDate(
+                    histories
+                    .sortedBy { it.readAt }
+                    .filter { it.mangaTitle.contains(query) }.reversed()
                 )
             }.stateIn(CoroutineScope(Dispatchers.IO))
 

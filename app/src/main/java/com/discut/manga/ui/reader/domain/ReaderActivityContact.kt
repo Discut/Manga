@@ -37,6 +37,8 @@ sealed interface ReaderActivityEvent : UiEvent {
 
     data class ReaderModeChange(val mode: ReaderMode) : ReaderActivityEvent
 
+    data class SwitchToChapter(val chapter: ReaderChapter) : ReaderActivityEvent
+
 }
 
 sealed interface ReaderActivityEffect : UiEffect {
