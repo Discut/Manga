@@ -1,12 +1,12 @@
-package com.discut.manga.ui.reader.viewer
+package com.discut.manga.ui.reader.viewer.vertical
 
 import android.content.Context
 import android.view.View
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.discut.manga.ui.reader.viewer.domain.ReaderPage
+import com.discut.manga.ui.reader.page.PageTransitionView
+import com.discut.manga.ui.reader.domain.ReaderPage
 
-class RecyclerTransitionHolder(
+class VerticalTransitionHolder(
     private val context: Context,
     private val content: View
 ) : RecyclerView.ViewHolder(content) {

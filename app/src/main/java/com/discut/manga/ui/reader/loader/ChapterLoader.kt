@@ -1,8 +1,8 @@
-package com.discut.manga.ui.reader.viewer.loader
+package com.discut.manga.ui.reader.loader
 
 import android.content.Context
 import com.discut.manga.data.toSChapter
-import com.discut.manga.ui.reader.viewer.domain.ReaderChapter
+import com.discut.manga.ui.reader.domain.ReaderChapter
 import com.discut.manga.util.withIOContext
 import discut.manga.data.chapter.Chapter
 import discut.manga.data.manga.Manga

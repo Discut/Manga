@@ -1,6 +1,6 @@
-package com.discut.manga.ui.reader.viewer.loader
+package com.discut.manga.ui.reader.loader
 
-import com.discut.manga.ui.reader.viewer.domain.ReaderPage
+import com.discut.manga.ui.reader.domain.ReaderPage
 import java.io.File
 
 class LocalPageLoader(val file: File) : IPageLoader {

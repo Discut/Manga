@@ -1,11 +1,14 @@
-package com.discut.manga.ui.reader.viewer
+package com.discut.manga.ui.reader.viewer.horizontal
 
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
+import android.util.Log
 import com.discut.manga.components.reader.ReaderProgressIndicatorComponent
-import com.discut.manga.ui.reader.viewer.domain.PageState
-import com.discut.manga.ui.reader.viewer.domain.ReaderPage
+import com.discut.manga.ui.reader.page.IPageView
+import com.discut.manga.ui.reader.page.PageView
+import com.discut.manga.ui.reader.domain.PageState
+import com.discut.manga.ui.reader.domain.ReaderPage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
@@ -14,11 +17,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 
 @SuppressLint("ViewConstructor")
-class ChapterPageHolder(
+class HorizontalPageHolder(
     context: Context,
     //private val readerPage: ReaderPage.ChapterPage,
     attrs: AttributeSet? = null,
-) : PageView(context, attrs),IPageView {
+) : PageView(context, attrs), IPageView {
 
     private val imageLoadProgress: ReaderProgressIndicatorComponent =
         ReaderProgressIndicatorComponent(context)
@@ -27,20 +30,24 @@ class ChapterPageHolder(
 
     private lateinit var readerPage: ReaderPage.ChapterPage
 
-/*    init {
-        addView(imageLoadProgress)
-        loadJob = MainScope().launch {
-            loadPage()
-        }
-    }*/
-
-    fun bind(readerPage: ReaderPage.ChapterPage){
-        this.readerPage = readerPage
-        if (readerPage.state != PageState.READY) {
+    /*    init {
             addView(imageLoadProgress)
-        }
-        loadJob = MainScope().launch {
-            loadPage()
+            loadJob = MainScope().launch {
+                loadPage()
+            }
+        }*/
+
+    fun bind(readerPage: ReaderPage.ChapterPage) {
+        this.readerPage = readerPage
+        Log.d("ChapterPageHolder", "bind: ${readerPage.state}")
+        when (readerPage.state) {
+            PageState.READY -> showImage(readerPage)
+            else -> {
+                addView(imageLoadProgress)
+                loadJob = MainScope().launch {
+                    loadPage()
+                }
+            }
         }
     }
 
@@ -74,9 +81,7 @@ class ChapterPageHolder(
                         }
 
                         PageState.READY -> {
-                            readerPage.streamGetter?.invoke()?.let { stream ->
-                                setupPageContent(stream)
-                            }
+                            showImage(readerPage)
                             imageLoadProgress.hide()
                         }
 
@@ -86,6 +91,15 @@ class ChapterPageHolder(
                     }
                 }
             }
+        }
+    }
+
+    private fun showImage(readerPage: ReaderPage.ChapterPage) {
+        if (readerPage.state != PageState.READY) {
+            return
+        }
+        readerPage.streamGetter?.invoke()?.let {
+            setupPageContent(it)
         }
     }
 

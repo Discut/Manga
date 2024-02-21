@@ -1,6 +1,6 @@
 package com.discut.manga.ui.reader.utils
 
-import com.discut.manga.ui.reader.viewer.domain.ReaderChapter
+import com.discut.manga.ui.reader.domain.ReaderChapter
 
 fun List<ReaderChapter>.getPrevOrNull(index: Int): ReaderChapter? =
     if (isAscending)

@@ -1,4 +1,4 @@
-package com.discut.manga.ui.reader.viewer.domain
+package com.discut.manga.ui.reader.domain
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

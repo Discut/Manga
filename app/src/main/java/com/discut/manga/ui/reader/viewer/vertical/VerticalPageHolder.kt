@@ -1,4 +1,4 @@
-package com.discut.manga.ui.reader.viewer
+package com.discut.manga.ui.reader.viewer.vertical
 
 import android.content.Context
 import android.content.res.Resources
@@ -7,17 +7,17 @@ import android.widget.FrameLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.discut.manga.components.reader.ReaderProgressIndicatorComponent
-import com.discut.manga.ui.reader.viewer.domain.PageState
-import com.discut.manga.ui.reader.viewer.domain.ReaderPage
+import com.discut.manga.ui.reader.page.PageView
+import com.discut.manga.ui.reader.domain.PageState
+import com.discut.manga.ui.reader.domain.ReaderPage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 
-class RecyclerPageHolder(
+class VerticalPageHolder(
     private val context: Context,
     private val content: PageView
 ) : RecyclerView.ViewHolder(content) {

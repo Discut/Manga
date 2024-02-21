@@ -1,4 +1,4 @@
-package com.discut.manga.ui.reader.viewer.container
+package com.discut.manga.ui.reader.viewer.vertical
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -13,15 +13,12 @@ import androidx.recyclerview.widget.WebtoonLayoutManager
 import com.discut.manga.R
 import com.discut.manga.ui.reader.ReaderActivity
 import com.discut.manga.ui.reader.ReaderViewModel
-import com.discut.manga.ui.reader.adapter.RecyclerPagesViewAdapter
 import com.discut.manga.ui.reader.domain.ReaderActivityEvent
 import com.discut.manga.ui.reader.navigation.BaseReaderClickNavigation.NavigationRegion
 import com.discut.manga.ui.reader.navigation.LShapeNavigation
 import com.discut.manga.ui.reader.utils.transformToAction
-import com.discut.manga.ui.reader.viewer.RecyclerPagesView
-import com.discut.manga.ui.reader.viewer.domain.ReaderPage
-import com.discut.manga.ui.reader.viewer.scrollDown
-import com.discut.manga.ui.reader.viewer.scrollUp
+import com.discut.manga.ui.reader.viewer.PagesContainer
+import com.discut.manga.ui.reader.domain.ReaderPage
 
 @SuppressLint("ViewConstructor")
 class VerticalPagesContainer(
@@ -29,13 +26,13 @@ class VerticalPagesContainer(
     private val readerActivity: ReaderActivity
 ) : PagesContainer, FrameLayout(readerActivity) {
 
-    private var container: RecyclerPagesView = createContainer(readerActivity)
+    private var container: VerticalPagesView = createContainer(readerActivity)
 
     private var layoutManager: WebtoonLayoutManager = WebtoonLayoutManager(readerActivity)
 
 
-    private lateinit var _adapter: RecyclerPagesViewAdapter
-    var adapter: RecyclerPagesViewAdapter
+    private lateinit var _adapter: VerticalPagesViewAdapter
+    var adapter: VerticalPagesViewAdapter
         get() = _adapter
         set(value) {
             container.adapter = value
@@ -116,7 +113,7 @@ class VerticalPagesContainer(
      */
     private val focusLength = resources.displayMetrics.heightPixels * 3 / 4
 
-    fun createContainer(context: Context): RecyclerPagesView = RecyclerPagesView(context)
+    fun createContainer(context: Context): VerticalPagesView = VerticalPagesView(context)
     override fun onScrolled(index: Int?) {
         val position = index ?: layoutManager.findLastEndVisibleItemPosition()
         val page = adapter.readerPages.getOrNull(position) ?: return

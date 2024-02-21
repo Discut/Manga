@@ -1,7 +1,7 @@
 package com.discut.manga.ui.reader.loader
 
 import androidx.annotation.CallSuper
-import com.discut.manga.ui.reader.viewer.domain.ReaderPage
+import com.discut.manga.ui.reader.domain.ReaderPage
 
 /**
  * A loader used to load pages into the reader. Any open resources must be cleaned up when the

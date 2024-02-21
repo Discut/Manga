@@ -1,4 +1,4 @@
-package com.discut.manga.ui.reader.viewer
+package com.discut.manga.ui.reader.page
 
 import android.content.Context
 import android.graphics.PointF
@@ -6,7 +6,6 @@ import android.graphics.drawable.BitmapDrawable
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
-import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.FrameLayout
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes

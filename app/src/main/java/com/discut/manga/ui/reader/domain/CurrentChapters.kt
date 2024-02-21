@@ -1,8 +1,5 @@
 package com.discut.manga.ui.reader.domain
 
-import com.discut.manga.ui.reader.viewer.domain.ReaderChapter
-import com.discut.manga.ui.reader.viewer.domain.ReaderPage
-
 data class CurrentChapters(
     val prevReaderChapter: ReaderChapter?,
     val currReaderChapter: ReaderChapter,

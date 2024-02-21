@@ -1,12 +1,12 @@
-package com.discut.manga.ui.reader.viewer.loader
+package com.discut.manga.ui.reader.loader
 
 import com.discut.manga.data.generateHashKey
 import com.discut.manga.data.toSChapter
 import com.discut.manga.service.cache.ImageCache
 import com.discut.manga.service.cache.PagesCache
 import com.discut.manga.service.cache.instance
-import com.discut.manga.ui.reader.viewer.domain.PageState
-import com.discut.manga.ui.reader.viewer.domain.ReaderPage
+import com.discut.manga.ui.reader.domain.PageState
+import com.discut.manga.ui.reader.domain.ReaderPage
 import discut.manga.data.chapter.Chapter
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope

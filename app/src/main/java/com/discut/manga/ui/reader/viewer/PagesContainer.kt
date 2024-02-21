@@ -1,6 +1,6 @@
-package com.discut.manga.ui.reader.viewer.container
+package com.discut.manga.ui.reader.viewer
 
-import com.discut.manga.ui.reader.viewer.domain.ReaderPage
+import com.discut.manga.ui.reader.domain.ReaderPage
 
 interface PagesContainer {
 

@@ -15,10 +15,10 @@ import com.discut.manga.ui.reader.domain.ReaderActivityEvent
 import com.discut.manga.ui.reader.domain.ReaderActivityState
 import com.discut.manga.ui.reader.utils.getNextOrNull
 import com.discut.manga.ui.reader.utils.getPrevOrNull
-import com.discut.manga.ui.reader.viewer.domain.ReaderChapter
-import com.discut.manga.ui.reader.viewer.domain.ReaderPage
-import com.discut.manga.ui.reader.viewer.loader.ChapterLoader
-import com.discut.manga.ui.reader.viewer.loader.IChapterLoader
+import com.discut.manga.ui.reader.domain.ReaderChapter
+import com.discut.manga.ui.reader.domain.ReaderPage
+import com.discut.manga.ui.reader.loader.ChapterLoader
+import com.discut.manga.ui.reader.loader.IChapterLoader
 import com.discut.manga.util.get
 import com.discut.manga.util.launchIO
 import com.discut.manga.util.withIOContext

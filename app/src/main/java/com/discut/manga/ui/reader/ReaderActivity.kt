@@ -22,19 +22,19 @@ import com.discut.manga.preference.ReaderMode
 import com.discut.manga.ui.base.BaseActivity
 import com.discut.manga.ui.common.LoadingScreen
 import com.discut.manga.ui.main.MainActivity
-import com.discut.manga.ui.reader.adapter.PageViewerAdapter
-import com.discut.manga.ui.reader.adapter.RecyclerPagesViewAdapter
+import com.discut.manga.ui.reader.viewer.horizontal.HorizontalPageViewerAdapter
+import com.discut.manga.ui.reader.viewer.vertical.VerticalPagesViewAdapter
 import com.discut.manga.ui.reader.component.BottomSheetMenu
 import com.discut.manga.ui.reader.component.ReaderModeSheetMenu
 import com.discut.manga.ui.reader.component.ReaderNavigationBar
 import com.discut.manga.ui.reader.domain.CurrentChapters
 import com.discut.manga.ui.reader.domain.ReaderActivityEffect
 import com.discut.manga.ui.reader.domain.ReaderActivityEvent
-import com.discut.manga.ui.reader.viewer.container.HorizontalPagesContainer
-import com.discut.manga.ui.reader.viewer.container.PagesContainer
-import com.discut.manga.ui.reader.viewer.container.VerticalPagesContainer
-import com.discut.manga.ui.reader.viewer.domain.ReaderChapter
-import com.discut.manga.ui.reader.viewer.domain.ReaderPage
+import com.discut.manga.ui.reader.viewer.horizontal.HorizontalPagesContainer
+import com.discut.manga.ui.reader.viewer.PagesContainer
+import com.discut.manga.ui.reader.viewer.vertical.VerticalPagesContainer
+import com.discut.manga.ui.reader.domain.ReaderChapter
+import com.discut.manga.ui.reader.domain.ReaderPage
 import com.discut.manga.util.setComposeContent
 import com.discut.manga.util.toast
 import dagger.hilt.android.AndroidEntryPoint
@@ -285,7 +285,7 @@ class ReaderActivity : BaseActivity() {
             ReaderMode.WEBTOON -> {
                 val verticalPagesContainer = VerticalPagesContainer(vm, this)
                 pagesContainer = verticalPagesContainer
-                val pageViewerAdapter = RecyclerPagesViewAdapter(this, pages)
+                val pageViewerAdapter = VerticalPagesViewAdapter(this, pages)
                 verticalPagesContainer.adapter = pageViewerAdapter
                 if (offset > 0 && offset < pageViewerAdapter.itemCount) {
                     verticalPagesContainer.moveToPage(offset)
@@ -298,9 +298,9 @@ class ReaderActivity : BaseActivity() {
             ReaderMode.LEFT_TO_RIGHT -> {
                 val horizontalPagesContainer = HorizontalPagesContainer(vm, this)
                 pagesContainer = horizontalPagesContainer
-                val pageViewerAdapter = PageViewerAdapter(this, pages)
-                horizontalPagesContainer.adapter = pageViewerAdapter
-                if (offset > 0 && offset < pageViewerAdapter.count) {
+                val horizontalPageViewerAdapter = HorizontalPageViewerAdapter(pages)
+                horizontalPagesContainer.adapter = horizontalPageViewerAdapter
+                if (offset > 0 && offset < horizontalPageViewerAdapter.count) {
                     horizontalPagesContainer.moveToPage(offset)
                 }
                 horizontalPagesContainer.isVisible = true

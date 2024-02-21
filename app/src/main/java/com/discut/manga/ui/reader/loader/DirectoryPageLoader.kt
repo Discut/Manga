@@ -1,9 +1,8 @@
-package com.discut.manga.ui.reader.viewer.loader
+package com.discut.manga.ui.reader.loader
 
 import android.content.Context
-import com.discut.manga.ui.reader.viewer.domain.PageState
-import com.discut.manga.ui.reader.viewer.domain.ReaderPage
-import discut.manga.source.local.disk.LocalSourceFileSystem
+import com.discut.manga.ui.reader.domain.PageState
+import com.discut.manga.ui.reader.domain.ReaderPage
 import manga.core.utils.ImageUtil
 import manga.core.utils.compareToCaseInsensitiveNaturalOrder
 import java.io.File

@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.discut.manga.theme.padding
-import com.discut.manga.ui.reader.viewer.domain.ReaderPage
+import com.discut.manga.ui.reader.domain.ReaderPage
 import com.discut.manga.ui.util.isNull
 import java.text.SimpleDateFormat
 import java.util.Date

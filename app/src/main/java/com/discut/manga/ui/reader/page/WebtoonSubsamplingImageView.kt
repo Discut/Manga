@@ -1,4 +1,4 @@
-package com.discut.manga.ui.reader.viewer
+package com.discut.manga.ui.reader.page
 
 import android.annotation.SuppressLint
 import android.content.Context

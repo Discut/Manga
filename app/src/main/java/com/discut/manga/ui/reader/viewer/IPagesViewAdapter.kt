@@ -1,8 +1,8 @@
-package com.discut.manga.ui.reader.adapter
+package com.discut.manga.ui.reader.viewer
 
 import android.view.View
 import android.view.ViewGroup
-import com.discut.manga.ui.reader.viewer.domain.ReaderPage
+import com.discut.manga.ui.reader.domain.ReaderPage
 
 interface IPagesViewAdapter {
     enum class PageType {

@@ -1,4 +1,4 @@
-package com.discut.manga.ui.reader.viewer
+package com.discut.manga.ui.reader.viewer.horizontal
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -7,7 +7,7 @@ import androidx.viewpager.widget.DirectionalViewPager
 import com.discut.manga.ui.reader.GestureDetectorWithLongTap
 
 @SuppressLint("ViewConstructor")
-open class PagesView(context: Context, isHorizontal: Boolean = true) :
+open class HorizontalPagesView(context: Context, isHorizontal: Boolean = true) :
     DirectionalViewPager(context, isHorizontal) {
 
     private val gestureDetector = GestureDetectorWithLongTap(context, GestureListener())

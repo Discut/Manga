@@ -1,4 +1,4 @@
-package com.discut.manga.ui.reader.viewer
+package com.discut.manga.ui.reader.page
 
 import android.content.Context
 import android.util.AttributeSet
@@ -13,10 +13,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.AbstractComposeView
 import com.discut.manga.theme.MangaTheme
 import com.discut.manga.ui.reader.component.ChapterTransition
-import com.discut.manga.ui.reader.viewer.domain.ReaderPage
+import com.discut.manga.ui.reader.domain.ReaderPage
 
-class PageTransitionView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
-    AbstractComposeView(context, attrs),IPageView {
+open class PageTransitionView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
+    AbstractComposeView(context, attrs), IPageView {
 
     private var transitionDate: ReaderPage.ChapterTransition? by mutableStateOf(null)
 

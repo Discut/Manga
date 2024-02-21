@@ -1,7 +1,6 @@
-package com.discut.manga.ui.reader.viewer.domain
+package com.discut.manga.ui.reader.domain
 
 import androidx.compose.runtime.mutableStateOf
-import com.discut.manga.preference.ReaderMode
 import discut.manga.data.chapter.Chapter
 
 class ReaderChapter(

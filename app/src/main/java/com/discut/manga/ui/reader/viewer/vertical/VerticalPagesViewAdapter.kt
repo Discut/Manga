@@ -1,19 +1,18 @@
-package com.discut.manga.ui.reader.adapter
+package com.discut.manga.ui.reader.viewer.vertical
 
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.discut.manga.ui.reader.adapter.IPagesViewAdapter.PageType.PAGE_VIEW
-import com.discut.manga.ui.reader.adapter.IPagesViewAdapter.PageType.TRANSITION_VIEW
-import com.discut.manga.ui.reader.viewer.PageTransitionView
-import com.discut.manga.ui.reader.viewer.PageView
-import com.discut.manga.ui.reader.viewer.RecyclerPageHolder
-import com.discut.manga.ui.reader.viewer.RecyclerTransitionHolder
-import com.discut.manga.ui.reader.viewer.domain.ReaderPage
+import com.discut.manga.ui.reader.viewer.IPagesViewAdapter.PageType.PAGE_VIEW
+import com.discut.manga.ui.reader.viewer.IPagesViewAdapter.PageType.TRANSITION_VIEW
+import com.discut.manga.ui.reader.page.PageTransitionView
+import com.discut.manga.ui.reader.page.PageView
+import com.discut.manga.ui.reader.domain.ReaderPage
+import com.discut.manga.ui.reader.viewer.IPagesViewAdapter
 
-class RecyclerPagesViewAdapter(private val context: Context, readerPages: List<ReaderPage>) :
+class VerticalPagesViewAdapter(private val context: Context, readerPages: List<ReaderPage>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>(), IPagesViewAdapter {
 
     var readerPages: MutableList<ReaderPage> = readerPages.toMutableList()
@@ -23,8 +22,8 @@ class RecyclerPagesViewAdapter(private val context: Context, readerPages: List<R
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (val view =
             createPageView(parent, IPagesViewAdapter.PageType.entries[viewType])) {
-            is PageView -> RecyclerPageHolder(context, view)
-            is PageTransitionView -> RecyclerTransitionHolder(context, view)
+            is PageView -> VerticalPageHolder(context, view)
+            is PageTransitionView -> VerticalTransitionHolder(context, view)
             else -> throw IllegalStateException("Unknown view type ${view.javaClass}")
         }
     }
@@ -43,13 +42,13 @@ class RecyclerPagesViewAdapter(private val context: Context, readerPages: List<R
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
-            is RecyclerPageHolder -> {
+            is VerticalPageHolder -> {
                 (readerPages[position] as? ReaderPage.ChapterPage)?.let {
                     holder.bind(it)
                 }
             }
 
-            is RecyclerTransitionHolder -> {
+            is VerticalTransitionHolder -> {
                 (readerPages[position] as? ReaderPage.ChapterTransition)?.let {
                     holder.bind(it)
                 }

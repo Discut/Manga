@@ -1,4 +1,4 @@
-package com.discut.manga.ui.reader.viewer.container
+package com.discut.manga.ui.reader.viewer.horizontal
 
 import android.content.Context
 import android.graphics.PointF
@@ -10,22 +10,21 @@ import androidx.viewpager.widget.ViewPager
 import com.discut.manga.R
 import com.discut.manga.ui.reader.ReaderActivity
 import com.discut.manga.ui.reader.ReaderViewModel
-import com.discut.manga.ui.reader.adapter.PageViewerAdapter
 import com.discut.manga.ui.reader.domain.ReaderActivityEvent
 import com.discut.manga.ui.reader.navigation.BaseReaderClickNavigation
 import com.discut.manga.ui.reader.navigation.LShapeNavigation
 import com.discut.manga.ui.reader.utils.transformToAction
-import com.discut.manga.ui.reader.viewer.PagesView
-import com.discut.manga.ui.reader.viewer.domain.ReaderChapter
-import com.discut.manga.ui.reader.viewer.domain.ReaderPage
+import com.discut.manga.ui.reader.viewer.PagesContainer
+import com.discut.manga.ui.reader.domain.ReaderChapter
+import com.discut.manga.ui.reader.domain.ReaderPage
 
 class HorizontalPagesContainer(
     private val readerViewModel: ReaderViewModel,
     readerActivity: ReaderActivity
 ) : PagesContainer {
-    private var pageViewContainer: PagesView = createContainer(readerActivity)
+    private var pageViewContainer: HorizontalPagesView = createContainer(readerActivity)
 
-    private lateinit var _adapter: PageViewerAdapter
+    private lateinit var _adapter: HorizontalPageViewerAdapter
 
     private var waitSwitch: ReaderChapter? = null
 
@@ -56,7 +55,7 @@ class HorizontalPagesContainer(
      */
     private var _pvcContainer: FrameLayout
 
-    var adapter: PageViewerAdapter
+    var adapter: HorizontalPageViewerAdapter
         set(a) {
             _adapter = a
             pageViewContainer.adapter = _adapter
@@ -93,6 +92,8 @@ class HorizontalPagesContainer(
                         moveToPage(currentItem - 1)
                         changeMenuVisible(false)
                     }
+
+                    else -> {}
                 }
             }
 
@@ -114,7 +115,7 @@ class HorizontalPagesContainer(
 
     }
 
-    fun createContainer(context: Context): PagesView = PagesView(context, true)
+    fun createContainer(context: Context): HorizontalPagesView = HorizontalPagesView(context, true)
     override fun onScrolled(index: Int?) {
         changeMenuVisible(false)
         val position = index ?: pageViewContainer.currentItem
@@ -142,6 +143,8 @@ class HorizontalPagesContainer(
                         page.prevChapter
                     } else page.currChapter
             }
+
+            else -> {}
         }
     }
 

@@ -1,4 +1,4 @@
-package com.discut.manga.ui.reader.viewer
+package com.discut.manga.ui.reader.viewer.vertical
 
 import android.animation.AnimatorSet
 import android.animation.ValueAnimator
@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.discut.manga.ui.reader.GestureDetectorWithLongTap
 import kotlin.math.abs
 
-class RecyclerPagesView @JvmOverloads constructor(
+class VerticalPagesView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
@@ -296,11 +296,11 @@ class RecyclerPagesView @JvmOverloads constructor(
     }
 }
 
-fun RecyclerPagesView.scrollUp(length: Int) {
+fun VerticalPagesView.scrollUp(length: Int) {
     smoothScrollBy(0, -abs(length))
 }
 
-fun RecyclerPagesView.scrollDown(length: Int) {
+fun VerticalPagesView.scrollDown(length: Int) {
     smoothScrollBy(0, abs(length))
 }
 

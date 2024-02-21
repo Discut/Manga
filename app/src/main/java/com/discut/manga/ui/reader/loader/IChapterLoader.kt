@@ -1,6 +1,6 @@
-package com.discut.manga.ui.reader.viewer.loader
+package com.discut.manga.ui.reader.loader
 
-import com.discut.manga.ui.reader.viewer.domain.ReaderChapter
+import com.discut.manga.ui.reader.domain.ReaderChapter
 
 interface IChapterLoader {
 

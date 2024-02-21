@@ -1,7 +1,7 @@
 package com.discut.manga.ui.reader.loader
 
-import com.discut.manga.ui.reader.viewer.domain.PageState
-import com.discut.manga.ui.reader.viewer.domain.ReaderPage
+import com.discut.manga.ui.reader.domain.PageState
+import com.discut.manga.ui.reader.domain.ReaderPage
 import manga.core.utils.ImageUtil
 import manga.core.utils.compareToCaseInsensitiveNaturalOrder
 import java.io.File

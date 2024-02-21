@@ -6,7 +6,6 @@ import com.discut.core.mvi.contract.UiEffect
 import com.discut.core.mvi.contract.UiEvent
 import com.discut.core.mvi.contract.UiState
 import com.discut.manga.preference.ReaderMode
-import com.discut.manga.ui.reader.viewer.domain.ReaderChapter
 import discut.manga.data.manga.Manga
 
 @Immutable
