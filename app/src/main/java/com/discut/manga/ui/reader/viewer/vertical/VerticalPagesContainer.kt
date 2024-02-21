@@ -3,6 +3,7 @@ package com.discut.manga.ui.reader.viewer.vertical
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.PointF
+import android.util.Log
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.ViewGroup
@@ -14,11 +15,13 @@ import com.discut.manga.R
 import com.discut.manga.ui.reader.ReaderActivity
 import com.discut.manga.ui.reader.ReaderViewModel
 import com.discut.manga.ui.reader.domain.ReaderActivityEvent
+import com.discut.manga.ui.reader.domain.ReaderChapter
+import com.discut.manga.ui.reader.domain.ReaderPage
 import com.discut.manga.ui.reader.navigation.BaseReaderClickNavigation.NavigationRegion
 import com.discut.manga.ui.reader.navigation.LShapeNavigation
+import com.discut.manga.ui.reader.utils.getRealPosition
 import com.discut.manga.ui.reader.utils.transformToAction
 import com.discut.manga.ui.reader.viewer.PagesContainer
-import com.discut.manga.ui.reader.domain.ReaderPage
 
 @SuppressLint("ViewConstructor")
 class VerticalPagesContainer(
@@ -29,6 +32,8 @@ class VerticalPagesContainer(
     private var container: VerticalPagesView = createContainer(readerActivity)
 
     private var layoutManager: WebtoonLayoutManager = WebtoonLayoutManager(readerActivity)
+
+    private var waitSwitch: ReaderChapter? = null
 
 
     private lateinit var _adapter: VerticalPagesViewAdapter
@@ -120,21 +125,27 @@ class VerticalPagesContainer(
         when (page) {
             is ReaderPage.ChapterPage -> {
                 readerViewModel.sendEvent(
-                    ReaderActivityEvent.PageSelected(position)
+                    ReaderActivityEvent.PageSelected(adapter.readerPages.getRealPosition(position))
                 )
+
+                val state = readerViewModel.uiState.value.currentChapters?.currReaderChapter?.state
+                if (state is ReaderChapter.State.Loaded) {
+                    if (state.pages.contains(page).not() && waitSwitch != null) {
+                        readerViewModel.sendEvent(
+                            ReaderActivityEvent.SwitchToChapter(waitSwitch!!)
+                        )
+                    } else {
+                        waitSwitch = null
+                    }
+                }
             }
 
             is ReaderPage.ChapterTransition -> {
-                val switchTo =
+                Log.d("VerticalPagesContainer", "ChapterTransition")
+                waitSwitch =
                     if (readerViewModel.uiState.value.currentChapters?.currReaderChapter == page.currChapter) {
                         page.prevChapter
                     } else page.currChapter
-                switchTo?.apply {
-                    readerViewModel.sendEvent {
-                        ReaderActivityEvent.SwitchToChapter(switchTo)
-                    }
-                }
-
             }
         }
     }

@@ -2,7 +2,6 @@ package com.discut.manga.ui.reader.viewer.horizontal
 
 import android.content.Context
 import android.graphics.PointF
-import android.util.Log
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.view.isVisible
@@ -11,12 +10,14 @@ import com.discut.manga.R
 import com.discut.manga.ui.reader.ReaderActivity
 import com.discut.manga.ui.reader.ReaderViewModel
 import com.discut.manga.ui.reader.domain.ReaderActivityEvent
-import com.discut.manga.ui.reader.navigation.BaseReaderClickNavigation
-import com.discut.manga.ui.reader.navigation.LShapeNavigation
-import com.discut.manga.ui.reader.utils.transformToAction
-import com.discut.manga.ui.reader.viewer.PagesContainer
 import com.discut.manga.ui.reader.domain.ReaderChapter
 import com.discut.manga.ui.reader.domain.ReaderPage
+import com.discut.manga.ui.reader.navigation.BaseReaderClickNavigation
+import com.discut.manga.ui.reader.navigation.LShapeNavigation
+import com.discut.manga.ui.reader.utils.getIndexOfRealFirst
+import com.discut.manga.ui.reader.utils.getRealPosition
+import com.discut.manga.ui.reader.utils.transformToAction
+import com.discut.manga.ui.reader.viewer.PagesContainer
 
 class HorizontalPagesContainer(
     private val readerViewModel: ReaderViewModel,
@@ -38,9 +39,9 @@ class HorizontalPagesContainer(
                 awaitingIdlePages?.let { pages ->
                     setPagesInternal(pages)
                     awaitingIdlePages = null
-                    if (prevPosition == 1){
+                    if (prevPosition == 1) {
                         pageViewContainer.setCurrentItem(pages.size - 4, false)
-                    }else{
+                    } else {
                         pageViewContainer.setCurrentItem(3, false)
                     }
                     /*if (pages.currChapter.pages?.size == 1) {
@@ -123,8 +124,9 @@ class HorizontalPagesContainer(
         when (page) {
             is ReaderPage.ChapterPage -> {
                 readerViewModel.sendEvent(
-                    ReaderActivityEvent.PageSelected(position)
+                    ReaderActivityEvent.PageSelected(adapter.readerPages.getRealPosition(position))
                 )
+
                 val state = readerViewModel.uiState.value.currentChapters?.currReaderChapter?.state
                 if (state is ReaderChapter.State.Loaded) {
                     if (state.pages.contains(page).not() && waitSwitch != null) {
@@ -157,26 +159,14 @@ class HorizontalPagesContainer(
     }
 
     override fun setPages(pages: List<ReaderPage>) {
-        Log.d("HorizontalPagesContainer", "setPages isIdle $isIdle")
-
         if (isIdle) {
-            Log.d("HorizontalPagesContainer", "setPages")
             setPagesInternal(pages)
         } else {
             awaitingIdlePages = pages
         }
-/*        val currentItem = pageViewContainer.currentItem
-        adapter.setPages(pages)
-        if (currentItem == 1) {
-            moveToPage(2 + pages.size - 6)
-        } else {
-            moveToPage(3)
-        }*/
     }
 
     private fun setPagesInternal(pages: List<ReaderPage>) {
-        Log.d("HorizontalPagesContainer", "setPagesInternal")
-        // val currentItem = pageViewContainer.currentItem
         adapter.setPages(pages)
     }
 

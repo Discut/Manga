@@ -13,12 +13,13 @@ import com.discut.manga.ui.reader.domain.CurrentChapters
 import com.discut.manga.ui.reader.domain.ReaderActivityEffect
 import com.discut.manga.ui.reader.domain.ReaderActivityEvent
 import com.discut.manga.ui.reader.domain.ReaderActivityState
-import com.discut.manga.ui.reader.utils.getNextOrNull
-import com.discut.manga.ui.reader.utils.getPrevOrNull
 import com.discut.manga.ui.reader.domain.ReaderChapter
 import com.discut.manga.ui.reader.domain.ReaderPage
 import com.discut.manga.ui.reader.loader.ChapterLoader
 import com.discut.manga.ui.reader.loader.IChapterLoader
+import com.discut.manga.ui.reader.utils.getNextOrNull
+import com.discut.manga.ui.reader.utils.getPrevOrNull
+import com.discut.manga.ui.util.isNull
 import com.discut.manga.util.get
 import com.discut.manga.util.launchIO
 import com.discut.manga.util.withIOContext
@@ -60,7 +61,7 @@ class ReaderViewModel @Inject constructor(
                             initState.exceptionOrNull() ?: IllegalStateException("Unknown error")
                         sendEffect(ReaderActivityEffect.InitChapterError(exception))
                     }
-                    pair.second.currentChapters?.apply {
+                    /*pair.second.currentChapters?.apply {
                         withIOContext {
                             historyProvider.insert(
                                 MangaChapterHistory(
@@ -74,7 +75,9 @@ class ReaderViewModel @Inject constructor(
                                 )
                             )
                         }
-                    }
+                    }*/
+
+                    updateHistory(pair.second)
 
                     pair.second
                 }
@@ -132,7 +135,9 @@ class ReaderViewModel @Inject constructor(
                 }
                 state.copy(
                     currentChapters = currentChapters
-                )
+                ).apply {
+                    updateHistory(this)
+                }
             }
 
         }
@@ -171,6 +176,28 @@ class ReaderViewModel @Inject constructor(
             }
         }
     }
+
+    private suspend fun updateHistory(state: ReaderActivityState) =
+        withIOContext {
+            if (state.currentChapters.isNull()) {
+                return@withIOContext
+            }
+            if (state.manga.isNull()) {
+                return@withIOContext
+            }
+
+            historyProvider.insert(
+                MangaChapterHistory(
+                    historyId = SnowFlakeUtil.generateSnowFlake(),
+                    mangaId = state.manga!!.id,
+                    chapterId = state.currentChapters!!.currReaderChapter.dbChapter.id,
+                    mangaTitle = state.manga.title,
+                    chapterName = state.currentChapters.currReaderChapter.dbChapter.name,
+                    thumbnailUrl = state.manga.thumbnailUrl,
+                    readAt = System.currentTimeMillis(),
+                )
+            )
+        }
 
     private fun initChaptersForReader(chapters: List<Chapter>): List<ReaderChapter> {
         val readerChapters = chapters.map {
