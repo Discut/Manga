@@ -22,19 +22,20 @@ import com.discut.manga.preference.ReaderMode
 import com.discut.manga.ui.base.BaseActivity
 import com.discut.manga.ui.common.LoadingScreen
 import com.discut.manga.ui.main.MainActivity
-import com.discut.manga.ui.reader.viewer.horizontal.HorizontalPageViewerAdapter
-import com.discut.manga.ui.reader.viewer.vertical.VerticalPagesViewAdapter
 import com.discut.manga.ui.reader.component.BottomSheetMenu
 import com.discut.manga.ui.reader.component.ReaderModeSheetMenu
 import com.discut.manga.ui.reader.component.ReaderNavigationBar
 import com.discut.manga.ui.reader.domain.CurrentChapters
 import com.discut.manga.ui.reader.domain.ReaderActivityEffect
 import com.discut.manga.ui.reader.domain.ReaderActivityEvent
-import com.discut.manga.ui.reader.viewer.horizontal.HorizontalPagesContainer
-import com.discut.manga.ui.reader.viewer.PagesContainer
-import com.discut.manga.ui.reader.viewer.vertical.VerticalPagesContainer
 import com.discut.manga.ui.reader.domain.ReaderChapter
 import com.discut.manga.ui.reader.domain.ReaderPage
+import com.discut.manga.ui.reader.utils.getIndexOfRealFirst
+import com.discut.manga.ui.reader.viewer.PagesContainer
+import com.discut.manga.ui.reader.viewer.horizontal.HorizontalPageViewerAdapter
+import com.discut.manga.ui.reader.viewer.horizontal.HorizontalPagesContainer
+import com.discut.manga.ui.reader.viewer.vertical.VerticalPagesContainer
+import com.discut.manga.ui.reader.viewer.vertical.VerticalPagesViewAdapter
 import com.discut.manga.util.setComposeContent
 import com.discut.manga.util.toast
 import dagger.hilt.android.AndroidEntryPoint
@@ -202,15 +203,16 @@ class ReaderActivity : BaseActivity() {
         var oldCurrentChapters: CurrentChapters? = null
         vm.collectState {
             it.currentChapters?.let { currentChapters ->
-                val offset =
+/*                val offset =
                     if (currentChapters.prevReaderChapter?.state is ReaderChapter.State.Loaded) {
                         3
-                    } else -1
+                    } else -1*/
                 if (currentChapters != oldCurrentChapters) {
+                    val pages = currentChapters.pages
                     handleChapterStateChange(
                         currentChapters.currReaderChapter.state,
-                        currentChapters.pages,
-                        offset,
+                        pages,
+                        pages.getIndexOfRealFirst() + currentChapters.currReaderChapter.dbChapter.lastPageRead.toInt() - 1,
                         it.readerMode
                     )
                 }
