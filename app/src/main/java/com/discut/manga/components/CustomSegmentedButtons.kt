@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -36,12 +37,13 @@ fun CustomSegmentedButtons(
         modifier = modifier
             .clip(MaterialTheme.shapes.large)
             .border(width = 1.dp, color = Color.LightGray, shape = MaterialTheme.shapes.large)
+            .height(IntrinsicSize.Min)
 
     ) {
         var index = 0
         contents.items.forEach { (key, value) ->
             if (index > 0) {
-                VerticalDivider(modifier = Modifier.fillMaxHeight(), color = Color.LightGray)
+                VerticalDivider(modifier = Modifier/*.fillMaxHeight()*/, color = Color.LightGray)
             }
             Box(
                 modifier = Modifier
