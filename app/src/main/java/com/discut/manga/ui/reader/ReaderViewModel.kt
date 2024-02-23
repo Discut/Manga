@@ -44,7 +44,9 @@ class ReaderViewModel @Inject constructor(
 
     private val scope = viewModelScope
     override fun initialState(): ReaderActivityState = ReaderActivityState(
-        readerMode = pref.readerMode
+        readerMode = pref.readerMode,
+        isScreenOn = pref.screenOn,
+        readerBackgroundColor = pref.backgroundColor
     )
 
     override suspend fun handleEvent(
@@ -138,6 +140,16 @@ class ReaderViewModel @Inject constructor(
                 ).apply {
                     updateHistory(this)
                 }
+            }
+
+            is ReaderActivityEvent.ReaderScreenOnChange -> {
+                pref.screenOn = event.isScreenOn
+                state.copy(isScreenOn = event.isScreenOn)
+            }
+
+            is ReaderActivityEvent.ReaderBackgroundColorChange -> {
+                pref.backgroundColor = event.color
+                state.copy(readerBackgroundColor = event.color)
             }
 
         }

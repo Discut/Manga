@@ -3,10 +3,12 @@ package com.discut.manga.ui.reader.component
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalContentColor
@@ -25,6 +27,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import com.discut.manga.components.CustomModalBottomSheet
+import com.discut.manga.preference.ReaderBackgroundColor
+import com.discut.manga.preference.ReaderMode
 import com.discut.manga.theme.padding
 import com.discut.manga.util.launchUI
 
@@ -33,9 +37,16 @@ import com.discut.manga.util.launchUI
 fun BottomSheetMenu(
     modifier: Modifier = Modifier,
     isShow: Boolean = false,
+    isScreenOn: Boolean = false,
+    readerMode: ReaderMode,
+    backgroundColor: ReaderBackgroundColor,
+
     sheetState: SheetState = rememberModalBottomSheetState(),
     sheetMaxWidth: Dp = BottomSheetDefaults.SheetMaxWidth,
 
+    onReaderModeChange: (ReaderMode) -> Unit,
+    onScreenOnChange: (Boolean) -> Unit,
+    onBackgroundColorChange: (ReaderBackgroundColor) -> Unit,
     onDismissRequest: () -> Unit
 ) {
     CustomModalBottomSheet(
@@ -43,6 +54,7 @@ fun BottomSheetMenu(
         isShow = isShow,
         sheetState = sheetState,
         sheetMaxWidth = sheetMaxWidth,
+        isCustomPadding = true,
         onDismissRequest = onDismissRequest
     ) {
         val pages = listOf("Normal", "Read mode")
@@ -52,7 +64,10 @@ fun BottomSheetMenu(
         }
         BoxWithConstraints {
             Column(
-                modifier = Modifier.heightIn(min = maxHeight * 0.5f)
+                modifier = Modifier
+                    .height(maxHeight * 0.75f)
+                    .verticalScroll(rememberScrollState())
+                    .padding(it)
             ) {
                 TabRow(
                     selectedTabIndex = state.currentPage,
@@ -94,7 +109,14 @@ fun BottomSheetMenu(
                         }
 
                         "Read mode" -> {
-                            ReadModeSettingsSheet()
+                            ReadModeSettingsSheet(
+                                readerMode = readerMode,
+                                isScreenOn = isScreenOn,
+                                backgroundColor = backgroundColor,
+                                onBackgroundColorChange = onBackgroundColorChange,
+                                onReaderModeChange = onReaderModeChange,
+                                onScreenOnChange = onScreenOnChange
+                            )
                         }
 
                         else -> {

@@ -12,4 +12,8 @@
     
     <string name="reader_mode_webtoon">Webtoon</string>
     <string name="reader_mode_left_to_right">left to right</string>
+
+    <string name="reader_background_color_white">White</string>
+    <string name="reader_background_color_black">Black</string>
+    <string name="reader_background_color_gray">Gray</string>
 </resources>

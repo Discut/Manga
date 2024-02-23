@@ -5,6 +5,7 @@ import androidx.compose.runtime.Immutable
 import com.discut.core.mvi.contract.UiEffect
 import com.discut.core.mvi.contract.UiEvent
 import com.discut.core.mvi.contract.UiState
+import com.discut.manga.preference.ReaderBackgroundColor
 import com.discut.manga.preference.ReaderMode
 import discut.manga.data.manga.Manga
 
@@ -16,7 +17,9 @@ data class ReaderActivityState(
     val currentPage: Int = -1,
     val isMenuShow: Boolean = false,
 
-    val readerMode: ReaderMode
+    val readerMode: ReaderMode,
+    val isScreenOn: Boolean,
+    val readerBackgroundColor: ReaderBackgroundColor
 ) : UiState {
     val readerPages: Int by lazy {
         when (val chapterState = currentChapters?.currReaderChapter?.state) {
@@ -37,6 +40,10 @@ sealed interface ReaderActivityEvent : UiEvent {
     data class ReaderModeChange(val mode: ReaderMode) : ReaderActivityEvent
 
     data class SwitchToChapter(val chapter: ReaderChapter) : ReaderActivityEvent
+
+    data class ReaderBackgroundColorChange(val color: ReaderBackgroundColor) : ReaderActivityEvent
+
+    data class ReaderScreenOnChange(val isScreenOn: Boolean) : ReaderActivityEvent
 
 }
 

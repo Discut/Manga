@@ -155,18 +155,30 @@ class ReaderActivity : BaseActivity() {
                 }
             )
 
-            BottomSheetMenu(isShow = showBottomSheet) {
+            BottomSheetMenu(
+                isShow = showBottomSheet,
+                readerMode = state.readerMode,
+                isScreenOn = state.isScreenOn,
+                backgroundColor = state.readerBackgroundColor,
+                onReaderModeChange = ::readerModeChange,
+                onScreenOnChange = {
+                    vm.sendEvent {
+                        ReaderActivityEvent.ReaderScreenOnChange(it)
+                    }
+                },
+                onBackgroundColorChange = {
+                    vm.sendEvent {
+                        ReaderActivityEvent.ReaderBackgroundColorChange(it)
+                    }
+                }
+            ) {
                 showBottomSheet = false
             }
             ReaderModeSheetMenu(
                 isShow = showReaderModeSheet,
                 readerMode = state.readerMode,
-                onReaderModeChange = {
-                    vm.sendEvent(ReaderActivityEvent.ReaderModeChange(it))
-                    if (state.currentChapters?.currReaderChapter?.state is ReaderChapter.State.Loaded) {
-                        buildPagesContainerAndShow(state.currentChapters!!.pages, it, true)
-                    }
-                }) {
+                onReaderModeChange = ::readerModeChange
+            ) {
                 showReaderModeSheet = false
             }
             if (state.currentChapters == null ||
@@ -178,6 +190,14 @@ class ReaderActivity : BaseActivity() {
         }
 
 
+    }
+
+    private fun readerModeChange(mode: ReaderMode) {
+        val state = vm.uiState.value
+        vm.sendEvent(ReaderActivityEvent.ReaderModeChange(mode))
+        if (state.currentChapters?.currReaderChapter?.state is ReaderChapter.State.Loaded) {
+            buildPagesContainerAndShow(state.currentChapters.pages, mode, true)
+        }
     }
 
     /*    @Deprecated("Deprecated in Java")

@@ -28,6 +28,7 @@ fun CustomModalBottomSheet(
     sheetMaxWidth: Dp = BottomSheetDefaults.SheetMaxWidth,
 
     onDismissRequest: () -> Unit = {},
+    isCustomPadding: Boolean = false,
     content: @Composable ColumnScope.(PaddingValues) -> Unit
 ) {
     if (isShow) {
@@ -45,9 +46,12 @@ fun CustomModalBottomSheet(
             windowInsets = WindowInsets.captionBar,
             onDismissRequest = onDismissRequest,
         ) {
-            Column(modifier = Modifier.padding(bottomPadding)) {
+            if (isCustomPadding)
                 content.invoke(this, bottomPadding)
-            }
+            else
+                Column(modifier = Modifier.padding(bottomPadding)) {
+                    content.invoke(this, bottomPadding)
+                }
         }
     }
 }
